@@ -3,8 +3,11 @@ import React from 'react'
 export default function Login() {
   return (
     <>
-       <form>Login</form>
-        <p></p>
+       <form>Login
+      <input type='text' name='aaa'/>
+
+       </form>
+        <p>OOOOOOOOOOOOOOO</p>
     </>
  
   )
