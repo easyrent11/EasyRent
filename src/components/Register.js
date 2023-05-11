@@ -2,8 +2,11 @@ import React from 'react'
 
 export default function Register() {
   return (
-    <form>
-        
-    </form>
+    <>
+      <form>
+        <input/>
+        <input type='text'/>
+      </form>
+    </>
   )
 }
