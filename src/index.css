@@ -15,10 +15,11 @@ code {
 #root{
   display: flex;
   flex-direction: column;
+  font-weight: 500;
   align-items: center;
-  justify-content: center;
   width: 100%;
   background-color: #F6F6F6;
+  min-height: 100vh;
 }
 
 @import 'tailwindcss/base';

@@ -1,26 +1,43 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import Logo from "../components/Logo";
 export default function Header() {
   return (
-    <header className="w-full flex justify-around align-center border-2 border-black">
-      <h1 className="">EasyRent</h1>
-      <nav className="flex justify-end w-full p-6 m-3 border-black border-2">
-        <Link className="m-2" to="/Login">
-          Login
-        </Link>
-        <Link className="m-2" to="/Register">
-          Register
-        </Link>
-        <Link className="m-2" to="/">
-          Home
-        </Link>
-        <Link className="m-2" to="/about">
-          About
-        </Link>
-        <Link className="m-2" to="/contact">
-          Contact
-        </Link>
+    <header className="w-full flex justify-around align-center">
+      <nav className="flex justify-between w-full p-3 m-1">
+        <Logo/>
+        <div className="flex items-center justify-center w-1/2 ">
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/Login"
+          >
+            Login
+          </Link>
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/Register"
+          >
+            Register
+          </Link>
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/"
+          >
+            Home
+          </Link>
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/about"
+          >
+            About
+          </Link>
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/contact"
+          >
+            Contact
+          </Link>
+        </div>
       </nav>
     </header>
   );

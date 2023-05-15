@@ -20,7 +20,8 @@ export default function Login() {
   return (
     <>
       <section className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
-        <form className="bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg h-2/4">
+        <div className='bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg h-2/'>
+        <form>
           <div className="flex justify-end">
             <button
               type="button"
@@ -44,14 +45,14 @@ export default function Login() {
           >
             Login
           </button>
-        
-          <p className="text-center mt-10">
+        </form>
+        <p className="text-center mt-10">
           Forgot your password?
           <Link to="/login" className="p-2 text-[#CC6200]">
             Reset
           </Link>
           </p>
-        </form>
+        </div>
       </section>
     </>
   );

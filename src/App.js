@@ -3,6 +3,8 @@ import {BrowserRouter as Router, Routes,Route} from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
 import Register from './components/Register';
+import FirstSection from './pages/FirstSection/FirstSection';
+import SecondSection from './pages/SecondSection/SecondSection';
 function App() {
   return (
     <>
@@ -14,9 +16,11 @@ function App() {
           <Route path="/"/>
           <Route path="/about"/>
           <Route path="/contact"/>
-
         </Routes>
       </Router>
+      <FirstSection/>
+      <SecondSection/>
+    
     </>
   );
 }
