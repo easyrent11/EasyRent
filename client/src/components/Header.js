@@ -8,19 +8,19 @@ export default function Header() {
         <Logo/>
         <div className="flex items-center justify-center w-1/2 ">
           <Link
-            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            className="m-2 hover:text-[#CC6200]"
             to="/Login"
           >
             Login
           </Link>
           <Link
-            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            className="m-2 hover:text-[#CC6200]"
             to="/Register"
           >
             Register
           </Link>
           <Link
-            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            className="m-2 hover:text-[#CC6200] "
             to="/"
           >
             Home

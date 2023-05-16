@@ -9,7 +9,7 @@ export default function FirstSection() {
       <SearchCar/>
       <MainTitle/>
       </article>
-      <button className="bg-[#CC6200] w-2/2 p-3">Get Started Now</button>
+      <button className="bg-[#CC6200] rounded-md w-2/2 p-3">Get Started Now</button>
     </div>
   )
 }
