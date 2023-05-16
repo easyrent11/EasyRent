@@ -33,7 +33,10 @@ export default function SearchCarForm() {
   };
 
   return (
-    <form className="grid grid-cols-4 gap-4 p-4 w-5/6" onSubmit={handleSubmit}>
+    <form
+      className="grid grid-cols-4 gap-4 p-4 w-1/2"
+      onSubmit={handleSubmit}
+    >
       <div className="col-span-2 md:col-span-1">
         <Select
           id="location"
@@ -49,7 +52,7 @@ export default function SearchCarForm() {
           id="pickDate"
           value={pickDate}
           onChange={handlePickDateChange}
-          className="w-full"
+          className="w-full p-1.5 rounded-md"
         />
       </div>
 
@@ -59,7 +62,7 @@ export default function SearchCarForm() {
           id="returnDate"
           value={returnDate}
           onChange={handleReturnDateChange}
-          className="w-full"
+          className="w-full p-1.5  rounded-md"
         />
       </div>
 
@@ -72,9 +75,9 @@ export default function SearchCarForm() {
         />
       </div>
 
-      <div className="col-span-2">
+      <div className="col-span-5 flex justify-center items-center">
         <button
-          className="bg-black text-1xl text-white mx-0 m-auto p-1 w-1/2 md:w-3/5"
+          className="bg-black text-1xl mt-4 text-white p-1 w-1/2 md:w-2/5 rounded-md"
           type="submit"
         >
           Search
