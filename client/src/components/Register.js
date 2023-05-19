@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 
-export default function Register() {
+export default function Register({handleRegisterClose}) {
   // use state for all user credentials.
   // const [] = useState("");
   // const [] = useState("");
@@ -16,16 +16,15 @@ export default function Register() {
   // const [] = useState("");
 
   const [isOpen, setIsOpen] = useState(true);
-  const navigate = useNavigate();
-
-  const handleClose = () => {
-    setIsOpen(false);
-    navigate('/');
-  };
 
   if (!isOpen) {
     return null;
   }
+
+  function handleCloseAndReset(){
+    handleRegisterClose();
+    setIsOpen(false);
+  }    
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
@@ -34,7 +33,7 @@ export default function Register() {
           <button
             type="button"
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
-            onClick={handleClose}
+            onClick={handleCloseAndReset}
           >
             X
           </button>
