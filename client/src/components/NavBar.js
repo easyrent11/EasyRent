@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Logo from './Logo';
-import Login from './Login';
-import Register from './Register';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Logo from "./Logo";
+import Login from "./Login";
+import Register from "./Register";
 
 export default function NavBar() {
   const [loginState, setLoginState] = useState(false);
@@ -12,7 +12,7 @@ export default function NavBar() {
     setLoginState(true);
   }
 
-  function handleRegisterClick(){
+  function handleRegisterClick() {
     setRegisterState(true);
   }
 
@@ -29,18 +29,33 @@ export default function NavBar() {
       <nav className="flex justify-between items-center w-full p-1 m-1">
         <Logo />
         <div className="flex items-center justify-center w-1/2">
-          <button className="m-2 hover:text-[#CC6200]" onClick={handleLoginClick}>Login</button>
-          <button className="m-2 hover:text-[#CC6200]" onClick={handleRegisterClick}>Register</button>
-
           <Link className="m-2 hover:text-[#CC6200] " to="/">
             Home
           </Link>
-          <Link className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black" to="/about">
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/about"
+          >
             About
           </Link>
-          <Link className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black" to="/contact">
+          <Link
+            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            to="/contact"
+          >
             Contact
           </Link>
+          <button
+            className="m-2 hover:text-[#CC6200]"
+            onClick={handleLoginClick}
+          >
+            Login
+          </button>
+          <button
+            className="m-2 hover:text-[#CC6200]"
+            onClick={handleRegisterClick}
+          >
+            Register
+          </button>
         </div>
       </nav>
 
