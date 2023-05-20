@@ -1,10 +1,10 @@
 import React,{useContext} from 'react';
 import Car from '../components/Car';
-import {CarListContext} from '../CarListContext';
+import { CarListContext } from '../App';
 
 export default function SecondSection() {
-  // getting the list of cars from the Car List context.
   const ListOfCars = useContext(CarListContext);
+  console.log(ListOfCars);
   return (
     <>
       <div className="flex w-2/3 flex-col">

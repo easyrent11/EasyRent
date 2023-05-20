@@ -5,13 +5,16 @@ import Login from "./components/Login";
 import CarView from './components/CarView';
 import React from "react";
 import HomeLayout from "./pages/HomeLayout";
-import {CarListContext} from "./CarListContext";
+import NavBar from "./components/NavBar";
+import { createContext } from "react";
 
+export const CarListContext = createContext([]);
 
 
 function App() {
   const ListOfCars = [
     {
+      platesNumber:11122233,
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       Manufacturer: "Mercedes",
@@ -23,6 +26,7 @@ function App() {
       seats: 3,
     },
     {
+      platesNumber:11133344,
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       Manufacturer: "Mercedes",
@@ -34,6 +38,7 @@ function App() {
       seats: 1,
     },
     {
+      platesNumber:11122299,
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       Manufacturer: "Mercedes",
@@ -45,17 +50,19 @@ function App() {
       seats: 3,
     },
     {
+      platesNumber:11122237,
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
-      Manufacturer: "Mercedes",
-      Model: "E300",
-      year: 2019,
-      RentalPrice: 80,
-      gearbox: "manual",
-      luggage: 2,
-      seats: 3,
+      Manufacturer: "Toyota",
+      Model: "Corola",
+      year: 2005,
+      RentalPrice: 20,
+      gearbox: "auto",
+      luggage: 3,
+      seats: 5,
     },
     {
+      platesNumber:11121133,
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       Manufacturer: "Mercedes",
@@ -70,12 +77,14 @@ function App() {
 
   return (
     <Router>
+      <NavBar/>
       <CarListContext.Provider value={ListOfCars}>
         <Routes>
-          <Route path="/" element={<CarListContext.Provider value={ListOfCars}><HomeLayout /></CarListContext.Provider>} />
+          {/* <Route path="/" element={<CarListContext.Provider value={ListOfCars}><HomeLayout /></CarListContext.Provider>} /> */}
+          <Route path="/" element={<HomeLayout/>}/>
           <Route path="/Login" element={<Login />} />
           <Route path="/Register" element={<Register />} />
-          <Route path="/CarView" element={<CarView />} />
+          <Route path="/CarView/:platesNumber" element={<CarView />} />
           <Route path="/about" />
           <Route path="/contact" />
         </Routes>

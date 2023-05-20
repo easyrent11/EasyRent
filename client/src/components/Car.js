@@ -10,7 +10,7 @@ export default function Car({car}) {
 
       <div className='flex flex-col rounded-md w-1/4 items-center bg-[#FFFFFF] m-8 p-4 min-w-screen-2xl:w-1/5'>
         
-        <Link to={{ pathname: "/CarView", state: { car } }}>
+        <Link to={`/CarView/${car.platesNumber}`}>
           <figure className='flex items-center w-full h-40 justify-center'> 
             <img className="w-full h-full rounded-md " src={car.Image} alt="Logo" />
           </figure>
