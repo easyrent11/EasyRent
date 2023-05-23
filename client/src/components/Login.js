@@ -1,37 +1,28 @@
 import React, { useState } from 'react';
 import { Link} from 'react-router-dom';
 
-export default function Login({ handleClose }) {
+export default function Login({ onClose }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const [isOpen, setIsOpen] = useState(true);
 
-  function handleFormSubmit(e) {
-    e.preventDefault();
-    // Add your login logic here
-    console.log('Login form submitted');
-  }
-
-  function handleCloseAndReset() {
-    setIsOpen(false);
-    handleClose(); 
-  }
-
-  if (!isOpen) {
-    return null;
+  // handle the login submit.
+  const handleLogin = () => {
+    console.log("Logged in");
+    setUsername('');
+    setPassword('');
   }
 
   return (
     <>
       <section className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900 border-3">
         <div className="bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg h-2/">
-          <form onSubmit={handleFormSubmit}>
+          <form>
             <div className="flex justify-end">
               <button
                 type="button"
                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
-                onClick={handleCloseAndReset}
+                onClick={onClose}
               >
                 X
               </button>
@@ -59,6 +50,7 @@ export default function Login({ handleClose }) {
             <button
               type="submit"
               className="bg-[#CC6200] text-white px-4 py-2 rounded-md w-full mt-7"
+              onClick={handleLogin}
             >
               Login
             </button>

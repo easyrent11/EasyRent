@@ -1,29 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Logo from "./Logo";
-import Login from "./Login";
-import Register from "./Register";
 
-export default function NavBar() {
-  const [loginState, setLoginState] = useState(false);
-  const [registerState, setRegisterState] = useState(false);
-
-  function handleLoginClick() {
-    setLoginState(true);
-  }
-
-  function handleRegisterClick() {
-    setRegisterState(true);
-  }
-
-  function handleLoginClose() {
-    setLoginState(false);
-  }
-
-  function handleRegisterClose() {
-    setRegisterState(false);
-  }
-
+export default function NavBar({openLogin, openRegister}) {
+  
   return (
     <>
       <nav className="flex justify-between items-center w-full p-1 m-1">
@@ -33,34 +13,32 @@ export default function NavBar() {
             Home
           </Link>
           <Link
-            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            className="m-2 hover:text-[#CC6200]"
             to="/about"
           >
             About
           </Link>
           <Link
-            className="m-2 hover:text-[#CC6200] hover:border-b-2 border-black"
+            className="m-2 hover:text-[#CC6200] "
             to="/contact"
           >
             Contact
           </Link>
           <button
             className="m-2 hover:text-[#CC6200]"
-            onClick={handleLoginClick}
+            onClick={openLogin}
           >
             Login
           </button>
           <button
             className="m-2 hover:text-[#CC6200]"
-            onClick={handleRegisterClick}
+            onClick={openRegister}
           >
             Register
           </button>
         </div>
       </nav>
 
-      {loginState && <Login handleClose={handleLoginClose} />}
-      {registerState && <Register handleRegisterClose={handleRegisterClose} />}
     </>
   );
 }

@@ -2,23 +2,44 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
-import CarView from './components/CarView';
+import CarView from "./components/CarView";
 import React from "react";
 import HomeLayout from "./pages/HomeLayout";
 import NavBar from "./components/NavBar";
-import { createContext } from "react";
-
+import { createContext, useState } from "react";
+import Footer from "./components/Footer";
 export const CarListContext = createContext([]);
 
-
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+
+  const openLogin = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+  };
+
+  const openRegister = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+  };
+
+  const closeLogin = () => {
+    setShowLogin(false);
+  };
+
+  const closeRegister = () => {
+    setShowRegister(false);
+  };
+
   const ListOfCars = [
     {
-      platesNumber:11122233,
-      Images:[
+      platesNumber: 11122233,
+      profilePicture: "profileimage.png",
+      Images: [
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
         "https://stimg.cardekho.com/images/carexteriorimages/930x620/Mercedes-Benz/GLA/7269/1621948227508/front-left-side-47.jpg?tr=w-375",
-        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg"
+        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       ],
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
@@ -31,11 +52,12 @@ function App() {
       seats: 3,
     },
     {
-      platesNumber:11133344,
-      Images:[
+      platesNumber: 11133344,
+      profilePicture: "profileimage.png",
+      Images: [
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
-        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg"
+        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       ],
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
@@ -48,11 +70,12 @@ function App() {
       seats: 1,
     },
     {
-      platesNumber:11122299,
-      Images:[
+      platesNumber: 11122299,
+      profilePicture: "profileimage.png",
+      Images: [
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
-        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg"
+        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       ],
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
@@ -65,11 +88,12 @@ function App() {
       seats: 3,
     },
     {
-      platesNumber:11122237,
-      Images:[
+      platesNumber: 11122237,
+      profilePicture: "profileimage.png",
+      Images: [
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
-        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg"
+        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       ],
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
@@ -82,10 +106,11 @@ function App() {
       seats: 5,
     },
     {
-      platesNumber:11121133,
-      Images:[
+      platesNumber: 11121133,
+      profilePicture: "profileimage.png",
+      Images: [
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
-        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg"
+        "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
       ],
       Image:
         "http://www.mercedesbenzcary.com/static/agency-leith/mercedes-benz-cary/mr/2017/E-Class/2017-Mercedes-Benz-E-Class-main.jpg",
@@ -100,20 +125,26 @@ function App() {
   ];
 
   return (
-    <Router>
-      <NavBar/>
+    <>
       <CarListContext.Provider value={ListOfCars}>
-        <Routes>
-          {/* <Route path="/" element={<CarListContext.Provider value={ListOfCars}><HomeLayout /></CarListContext.Provider>} /> */}
-          <Route path="/" element={<HomeLayout/>}/>
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
-          <Route path="/CarView/:platesNumber" element={<CarView />} />
-          <Route path="/about" />
-          <Route path="/contact" />
-        </Routes>
+        <Router>
+          <>
+            <NavBar openLogin={openLogin} openRegister={openRegister} />
+            <Routes>
+              <Route path="/" element={<HomeLayout />} />
+              <Route path="/CarView/:platesNumber" element={<CarView />} />
+              <Route path="/about" />
+              <Route path="/contact" />
+            </Routes>
+
+            {showLogin && <Login onClose={closeLogin} />}
+            {showRegister && <Register onClose={closeRegister} openLogin={openLogin}/>}
+          </>
+        </Router>
       </CarListContext.Provider>
-    </Router>
+      <Footer/>
+    </>
+
   );
 }
 

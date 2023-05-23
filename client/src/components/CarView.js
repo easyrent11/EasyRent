@@ -1,42 +1,123 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { CarListContext } from "../App";
-import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from "@material-tailwind/react";
+
 
 export default function CarView() {
   const ListOfCars = useContext(CarListContext);
   let { platesNumber } = useParams();
   const car = ListOfCars.find((car) => car.platesNumber == platesNumber);
-
+  console.log(car.profilePicture);
   return (
-    <div className="flex flex-wrap border-2 border-red-500">
-      <section className="w-full flex items-center justify-center border-2 border-blue-500 p-4">
-        <div className="max-w-screen-lg w-full mx-auto">
-          <Carousel
-            className="w-full border-2 border-black"
-            showStatus={false}
-            showThumbs={false}
-            infiniteLoop
-            autoPlay
-            interval={5000}
-          >
-            {car.Images.map((image, index) => (
-              <figure key={index}>
-                <img src={image} alt={`Car Image ${index + 1}`} />
-              </figure>
-            ))}
-          </Carousel>
-        </div>
+    <div className="min-h-screen flex flex-col items-center border-2 border-blue-500">
+      <section className="w-full max-w-3xl mt-10">
+        <Carousel>
+          {car.Images.map((image, index) => (
+            <figure key={index} className="rounded-xl">
+              <img
+                src={image}
+                alt={`image ${index + 1}`}
+                className="object-cover w-full h-80"
+              />
+            </figure>
+          ))}
+        </Carousel>
       </section>
 
-      <section className="w-1/2 bg-red-300 p-4">
-        <h1>Hello world</h1>
-      </section>
+      <div className="flex p-2 m-2">
+        <section className="w-full max-w-3xl mt-10 p-6 mr-4  bg-white shadow-md rounded-lg">
+          
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">
+              {car.Manufacturer} {car.Model}
+            </h2>
+            <p className="text-gray-500 text-lg">Year: {car.year}</p>
+          </div>
 
-      <section className="w-1/2 bg-gray-500 p-4">
-        <h1>Hello world</h1>
-      </section>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-700 text-xl mb-2">
+                Features and Specifications:
+              </p>
+              <ul className="space-y-2">
+                <li>
+                  <span className="font-bold">Seats:</span> {car.seats}
+                </li>
+                <li>
+                  <span className="font-bold">Luggage:</span> {car.luggage}
+                </li>
+                <li>
+                  <span className="font-bold">Gearbox:</span> {car.gearbox}
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-gray-700 text-xl mb-2">Rental Price:</p>
+              <p className="text-3xl font-bold  text-[#CC6200]">
+                ₪{car.RentalPrice}/day
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg">
+              Rent Now
+            </button>
+          </div>
+        </section>
+
+        <section className="w-full max-w-3xl mt-10 p-6 bg-white shadow-md rounded-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Book this car</h2>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              From Date:
+            </label>
+            <input
+              className="border-2 border-gray-300 rounded-md p-2 w-full"
+              type="date"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              To Date:
+            </label>
+            <input
+              className="border-2 border-gray-300 rounded-md p-2 w-full"
+              type="date"
+            />
+          </div>
+
+          <p className="text-gray-500 mb-4">
+            You'll pickup and return the key by meeting with the owner face to
+            face.
+          </p>
+
+          <section className="flex flex-col ">
+            <div>
+              <p className="text-lg font-bold mb-2">
+                Total Price (including fees):
+              </p>
+              {/* Calculate and display the total price including fees */}
+              {/* Example: ₪{car.RentalPrice * numberOfDays * (1 + 0.05)} */}
+            </div>
+
+            <div>
+              <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
+                Send Request
+              </button>
+              <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
+                Start Chat with Seller
+              </button>
+            </div>
+          </section>
+        </section>
+      </div>
     </div>
   );
 }
