@@ -4,7 +4,7 @@ import { FiMapPin, FiPhone } from "react-icons/fi";
 import { Link } from "react-router-dom";
 export default function Footer() {
   return (
-    <footer className="bg-black py-6 w-full">
+    <footer className="  bg-black py-6 w-full">
       <article className="flex items-center justify-around m-2 p-2  ">
         {/* About Us */}
         <div className="text-white w-1/4 p-4">
@@ -33,14 +33,14 @@ export default function Footer() {
         </div>
         {/* Navigate */}
         <div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
-          <h2 className="m-4"> Navigate </h2>
+          <h2 className="m-4 text-2xl"> Navigate </h2>
           <Link to="/Rating" className="text-[#CC6200]  mb-2">
             Rating
           </Link>
           <Link to="/FAQ" className="text-[#CC6200] mb-2">
             FAQ
           </Link>
-          <Link to="/ContactUS" className="text-[#CC6200] mb-2 ">
+          <Link to="/ContactUs" className="text-[#CC6200] mb-2 ">
             Contact Us
           </Link>
         </div>
