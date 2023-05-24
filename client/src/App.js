@@ -8,6 +8,7 @@ import HomeLayout from "./pages/HomeLayout";
 import NavBar from "./components/NavBar";
 import { createContext, useState } from "react";
 import Footer from "./components/Footer";
+import Rating from './components/Rating';
 export const CarListContext = createContext([]);
 
 function App() {
@@ -132,6 +133,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomeLayout />} />
             <Route path="/CarView/:platesNumber" element={<CarView />} />
+            <Route path="/Rating" element={<Rating/>}/>
             <Route path="/about" />
             <Route path="/contact" />
           </Routes>
