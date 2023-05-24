@@ -41,7 +41,6 @@ export default function Footer() {
             FAQ
           </Link>
           <Link to="/ContactUS" className="text-[#CC6200] mb-2 ">
-            {" "}
             Contact Us
           </Link>
         </div>

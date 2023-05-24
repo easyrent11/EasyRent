@@ -6,6 +6,8 @@ import CarView from "./components/CarView";
 import React from "react";
 import HomeLayout from "./pages/HomeLayout";
 import NavBar from "./components/NavBar";
+import FAQ from "./components/FAQ";
+import ContactUs from "./components/ContactUs";
 import { createContext, useState } from "react";
 import Footer from "./components/Footer";
 export const CarListContext = createContext([]);
@@ -134,6 +136,8 @@ function App() {
             <Route path="/CarView/:platesNumber" element={<CarView />} />
             <Route path="/about" />
             <Route path="/contact" />
+            <Route path="/FAQ" element={<FAQ />} />
+            <Route path="/ContactUs" element={<ContactUs />} />
           </Routes>
 
           {showLogin && <Login onClose={closeLogin} />}
