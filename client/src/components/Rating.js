@@ -1,14 +1,13 @@
 import React from 'react';
 import { FaStar } from "react-icons/fa";
 import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
-import RatingImg from "../Assets/Rating.jpg";
 import { useScrollToTop } from './ScrollToTheTop';
 export default function Rating() {
   useScrollToTop();
   return (
 
-    <div className="flex items-center justify-center  w-full min-h-screen " style={{ backgroundImage: `url(${RatingImg})`,backgroundPosition:'center', backgroundSize:'cover', backgroundRepeat: 'no-repeat' }}>
-      <article className="pb-8 pt-4 rounded-md  bg-black bg-opacity-80 background-filter backdrop-blue-lg flex flex-col items-center rating-container  w-1/2">
+    <div className="flex items-center justify-center  w-full min-h-screen ">
+      <article className="pb-8 pt-4 rounded-lg  bg-black  flex flex-col items-center rating-container  w-2/6">
         <div className="flex mb-4 items-center justify-center text-white text-4xl">
           <h1 className="m-2">Rate Us</h1>
           <SentimentVerySatisfiedIcon fontSize="large" style={{ color: 'yellow' }} />
@@ -82,7 +81,7 @@ export default function Rating() {
         </div>
         <textarea
           id="rating-message"
-          className="bg-transparent border-2 border-white bg-opacity-80 background-filter backdrop-blue-lg text-white w-2/3 p-2 h-60 rounded-lg mt-2"
+          className="bg-white  border-none  text-black w-2/3 p-2 h-60 rounded-lg mt-2"
           placeholder="Leave something nice :)"
         ></textarea>
         <button
