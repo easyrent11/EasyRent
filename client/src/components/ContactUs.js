@@ -1,7 +1,9 @@
 import React from 'react'
 import { useState } from 'react';
+import { useScrollToTop } from './ScrollToTheTop';
 
 export default function ContactUs () {
+  useScrollToTop();
  const [firstName, setFirstName] = useState("");
  const [lastName, setLastName] = useState("");
  const [email, setEmail] = useState("");
@@ -25,17 +27,17 @@ export default function ContactUs () {
  };
 
  return (
-   <div className="container mx-auto py-8">
+   <div className="min-h-screen container mx-auto py-8">
      <div className="mt-8 flex justify-center">
-       <div className="bg-black shadow-lg rounded-lg p-6 max-w-md w-full">
-         <h3 className="text-2xl text-white text-center font-bold mb-4">
+       <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
+         <h3 className="text-2xl text-black text-center font-bold mb-4">
            Contact Form
          </h3>
          <form onSubmit={handleFormSubmit} className="grid grid-cols-2 gap-4">
            <div>
              <label
                htmlFor="firstName"
-               className="text-lg text-white font-semibold mb-2"
+               className="text-lg text-black font-semibold mb-2"
              >
                First Name
              </label>
@@ -52,7 +54,7 @@ export default function ContactUs () {
            <div>
              <label
                htmlFor="lastName"
-               className="text-lg text-white font-semibold mb-2"
+               className="text-lg text-black font-semibold mb-2"
              >
                Last Name
              </label>
@@ -69,7 +71,7 @@ export default function ContactUs () {
            <div>
              <label
                htmlFor="email"
-               className="text-lg text-white font-semibold mb-2"
+               className="text-lg text-black font-semibold mb-2"
              >
                Email
              </label>
@@ -86,7 +88,7 @@ export default function ContactUs () {
            <div>
              <label
                htmlFor="phone"
-               className="text-lg text-white font-semibold mb-2"
+               className="text-lg text-black font-semibold mb-2"
              >
                Phone Number
              </label>
@@ -103,7 +105,7 @@ export default function ContactUs () {
            <div className="col-span-2 ">
              <label
                htmlFor="message"
-               className="text-lg text-white font-semibold mb-2"
+               className="text-lg text-black font-semibold mb-2"
              >
                Message
              </label>
@@ -112,7 +114,7 @@ export default function ContactUs () {
                name="message"
                value={message}
                onChange={(e) => setMessage(e.target.value)}
-               className="border border-gray-300 rounded-lg p-2 mb-4 resize-none w-full"
+               className=" border-gray-300 border-2 rounded-lg p-2 mb-4 resize-none w-full"
                rows="5"
                required
              ></textarea>
@@ -120,7 +122,7 @@ export default function ContactUs () {
            <div className="col-span-2 flex justify-center">
              <button
                type="submit"
-               className="bg-[#cc6200] hover:bg-[#ee9f51] text-white font-semibold py-2 px-4 rounded"
+               className="bg-[#cc6200] hover:bg-[#ee9f51] text-black font-semibold py-2 px-4 rounded"
              >
                Send Message
              </button>

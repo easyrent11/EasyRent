@@ -11,6 +11,7 @@ import ContactUs from "./components/ContactUs";
 import { createContext, useState } from "react";
 import Footer from "./components/Footer";
 import Rating from './components/Rating';
+
 export const CarListContext = createContext([]);
 
 function App() {
@@ -136,8 +137,6 @@ function App() {
             <Route path="/" element={<HomeLayout />} />
             <Route path="/CarView/:platesNumber" element={<CarView />} />
             <Route path="/Rating" element={<Rating/>}/>
-            <Route path="/about" />
-            <Route path="/contact" />
             <Route path="/FAQ" element={<FAQ />} />
             <Route path="/ContactUs" element={<ContactUs />} />
           </Routes>
