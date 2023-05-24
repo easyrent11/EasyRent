@@ -128,23 +128,22 @@ function App() {
     <>
       <CarListContext.Provider value={ListOfCars}>
         <Router>
-          <>
-            <NavBar openLogin={openLogin} openRegister={openRegister} />
-            <Routes>
-              <Route path="/" element={<HomeLayout />} />
-              <Route path="/CarView/:platesNumber" element={<CarView />} />
-              <Route path="/about" />
-              <Route path="/contact" />
-            </Routes>
+          <NavBar openLogin={openLogin} openRegister={openRegister} />
+          <Routes>
+            <Route path="/" element={<HomeLayout />} />
+            <Route path="/CarView/:platesNumber" element={<CarView />} />
+            <Route path="/about" />
+            <Route path="/contact" />
+          </Routes>
 
-            {showLogin && <Login onClose={closeLogin} />}
-            {showRegister && <Register onClose={closeRegister} openLogin={openLogin}/>}
-          </>
+          {showLogin && <Login onClose={closeLogin} />}
+          {showRegister && (
+            <Register onClose={closeRegister} openLogin={openLogin} />
+          )}
+          <Footer />
         </Router>
       </CarListContext.Provider>
-      <Footer/>
     </>
-
   );
 }
 
