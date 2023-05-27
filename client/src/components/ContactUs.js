@@ -31,7 +31,7 @@ export default function ContactUs () {
      <div className="mt-8 flex justify-center">
        <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
          <h3 className="text-2xl text-black text-center font-bold mb-4">
-           Contact Form
+           Contact Us
          </h3>
          <form onSubmit={handleFormSubmit} className="grid grid-cols-2 gap-4">
            <div>

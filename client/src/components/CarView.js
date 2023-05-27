@@ -1,38 +1,55 @@
 import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
-import { CarListContext } from "../App";
 import { Carousel } from "@material-tailwind/react";
-
+import UserProfile from "./UserProfile";
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import PersonIcon from '@mui/icons-material/Person';
+import  {TbManualGearbox} from "react-icons/tb";
+import {CarListContext}  from "../contexts/CarListContext";
 
 export default function CarView() {
-  const ListOfCars = useContext(CarListContext);
+  const {carList}  = useContext(CarListContext);
+
+  //getting the plates number out of the paramaters that are passed.
   let { platesNumber } = useParams();
-  const car = ListOfCars.find((car) => car.platesNumber == platesNumber);
-  console.log(car.profilePicture);
+  // extracting the car from the car list using the plates Number to match it to the one we click on.
+  const car = carList.find((car) => Number(car.platesNumber) === Number(platesNumber));
+
+
+  //function that will make the image full screen when clicked on.
+  const handleImageClick = (e) => {
+    e.target.requestFullScreen();
+  }
+
+  
   return (
     <div className="min-h-screen flex flex-col items-center border-2 border-blue-500">
       <section className="w-full max-w-3xl mt-10">
+        {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel>
           {car.Images.map((image, index) => (
             <figure key={index} className="rounded-xl">
               <img
+                onClick={handleImageClick}
                 src={image}
-                alt={`image ${index + 1}`}
+                alt={`Car Pic ${index + 1}`}
                 className="object-cover w-full h-80"
               />
             </figure>
           ))}
         </Carousel>
       </section>
+      {/* Displaying additional car information. */}
+
 
       <div className="flex p-2 m-2">
         <section className="w-full max-w-3xl mt-10 p-6 mr-4  bg-white shadow-md rounded-lg">
-          
+          <UserProfile imagePath={"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"}/>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">
               {car.Manufacturer} {car.Model}
             </h2>
-            <p className="text-gray-500 text-lg">Year: {car.year}</p>
+            <p className="text-gray-500 text-lg">Year: {car.Year}</p>
           </div>
 
           <div className="flex justify-between items-center">
