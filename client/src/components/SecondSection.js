@@ -9,13 +9,11 @@ export default function SecondSection() {
   if (!carList || carList.length === 0) {
     return (
       <div className='flex items-center justify-center'>
-        <h2 className='font-bold text-2xl text-black'>Loading...</h2>
+        <h2 className='font-bold text-2xl text-black'>No cars Yet...</h2>
       </div>
     );
   }
-
-  console.log('Carlist in second section = ', carList);
-
+  
   return (
     <>
       <div className='flex w-2/3 flex-col'>

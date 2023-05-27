@@ -10,7 +10,7 @@ import {CarListContext}  from "../contexts/CarListContext";
 export default function CarView() {
   const {carList}  = useContext(CarListContext);
 
-  //getting the plates number out of the paramaters that are passed.
+  //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
   const car = carList.find((car) => Number(car.platesNumber) === Number(platesNumber));
