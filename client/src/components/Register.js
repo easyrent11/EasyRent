@@ -125,6 +125,7 @@ export default function Register({ onClose, openLogin }) {
               type="file"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={profilePicture}
+              name="profilepicture"
               onChange={(e) => setProfilePicture(e.target.value)}
             />
           </div>
