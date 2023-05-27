@@ -1,6 +1,5 @@
 import React, { useState, useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Axios from "axios";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import CarView from "./components/CarView";
@@ -11,7 +10,7 @@ import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
 import Rating from "./components/Rating";
 import { CarListContext } from './contexts/CarListContext';
-
+import { getCars } from "./api/CarApi";
 
 function App() {
   const [carList, setCarList] = useState([]);
@@ -19,15 +18,11 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
-    const getCarList = async () => {
-      try {
-        const response = await Axios.get('http://localhost:3001/api/cars/searchcar');
-        console.log("app response data = ", response.data);
-      } catch (error) {
-        console.error('Error fetching car list:', error);
-      }
-    };
-    getCarList();
+    getCars()
+    .then((res) => {
+      setCarList(res.data);
+    })
+    .catch((err) => console.log("Failed",err));
   }, []);
 
   const updateCarList = (updatedList) => {

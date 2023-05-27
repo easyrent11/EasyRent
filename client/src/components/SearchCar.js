@@ -2,11 +2,11 @@ import React, { useState, useContext } from "react";
 import Select from "react-select";
 import { Cities } from "../res/Cities";
 import { CarTypes } from "../res/CarTypes";
-import Axios from "axios";
+import { searchCars } from "../api/CarApi";
 import { CarListContext } from "../contexts/CarListContext";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-time-picker/dist/TimePicker.css";
+
+
+
 
 export default function SearchCar() {
   // getting the update car list from the car list context so we can update it after searching for a car and getting the result back.
@@ -51,16 +51,13 @@ export default function SearchCar() {
       endTime: "14:00:00",
     };
 
-    // sending post request to the backend.
-    Axios.post("http://localhost:3001/api/cars/searchcar", requestData)
-      .then((response) => {
-        // updating the car list array with the recieved list.
-        console.log("Response after sending data",response.data);
-        updateCarList(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+   searchCars(requestData)
+   .then((res) => {
+      updateCarList(res.data);
+   })
+   .catch((err) => console.log("Failed",err));
+    
+    
   };
 
   return (

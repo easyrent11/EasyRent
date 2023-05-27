@@ -13,9 +13,6 @@ export default function SecondSection() {
       </div>
     );
   }
-
-  console.log('Carlist in second section = ', carList);
-
   return (
     <>
       <div className='flex w-2/3 flex-col'>
