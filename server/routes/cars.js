@@ -5,6 +5,7 @@ const fs = require("fs");
 const multer = require("multer");
 const db = require("../models/db");
 
+//call multer and  define  the images folder.
 const upload = multer({ dest: path.join(__dirname, "../../client/src/images") }).array("carpics", 20);
 
 
@@ -72,15 +73,14 @@ router.post("/uploadImages", (req, res) => {
     }
     console.log(req.files);
 
-    // If no errors occurred, you can process the uploaded files
+    // If no errors occurred, we will map the files array.
     const fileUrls = req.files.map((file) => {
       const fileExtension = file.mimetype.split("/")[1];
-      const newFileName = `${file.originalname.split('.')[0]}.${fileExtension}`; // Use the extracted extension to construct the new filename
-      console.log("the new filename = ",newFileName)
+      // extracting the url of each image from the array.
+      const newFileName = `${file.filename}.${fileExtension}`; 
       const newFilePath = path.join(__dirname, `../../client/src/images/${newFileName}`); // Construct the new file path
       fs.renameSync(file.path, newFilePath); // Rename the file
-
-      return `${req.protocol}://${req.get("host")}/images/${newFileName}`; // Return the URL of the renamed file
+      return `${req.protocol}://${req.get("host")}/images/${newFileName}`; // Return the URL of the renamed file example : http://localhost:3000/images/car1.jpg
     });
 
     return res.json({ message: "Success", files: fileUrls });

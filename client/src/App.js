@@ -88,10 +88,12 @@ function App() {
           <Route path="/ContactUs" element={<ContactUs />} />
           <Route path="/SearchResultDisplay" element={<SearchResultDisplay/>}/>
         </Routes>
+
         {showLogin && <Login onClose={closeLogin} />}
         {showRegister && (
           <Register onClose={closeRegister} openLogin={openLogin} />
         )}
+        
         <Footer />
       </Router>
     </CarListContext.Provider>
