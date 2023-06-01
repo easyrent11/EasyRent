@@ -2,10 +2,9 @@ import React, { useContext } from 'react';
 import Car from '../components/Car';
 import { Link } from 'react-router-dom';
 import { CarListContext } from '../contexts/CarListContext';
-
 export default function SecondSection() {
   const {carList} = useContext(CarListContext);
-
+  console.log(carList);
   if (!carList || carList.length === 0) {
     return (
       <div className='flex items-center justify-center'>
@@ -13,7 +12,6 @@ export default function SecondSection() {
       </div>
     );
   }
-  
   return (
     <>
       <div className='flex w-2/3 flex-col'>
@@ -28,6 +26,8 @@ export default function SecondSection() {
           ))}
         </article>
       </div>
+
+      
     </>
   );
 }

@@ -122,9 +122,9 @@ export default function ContactUs () {
            <div className="col-span-2 flex justify-center">
              <button
                type="submit"
-               className="bg-[#cc6200] hover:bg-[#ee9f51] text-black font-semibold py-2 px-4 rounded"
+               className="bg-[#cc6200] w-1/2 hover:bg-[#ee9f51] text-black font-semibold py-2 px-4 rounded"
              >
-               Send Message
+               Send
              </button>
            </div>
          </form>

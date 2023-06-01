@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
-import { Link} from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { login } from "../api/CarApi";
 
 export default function Login({ onClose }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  // function that takes a message and displays it as an alert popout.
+  const notify = (message) => toast(message);
 
   // handle the login submit.
-  const handleLogin = () => {
-    console.log("Logged in");
-    setUsername('');
-    setPassword('');
-  }
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+
+    // creating the login object.
+    const loginInfo = {
+      email: email,
+      password: password,
+    };
+
+    // sending the login object to the backend and displaying the result .
+    login(loginInfo)
+      .then((res) => {
+        notify(res.data.message);
+        onClose();
+      })
+      .catch((err) => {
+        notify(err.response.data.message);
+      })
+      // reset the email and password field.
+      .finally(() => {
+        setEmail("");
+        setPassword("");
+      });
+  };
 
   return (
     <>
@@ -29,13 +54,13 @@ export default function Login({ onClose }) {
             </div>
             <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
 
-            <label className="mb-2">Username</label>
+            <label className="mb-2">Email</label>
             <input
               type="text"
-              name="username"
+              name="email"
               className="border border-gray-300 px-4 py-2 mt-4 mb-4 rounded-md w-full"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <label className="mt-4 mb-2">Password</label>

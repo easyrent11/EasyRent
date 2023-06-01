@@ -9,13 +9,14 @@ import {CarListContext}  from "../contexts/CarListContext";
 
 export default function CarView() {
   const {carList}  = useContext(CarListContext);
-
+  let flag = false;
   //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
-  const car = carList.find((car) => Number(car.platesNumber) === Number(platesNumber));
+  const car = carList.find((car) => Number(car.Plates_Number) === Number(platesNumber));
+  const arr =  car.image_urls.split(',');
 
-
+  
   //function that will make the image full screen when clicked on.
   const handleImageClick = (e) => {
     e.target.requestFullScreen();
@@ -23,20 +24,26 @@ export default function CarView() {
 
   
   return (
+
+   
     <div className="min-h-screen flex flex-col items-center border-2 border-blue-500">
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel>
-          {car.Images.map((image, index) => (
+          
+          {!flag ? car.image_urls.split(',').map((image, index) => (
             <figure key={index} className="rounded-xl">
+              {console.log(image)}
               <img
                 onClick={handleImageClick}
-                src={image}
+                src={require(`../images/${image}`).default}
                 alt={`Car Pic ${index + 1}`}
                 className="object-cover w-full h-80"
               />
             </figure>
-          ))}
+          )) :  <figure>
+                  <img src="/images/noImages.png"/>
+                </figure>}
         </Carousel>
       </section>
       {/* Displaying additional car information. */}
