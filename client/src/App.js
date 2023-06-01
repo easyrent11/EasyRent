@@ -12,13 +12,14 @@ import Footer from "./components/Footer";
 import Rating from "./components/Rating";
 import { CarListContext } from "./contexts/CarListContext";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
-import { ToastContainer} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [carList, setCarList] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
 
   const uploadImages = (files) => {
     const formData = new FormData();
@@ -33,13 +34,14 @@ function App() {
     });
   };
 
-  // Usage example
   const handleFileUpload = (event) => {
     const fileList = event.target.files;
     const files = Array.from(fileList);
     uploadImages(files)
       .then((response) => {
-        console.log(response.data); // Handle the response data
+        const { files } = response.data;
+        console.log(files)
+        setUploadedImageUrls(files); // Store the URLs in state or a variable
       })
       .catch((error) => {
         console.error(error);
@@ -70,35 +72,42 @@ function App() {
 
   return (
     <>
-    <CarListContext.Provider value={{ carList, updateCarList }}>
-      <Router>
-        <NavBar openLogin={openLogin} openRegister={openRegister} />
-        <input
-          className="text-black text-3xl"
-          type="file"
-          multiple
-          onChange={handleFileUpload}
-        />
+      <CarListContext.Provider value={{ carList, updateCarList }}>
+        <Router>
+          <NavBar openLogin={openLogin} openRegister={openRegister} />
+          <input
+            className="text-black text-3xl"
+            type="file"
+            multiple
+            onChange={handleFileUpload}
+          />
 
-        <Routes>
-          <Route path="/" element={<HomeLayout />} />
-          <Route path="/CarView/:platesNumber" element={<CarView />} />
-          <Route path="/Rating" element={<Rating />} />
-          <Route path="/FAQ" element={<FAQ />} />
-          <Route path="/ContactUs" element={<ContactUs />} />
-          <Route path="/SearchResultDisplay" element={<SearchResultDisplay/>}/>
-        </Routes>
+          {uploadedImageUrls.map((imageUrl) => (
+            <img src={imageUrl} alt="Uploaded" key={imageUrl} />
+          ))}
 
-        {showLogin && <Login onClose={closeLogin} />}
-        {showRegister && (
-          <Register onClose={closeRegister} openLogin={openLogin} />
-        )}
-        
-        <Footer />
-      </Router>
-    </CarListContext.Provider>
-    <ToastContainer />
-  </>
+          <Routes>
+            <Route path="/" element={<HomeLayout />} />
+            <Route path="/CarView/:platesNumber" element={<CarView images={uploadedImageUrls} />} />
+            <Route path="/Rating" element={<Rating />} />
+            <Route path="/FAQ" element={<FAQ />} />
+            <Route path="/ContactUs" element={<ContactUs />} />
+            <Route
+              path="/SearchResultDisplay"
+              element={<SearchResultDisplay />}
+            />
+          </Routes>
+
+          {showLogin && <Login onClose={closeLogin} />}
+          {showRegister && (
+            <Register onClose={closeRegister} openLogin={openLogin} />
+          )}
+
+          <Footer />
+        </Router>
+      </CarListContext.Provider>
+      <ToastContainer />
+    </>
   );
 }
 

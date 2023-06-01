@@ -6,7 +6,7 @@ import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import PersonIcon from '@mui/icons-material/Person';
 import  {TbManualGearbox} from "react-icons/tb";
 import {CarListContext}  from "../contexts/CarListContext";
-
+let url = 'http://localhost:3001/images/';
 export default function CarView() {
   const {carList}  = useContext(CarListContext);
   let flag = false;
@@ -36,7 +36,7 @@ export default function CarView() {
               {console.log(image)}
               <img
                 onClick={handleImageClick}
-                src={require(`../images/${image}`).default}
+                src={`${url}${image}`}
                 alt={`Car Pic ${index + 1}`}
                 className="object-cover w-full h-80"
               />

@@ -71,7 +71,7 @@ export default function SearchCar() {
 
   return (
     <form
-      className="flex items-center justify-center flex-wrap xl:1/2 w-1/2 2xl:w-1/2 lg:w-2/3 border-2 border-red-500"
+      className="flex items-center justify-center flex-wrap xl:1/2 w-1/2 sm:w-full md:w-3/4 2xl:w-1/2 lg:w-2/3 "
       onSubmit={handleFormSubmit}
     >
       <div className="flex-2 m-2 p-2">

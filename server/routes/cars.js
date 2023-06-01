@@ -6,8 +6,9 @@ const multer = require("multer");
 const db = require("../models/db");
 
 //call multer and  define  the images folder.
-const upload = multer({ dest: path.join(__dirname, "../../client/src/images") }).array("carpics", 20);
-
+const upload = multer({
+  dest: path.join(__dirname, "../images"),
+}).array("carpics", 20);
 
 const sql = `
 SELECT c.*, m.model_name, mf.Manufacturer_Name, GROUP_CONCAT(ci.image_url) AS image_urls
@@ -37,6 +38,7 @@ router.post("/cars/searchcar", (req, res) => {
   const { city, pickupDate, returnDate, carType, startTime, endTime } =
     req.body;
 
+  console.log("Start time = ", startTime, " End time = ", endTime);
   db.query(
     sql,
     [
@@ -60,6 +62,8 @@ router.post("/cars/searchcar", (req, res) => {
     }
   );
 });
+
+
 router.post("/uploadImages", (req, res) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
@@ -77,8 +81,11 @@ router.post("/uploadImages", (req, res) => {
     const fileUrls = req.files.map((file) => {
       const fileExtension = file.mimetype.split("/")[1];
       // extracting the url of each image from the array.
-      const newFileName = `${file.filename}.${fileExtension}`; 
-      const newFilePath = path.join(__dirname, `../../client/src/images/${newFileName}`); // Construct the new file path
+      const newFileName = `${file.filename}.${fileExtension}`;
+      const newFilePath = path.join(
+        __dirname,
+        `../images/${newFileName}`
+      ); // Construct the new file path
       fs.renameSync(file.path, newFilePath); // Rename the file
       return `${req.protocol}://${req.get("host")}/images/${newFileName}`; // Return the URL of the renamed file example : http://localhost:3000/images/car1.jpg
     });

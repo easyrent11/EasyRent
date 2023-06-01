@@ -13,7 +13,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-app.use('/static', express.static(path.join(__dirname, 'images')))
+app.use('/images', express.static('images'));
 app.use('/api', carRoutes);
 app.use('/api', userRoutes);
 
