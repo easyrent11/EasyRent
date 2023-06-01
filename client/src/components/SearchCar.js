@@ -42,8 +42,8 @@ export default function SearchCar() {
   const handleReturnDateChange = (e) => {
     setReturnDate(e.target.value);
   };
-  // const handleFromTimeChange = (e) => {setFromTime(e.target.value);}
-  // const handleToTimeChange = (e) => {setToTime(e.target.value);}
+  const handleFromTimeChange = (e) => {setFromTime(e.target.value);}
+  const handleToTimeChange = (e) => {setToTime(e.target.value);}
 
 
   // function that will run once we submit the form and will send the search info to the backend and recieve the result back.
@@ -56,8 +56,8 @@ export default function SearchCar() {
       pickupDate: pickupDate,
       returnDate: returnDate,
       carType: carType,
-      startTime: "10:00:00",
-      endTime: "14:00:00",
+      startTime: fromTime,
+      endTime: toTime,
     };
 
     searchCars(requestData)
@@ -71,10 +71,10 @@ export default function SearchCar() {
 
   return (
     <form
-      className="grid grid-cols-4 gap-4 p-4 pt-6 w-1/2"
+      className="flex items-center justify-center flex-wrap w-1/2 border-2 border-red-500"
       onSubmit={handleFormSubmit}
     >
-      <div className="col-span-2 md:col-span-1">
+      <div className="flex-2 m-2 p-2">
         <Select
           id="city"
           value={{ value: city, label: selectedCityLabel }}
@@ -84,7 +84,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="col-span-2 md:col-span-1">
+      <div className="m-2 p-2">
         <input
           type="date"
           id="pickupdate"
@@ -94,17 +94,37 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="col-span-2 md:col-span-1">
+      <div className="m-2 p-2">
+        <input
+          type="time"
+          id="fromtime"
+          value={fromTime}
+          onChange={handleFromTimeChange}
+          className="w-full p-1.5 rounded-md"
+        />
+      </div>
+
+      <div className="m-2 p-2">
         <input
           type="date"
           id="returnDate"
           value={returnDate}
           onChange={handleReturnDateChange}
-          className="w-full p-1.5  rounded-md"
+          className="w-full p-1.5 rounded-md"
         />
       </div>
 
-      <div className="col-span-2 md:col-span-1">
+      <div className="m-2 p-2">
+        <input
+          type="time"
+          id="totime"
+          value={toTime}
+          onChange={handleToTimeChange}
+          className="w-full p-1.5 rounded-md"
+        />
+      </div>
+
+      <div className="flex-2 m-2 p-2">
         <Select
           id="carType"
           value={{ value: carType, label: selectedCarTypeLabel }}
@@ -115,8 +135,8 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="col-span-5 flex justify-center items-center">
-        <button  type="submit" className="bg-black text-1xl mt-4 text-white p-2 w-full md:w-1/1 lg:w-1/4 rounded-md"> 
+      <div className="col-span-4 flex w-2/12 justify-center items-center">
+        <button type="submit" className="bg-black text-1xl mt-4 text-white p-2 w-full rounded-md mb-2"> 
           Submit
         </button>
       </div>
