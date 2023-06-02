@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/CarApi";
 
 export default function Login({ onClose }) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   // function that takes a message and displays it as an alert popout.
-  const notify = (message) => toast(message);
+  const notify = (status,message) => status === 'success' ? toast.success(message) : toast.error(message);
 
   // handle the login submit.
   const handleLogin = (e) => {
@@ -25,11 +28,13 @@ export default function Login({ onClose }) {
     // sending the login object to the backend and displaying the result .
     login(loginInfo)
       .then((res) => {
-        notify(res.data.message);
+        notify('success',res.data.message);
         onClose();
+        localStorage.setItem('token', res.data.token)
+        navigate('/user');
       })
       .catch((err) => {
-        notify(err.response.data.message);
+        notify('error',err.response.data.message);
       })
       // reset the email and password field.
       .finally(() => {

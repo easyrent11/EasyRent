@@ -17,7 +17,7 @@ export default function Rating() {
       <article className="pb-8 pt-4 rounded-lg bg-white flex flex-col items-center rating-container w-2/6">
         <div className="flex mb-4 items-center justify-center text-black text-4xl">
           <h1 className="m-2">Rate Us</h1>
-          <SentimentVerySatisfiedIcon fontSize="large" style={{ color: 'yellow' }} />
+          <SentimentVerySatisfiedIcon fontSize="large" style={{ color: '#ee9f51' }} />
         </div>
         <div className="flex items-center justify-center rating-stars p-4 w-1/2">
           {[5, 4, 3, 2, 1].map((value) => (

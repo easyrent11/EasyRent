@@ -1,7 +1,11 @@
 import React from 'react'
-
-export default function UserLayout({user}) {
+import FirstSection from "../components/FirstSection";
+import SearchResultDisplay from './SearchResultDisplay';
+export default function UserLayout() {
   return (
-    <div>Welcome {user.firstName}</div>
+    <>
+        <FirstSection/>
+        <SearchResultDisplay/>
+    </>
   )
 }

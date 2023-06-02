@@ -6,7 +6,7 @@ export default function PrivateRoute({ component: Component, ...rest }) {
   const navigate = useNavigate();
 
   if (!token) {
-    navigate('/login'); // Redirect to the login page
+    navigate('/'); // Redirect to the login page
     return null; // Render nothing while navigating
   }
 

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState,useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
-import axios from "axios";
 import CarView from "./components/CarView";
 import HomeLayout from "./pages/HomeLayout";
 import NavBar from "./components/NavBar";
@@ -14,43 +13,33 @@ import { CarListContext } from "./contexts/CarListContext";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import PrivateRoute from "./components/PrivateRoute";
+import UserLayout from "./pages/UserLayout";
+import UserNav from './components/UserNav';
+import PageNotFound from "./components/PageNotFound";
 function App() {
+
   const [carList, setCarList] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token") ? true : false);
 
-  const uploadImages = (files) => {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("carpics", files[i]);
+  useEffect(() => {
+    if (token) {
+      handleLogin();
     }
+    else{
+      handleLogout();
+    }
+  }, [token]);
 
-    return axios.post("http://localhost:3001/api/uploadImages", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  };
+  // function that sets the authenticated variable to false so we are logged out.
+  const handleLogout = () => setToken(false);
+  const handleLogin = () => setToken(true);
 
-  const handleFileUpload = (event) => {
-    const fileList = event.target.files;
-    const files = Array.from(fileList);
-    uploadImages(files)
-      .then((response) => {
-        const { files } = response.data;
-        console.log(files)
-        setUploadedImageUrls(files); // Store the URLs in state or a variable
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const updateCarList = (updatedList) => {
-    setCarList(updatedList);
-  };
+  const updateCarList = (updatedList) => setCarList(updatedList);
+  const closeLogin = () =>  setShowLogin(false);
+  const closeRegister = () => setShowRegister(false);
 
   const openLogin = () => {
     setShowLogin(true);
@@ -58,51 +47,42 @@ function App() {
   };
 
   const openRegister = () => {
+
     setShowRegister(true);
     setShowLogin(false);
-  };
-
-  const closeLogin = () => {
-    setShowLogin(false);
-  };
-
-  const closeRegister = () => {
-    setShowRegister(false);
   };
 
   return (
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <Router>
-          <NavBar openLogin={openLogin} openRegister={openRegister} />
-          <input
-            className="text-black text-3xl"
-            type="file"
-            multiple
-            onChange={handleFileUpload}
-          />
-
-          {uploadedImageUrls.map((imageUrl) => (
-            <img src={imageUrl} alt="Uploaded" key={imageUrl} />
-          ))}
-
-          <Routes>
-            <Route path="/" element={<HomeLayout />} />
-            <Route path="/CarView/:platesNumber" element={<CarView images={uploadedImageUrls} />} />
-            <Route path="/Rating" element={<Rating />} />
-            <Route path="/FAQ" element={<FAQ />} />
-            <Route path="/ContactUs" element={<ContactUs />} />
-            <Route
-              path="/SearchResultDisplay"
-              element={<SearchResultDisplay />}
-            />
-          </Routes>
-
+          {console.log(token)}
+        {token ? (
+            <UserNav onLogout = {handleLogout} />
+          ) : (
+            <NavBar openLogin={openLogin} openRegister={openRegister} />
+          )}
+            <Routes>
+              <Route path="/" element={<HomeLayout />} />
+              <Route path="/CarView/:platesNumber" element={<CarView />} />
+              <Route path="/Rating" element={<Rating />} />
+              <Route path="/FAQ" element={<FAQ />} />
+              <Route path="/ContactUs" element={<ContactUs />} />
+              <Route
+                path="/SearchResultDisplay"
+                element={<SearchResultDisplay />}
+              />
+              {/* Private Home route for the logged in users */}
+              <Route path="/user" element={<PrivateRoute component={UserLayout} onLogin={handleLogin} />} />
+              {/* catch all */}
+            <Route path="*" element={<PageNotFound />} />
+            </Routes>
+        
+          {/* conditional rendering login and register components. */}
           {showLogin && <Login onClose={closeLogin} />}
           {showRegister && (
             <Register onClose={closeRegister} openLogin={openLogin} />
           )}
-
           <Footer />
         </Router>
       </CarListContext.Provider>
