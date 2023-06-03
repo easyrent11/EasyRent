@@ -1,5 +1,5 @@
 import React from "react";
-import { Link} from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import Logo from "./Logo";
 import { Link as ScrollLink } from "react-scroll";
 import { toast } from "react-toastify";
@@ -8,12 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 
-export default function UserNav(onLogout) {
-
+export default function UserNav({handleLogout}) {
+  const navigate = useNavigate();
     const logout = () => {
-        toast("Sucessfully logged out");
+        toast.success("Sucessfully logged out");
         localStorage.removeItem('token');
-        onLogout();
+        handleLogout();
+        navigate('/');
     };
 
   return (
@@ -35,9 +36,9 @@ export default function UserNav(onLogout) {
           <Link className="m-2 hover:text-[#CC6200] " to="/ContactUs">
             Contact
           </Link>
-          <Link to="/" className="m-2 hover:text-[#CC6200]" onClick={logout}>
+          <button  className="m-2 hover:text-[#CC6200]" onClick={logout}>
             Logout
-          </Link>
+          </button>
         </div>
       </nav>
     </>

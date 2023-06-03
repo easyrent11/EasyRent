@@ -34,7 +34,7 @@ WHERE c.Type = ?
 GROUP BY c.Plates_Number;
 `;
 
-router.post("/cars/searchcar", (req, res) => {
+router.post("/searchcar", (req, res) => {
   const { city, pickupDate, returnDate, carType, startTime, endTime } =
     req.body;
 

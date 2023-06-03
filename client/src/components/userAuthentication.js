@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const useAuthentication = () => {
   const navigate = useNavigate();
@@ -9,8 +10,11 @@ const useAuthentication = () => {
 
     if (!token) {
       // User is not authenticated, redirect to login page or handle accordingly
-      navigate('/login');
+      navigate('/');
     }
+
+    // Set the token in the request headers for subsequent API calls
+    axios.defaults.headers.common['Authorization'] = token;
   }, [navigate]);
 
   // Optionally, you can return the token or user data if needed in your components

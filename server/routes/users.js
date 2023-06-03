@@ -3,9 +3,9 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require("../models/db");
-
+const verifyToken = require('../middleware/auth');
 // Register a user
-router.post('/users/register', async (req, res) => {
+router.post('/register', async (req, res) => {
   const {
     id,
     phone_number,
@@ -52,7 +52,7 @@ router.post('/users/register', async (req, res) => {
   }
 });
 
-router.post('/users/login', (req, res) => {
+router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
   // Check if the user exists in the database
@@ -78,11 +78,23 @@ router.post('/users/login', (req, res) => {
 
     // Password is correct, user is authenticated
     // Generate a token
-    const token = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id, userEmail:user.email}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
 
     // Send the token and success message as a response
     res.status(200).json({ message: 'Login successful', token });
   });
 });
+
+
+// Protected user page route.
+router.get('/homepage', verifyToken, (req, res) => {
+  // Access user information from req.user
+  const { userId, userEmail } = req.user;
+  
+   // Perform actions specific to the authenticated user
+   res.json({ message: `Welcome, ${userEmail}! This is your home page.` });
+});
+
+
 
 module.exports = router;

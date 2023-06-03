@@ -14,8 +14,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/images', express.static('images'));
-app.use('/api', carRoutes);
-app.use('/api', userRoutes);
+app.use('/cars', carRoutes);
+app.use('/user', userRoutes);
 
 
 

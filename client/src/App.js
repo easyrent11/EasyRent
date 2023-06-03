@@ -22,25 +22,10 @@ function App() {
   const [carList, setCarList] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem("token") ? true : false);
-
-  useEffect(() => {
-    if (token) {
-      handleLogin();
-    }
-    else{
-      handleLogout();
-    }
-  }, [token]);
-
-  // function that sets the authenticated variable to false so we are logged out.
-  const handleLogout = () => setToken(false);
-  const handleLogin = () => setToken(true);
 
   const updateCarList = (updatedList) => setCarList(updatedList);
   const closeLogin = () =>  setShowLogin(false);
   const closeRegister = () => setShowRegister(false);
-
   const openLogin = () => {
     setShowLogin(true);
     setShowRegister(false);
@@ -52,16 +37,16 @@ function App() {
     setShowLogin(false);
   };
 
+
+  const handleLogout = () =>{
+    setIsLoggedIn(false);
+  } 
+
   return (
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <Router>
-          {console.log(token)}
-        {token ? (
-            <UserNav onLogout = {handleLogout} />
-          ) : (
-            <NavBar openLogin={openLogin} openRegister={openRegister} />
-          )}
+          {isLoggedIn ? <UserNav logout={handleLogout}/> : <NavBar openLogin={openLogin} openRegister={openRegister} />}
             <Routes>
               <Route path="/" element={<HomeLayout />} />
               <Route path="/CarView/:platesNumber" element={<CarView />} />
@@ -73,7 +58,7 @@ function App() {
                 element={<SearchResultDisplay />}
               />
               {/* Private Home route for the logged in users */}
-              <Route path="/user" element={<PrivateRoute component={UserLayout} onLogin={handleLogin} />} />
+              <Route path="/user/homepage" element={<PrivateRoute component={UserLayout} />} />
               {/* catch all */}
             <Route path="*" element={<PageNotFound />} />
             </Routes>

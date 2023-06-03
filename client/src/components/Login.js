@@ -18,6 +18,15 @@ export default function Login({ onClose }) {
   const handleLogin = (e) => {
     e.preventDefault();
 
+    // check if user is already signed in
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      // User is already signed in, display a message or handle accordingly
+      notify('error', 'You are already signed in');
+      return;
+    }
+
 
     // creating the login object.
     const loginInfo = {
@@ -31,7 +40,7 @@ export default function Login({ onClose }) {
         notify('success',res.data.message);
         onClose();
         localStorage.setItem('token', res.data.token)
-        navigate('/user');
+        navigate('/user/homepage');
       })
       .catch((err) => {
         notify('error',err.response.data.message);
