@@ -2,7 +2,9 @@ import React, { useContext } from 'react';
 import Car from '../components/Car';
 import { Link } from 'react-router-dom';
 import { CarListContext } from '../contexts/CarListContext';
+
 export default function SecondSection() {
+
   const {carList} = useContext(CarListContext);
   if (!carList || carList.length === 0) {
     return (

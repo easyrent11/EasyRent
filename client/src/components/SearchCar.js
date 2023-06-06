@@ -49,7 +49,6 @@ export default function SearchCar() {
   // function that will run once we submit the form and will send the search info to the backend and recieve the result back.
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log("I am getting here");
     // creating the search object.
     const requestData = {
       city: city,
@@ -64,6 +63,7 @@ export default function SearchCar() {
       .then((res) => {
         console.log(res.data);
         navigate('/SearchResultDisplay')
+        // updating the Cars List with the new search Array
         updateCarList(res.data);
       })
       .catch((err) => console.log("Failed", err));

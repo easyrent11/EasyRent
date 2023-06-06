@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState} from "react";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -8,7 +8,6 @@ import NavBar from "./components/NavBar";
 import FAQ from "./components/FAQ";
 import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
-import Rating from "./components/Rating";
 import { CarListContext } from "./contexts/CarListContext";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
 import { ToastContainer } from "react-toastify";
@@ -62,15 +61,14 @@ function App() {
             <Routes>
               <Route path="/" element={<HomeLayout />} />
               <Route path="/CarView/:platesNumber" element={<CarView />} />
-              <Route path="/Rating" element={<Rating />} />
               <Route path="/FAQ" element={<FAQ />} />
-              <Route path="/ContactUs" element={<ContactUs />} />
+              <Route path="/ContactUs" element={<ContactUs isLoggedIn={isLoggedIn}/>} />
               <Route
                 path="/SearchResultDisplay"
                 element={<SearchResultDisplay />}
               />
               {/* Private Home route for the logged in users */}
-              <Route path="/user/homepage" element={<PrivateRoute openLogin={openLogin} component={UserLayout} />} />
+              <Route path="/homepage" element={<PrivateRoute openLogin={openLogin} component={UserLayout} />} />
               {/* catch all */}
             <Route path="*" element={<PageNotFound handleNotFound={handleNotFound}/>} />
             </Routes>

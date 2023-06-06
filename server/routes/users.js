@@ -96,5 +96,35 @@ router.get('/homepage', verifyToken, (req, res) => {
 });
 
 
+router.post('/ContactUs', (req, res) => {
+  const { id, message } = req.body;
+
+  // Check if the given id exists in the Users table
+  const checkUserQuery = 'SELECT id FROM Users WHERE id = ?';
+  connection.query(checkUserQuery, [id], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: err, errorMsg: 'Error checking user existence' });
+      return;
+    }
+
+    if (results.length === 0) {
+      res.status(404).json({ errorMsg: `User with id ${id} does not exist` });
+      return;
+    }
+
+    // Insert the form data into the UsersContact table
+    const sql = `INSERT INTO UsersContact (user_id, message) VALUES (?, ?)`;
+    connection.query(sql, [id, message], (err, result) => {
+      if (err) {
+        res.status(500).json({ error: err, errorMsg: 'Error inserting data into MySQL table' });
+        return;
+      }
+
+      res.status(200).json({result:result, message: 'Thanks for contacting us! Your message was sent to the admin' });
+    });
+  });
+});
+
+
 
 module.exports = router;
