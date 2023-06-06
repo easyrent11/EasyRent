@@ -22,6 +22,8 @@ function App() {
   const [carList, setCarList] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [notFound,setNotFound] = useState(false);
 
   const updateCarList = (updatedList) => setCarList(updatedList);
   const closeLogin = () =>  setShowLogin(false);
@@ -42,11 +44,21 @@ function App() {
     setIsLoggedIn(false);
   } 
 
+  const handleLogin = () => setIsLoggedIn(true);
+  const handleNotFound = () => setNotFound(true);
+
+
   return (
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <Router>
-          {isLoggedIn ? <UserNav logout={handleLogout}/> : <NavBar openLogin={openLogin} openRegister={openRegister} />}
+        {notFound ? (
+          <PageNotFound handleNotFound={handleNotFound} />
+        ) : isLoggedIn ? (
+          <UserNav handleLogout={handleLogout} />
+        ) : (
+          <NavBar openLogin={openLogin} openRegister={openRegister} />
+        )}
             <Routes>
               <Route path="/" element={<HomeLayout />} />
               <Route path="/CarView/:platesNumber" element={<CarView />} />
@@ -58,13 +70,13 @@ function App() {
                 element={<SearchResultDisplay />}
               />
               {/* Private Home route for the logged in users */}
-              <Route path="/user/homepage" element={<PrivateRoute component={UserLayout} />} />
+              <Route path="/user/homepage" element={<PrivateRoute openLogin={openLogin} component={UserLayout} />} />
               {/* catch all */}
-            <Route path="*" element={<PageNotFound />} />
+            <Route path="*" element={<PageNotFound handleNotFound={handleNotFound}/>} />
             </Routes>
         
           {/* conditional rendering login and register components. */}
-          {showLogin && <Login onClose={closeLogin} />}
+          {showLogin && <Login handleLogin={handleLogin} onClose={closeLogin} />}
           {showRegister && (
             <Register onClose={closeRegister} openLogin={openLogin} />
           )}
