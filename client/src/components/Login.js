@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/CarApi";
 
-export default function Login({ onClose }) {
+export default function Login({ onClose,handleLogin }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -15,7 +15,7 @@ export default function Login({ onClose }) {
   const notify = (status,message) => status === 'success' ? toast.success(message) : toast.error(message);
 
   // handle the login submit.
-  const handleLogin = (e) => {
+  const handleFormLogin = (e) => {
     e.preventDefault();
 
     // check if user is already signed in
@@ -40,6 +40,7 @@ export default function Login({ onClose }) {
         notify('success',res.data.message);
         onClose();
         localStorage.setItem('token', res.data.token)
+        handleLogin(true);
         navigate('/user/homepage');
       })
       .catch((err) => {
@@ -89,7 +90,7 @@ export default function Login({ onClose }) {
             <button
               type="submit"
               className="bg-[#CC6200] text-white px-4 py-2 rounded-md w-full mt-7"
-              onClick={handleLogin}
+              onClick={handleFormLogin}
             >
               Login
             </button>
