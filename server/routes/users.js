@@ -3,12 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../models/db");
-<<<<<<< HEAD
 const verifyToken = require("../middleware/auth");
-=======
-const verifyToken = require('../middleware/auth');
-
->>>>>>> 4bd80dce2f0bef7879f49538336e09dfc7e5af17
 
 // Register a user
 router.post("/register", async (req, res) => {
@@ -107,41 +102,8 @@ router.get("/homepage", verifyToken, (req, res) => {
 });
 
 
-<<<<<<< HEAD
 router.get("/AddCar", (req,res) {
-  const ()
+  
 })
-=======
-router.post('/ContactUs', (req, res) => {
-  const { id, message } = req.body;
-
-  // Check if the given id exists in the Users table
-  const checkUserQuery = 'SELECT id FROM Users WHERE id = ?';
-  connection.query(checkUserQuery, [id], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err, errorMsg: 'Error checking user existence' });
-      return;
-    }
-
-    if (results.length === 0) {
-      res.status(404).json({ errorMsg: `User with id ${id} does not exist` });
-      return;
-    }
-
-    // Insert the form data into the UsersContact table
-    const sql = `INSERT INTO UsersContact (user_id, message) VALUES (?, ?)`;
-    connection.query(sql, [id, message], (err, result) => {
-      if (err) {
-        res.status(500).json({ error: err, errorMsg: 'Error inserting data into MySQL table' });
-        return;
-      }
-
-      res.status(200).json({result:result, message: 'Thanks for contacting us! Your message was sent to the admin' });
-    });
-  });
-});
-
-
->>>>>>> 4bd80dce2f0bef7879f49538336e09dfc7e5af17
 
 module.exports = router;
