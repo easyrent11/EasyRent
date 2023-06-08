@@ -102,8 +102,5 @@ router.get("/homepage", verifyToken, (req, res) => {
 });
 
 
-router.get("/AddCar", (req,res) {
-  
-})
 
 module.exports = router;
