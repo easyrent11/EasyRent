@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState} from "react";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -8,7 +8,6 @@ import NavBar from "./components/NavBar";
 import FAQ from "./components/FAQ";
 import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
-import Rating from "./components/Rating";
 import { CarListContext } from "./contexts/CarListContext";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
 import { ToastContainer } from "react-toastify";
@@ -55,6 +54,7 @@ function App() {
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <Router>
+<<<<<<< HEAD
           {notFound ? (
             <PageNotFound handleNotFound={handleNotFound} />
           ) : isLoggedIn ? (
@@ -88,6 +88,30 @@ function App() {
             />
           </Routes>
 
+=======
+        {notFound ? (
+          <PageNotFound handleNotFound={handleNotFound} />
+        ) : isLoggedIn ? (
+          <UserNav handleLogout={handleLogout} />
+        ) : (
+          <NavBar openLogin={openLogin} openRegister={openRegister} />
+        )}
+            <Routes>
+              <Route path="/" element={<HomeLayout />} />
+              <Route path="/CarView/:platesNumber" element={<CarView />} />
+              <Route path="/FAQ" element={<FAQ />} />
+              <Route path="/ContactUs" element={<ContactUs isLoggedIn={isLoggedIn}/>} />
+              <Route
+                path="/SearchResultDisplay"
+                element={<SearchResultDisplay />}
+              />
+              {/* Private Home route for the logged in users */}
+              <Route path="/homepage" element={<PrivateRoute openLogin={openLogin} component={UserLayout} />} />
+              {/* catch all */}
+            <Route path="*" element={<PageNotFound handleNotFound={handleNotFound}/>} />
+            </Routes>
+        
+>>>>>>> 4bd80dce2f0bef7879f49538336e09dfc7e5af17
           {/* conditional rendering login and register components. */}
           {showLogin && (
             <Login handleLogin={handleLogin} onClose={closeLogin} />

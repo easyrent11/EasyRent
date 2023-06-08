@@ -41,7 +41,7 @@ export default function Login({ onClose,handleLogin }) {
         onClose();
         localStorage.setItem('token', res.data.token)
         handleLogin(true);
-        navigate('/user/homepage');
+        navigate('/homepage');
       })
       .catch((err) => {
         notify('error',err.response.data.message);

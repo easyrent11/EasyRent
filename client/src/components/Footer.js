@@ -34,9 +34,6 @@ export default function Footer() {
         {/* Navigate */}
         <div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
           <h2 className="m-4 text-2xl"> Navigate </h2>
-          <Link to="/Rating" className="text-[#CC6200]  mb-2">
-            Rating
-          </Link>
           <Link to="/FAQ" className="text-[#CC6200] mb-2">
             FAQ
           </Link>
