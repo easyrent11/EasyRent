@@ -23,7 +23,7 @@ export default function ContactUs({ isLoggedIn }) {
             <h3 className="text-2xl text-black text-center font-bold mb-4">
               Contact Us
             </h3>
-            <form onSubmit={handleFormSubmit}>
+            <form>
               <div className="col-span-2">
                 <label
                   htmlFor="message"
@@ -44,6 +44,7 @@ export default function ContactUs({ isLoggedIn }) {
               <div className="col-span-2 flex justify-center">
                 <button
                   type="submit"
+                  onClick={handleFormSubmit}
                   className="bg-[#cc6200] w-1/2 hover:bg-[#ee9f51] text-black font-semibold py-2 px-4 rounded"
                 >
                   Send
@@ -64,7 +65,7 @@ export default function ContactUs({ isLoggedIn }) {
           <h3 className="text-2xl text-black text-center font-bold mb-4">
             Contact Us
           </h3>
-          <form onSubmit={handleFormSubmit} className="grid grid-cols-2 gap-4">
+          <form className="grid grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="firstName"
@@ -143,11 +144,13 @@ export default function ContactUs({ isLoggedIn }) {
               ></textarea>
             </div>
             <div className="col-span-2 flex justify-center">
-              <button
+              <button 
                 type="submit"
+                onClick={handleFormSubmit}
                 className="bg-[#cc6200] w-1/2 hover:bg-[#ee9f51] text-black font-semibold py-2 px-4 rounded"
               >
                 Send
+                
               </button>
             </div>
           </form>
