@@ -25,7 +25,7 @@ export default function UserNav({ handleLogout }) {
         <Logo />
         <div className="flex items-center justify-center w-1/2">
           <Link className="m-2 hover:text-[#CC6200] " to="/user/homepage"> Home </Link>
-          <Link className="m-2 hover:text-[#CC6200]" to="/user/rentcar"> Share your car </Link>
+          <Link className="m-2 hover:text-[#CC6200]" to="/AddCar"> Share your car </Link>
           <Link className="m-2 hover:text-[#CC6200]" to="/user/chatapp"> Chat </Link>
           <Link className="m-2 hover:text-[#CC6200]" to="/user/ContactUs"> Contact Us </Link>
           <button className="m-2 hover:text-[#CC6200]" to="/user/notifications"> Notifications </button>

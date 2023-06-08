@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require('path');
 const carRoutes = require('./routes/cars');
 const userRoutes = require('./routes/users');
-
+//const addCarRoutes = require('./routes/addcar');
 
 // defining the server port.
 const port = process.env.PORT || 3001;
@@ -16,8 +16,7 @@ app.use(express.json());
 app.use('/images', express.static('images'));
 app.use('/cars', carRoutes);
 app.use('/user', userRoutes);
-
-
+//application.use('/AddCar', addCarRoutes);
 
 
 app.listen(port, () => {
