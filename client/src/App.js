@@ -10,6 +10,7 @@ import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
 import { CarListContext } from "./contexts/CarListContext";
 import { AllCarsContext } from "./contexts/AllCarsContext";
+import { UserImageProfileContext } from "./contexts/UserImageProfile";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -84,44 +85,59 @@ function App() {
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <AllCarsContext.Provider value={allCars}>
+          <UserImageProfileContext.Provider
+            value={{ userProfileImage, setUserImage }}
+          >
+            <Router>
+              {notFound ? (
+                <PageNotFound handleNotFound={handleNotFound} />
+              ) : isLoggedIn ? (
+                <UserNav handleLogout={handleLogout} />
+              ) : (
+                <NavBar openLogin={openLogin} openRegister={openRegister} />
+              )}
+              <Routes>
+                <Route path="/" element={<HomeLayout />} />
+                <Route path="/CarView/:platesNumber" element={<CarView />} />
+                <Route path="/FAQ" element={<FAQ />} />
+                <Route path="/ContactUs" element={<ContactUs />} />
+                <Route path="/AddCar" element={<AddCarForm />} />
 
-        <Router>
-          {notFound ? (
-            <PageNotFound handleNotFound={handleNotFound} />
-          ) : isLoggedIn ? (
-            <UserNav handleLogout={handleLogout} />
-          ) : (
-            <NavBar openLogin={openLogin} openRegister={openRegister} />
-          )}
-          <Routes>
-            <Route path="/" element={<HomeLayout />} />
-            <Route path="/CarView/:platesNumber" element={<CarView />} />
-            <Route path="/FAQ" element={<FAQ />} />
-            <Route path="/ContactUs" element={<ContactUs />} />
-            <Route path="/AddCar" element={<AddCarForm />} />
+                <Route
+                  path="/SearchResultDisplay"
+                  element={<SearchResultDisplay />}
+                />
+                {/* Private Home route for the logged in users */}
+                <Route
+                  path="/homepage"
+                  element={
+                    <PrivateRoute
+                      openLogin={openLogin}
+                      component={UserLayout}
+                    />
+                  }
+                />
+                {/* catch all */}
+                <Route
+                  path="*"
+                  element={<PageNotFound handleNotFound={handleNotFound} />}
+                />
+              </Routes>
 
-            <Route
-              path="/SearchResultDisplay"
-              element={<SearchResultDisplay />}
-            />
-            {/* Private Home route for the logged in users */}
-            <Route path="/homepage" element={<PrivateRoute openLogin={openLogin} component={UserLayout} />} />
-            {/* catch all */}
-            <Route
-              path="*"
-              element={<PageNotFound handleNotFound={handleNotFound} />}
-            />
-          </Routes>
-
-          {/* conditional rendering login and register components. */}
-          {showLogin && (
-            <Login handleLogin={handleLogin} onClose={closeLogin} />
-          )}
-          {showRegister && (
-            <Register onClose={closeRegister} openLogin={openLogin} setUserImage={setUserImage} />
-          )}
-          <Footer />
-        </Router>
+              {/* conditional rendering login and register components. */}
+              {showLogin && (
+                <Login handleLogin={handleLogin} onClose={closeLogin} />
+              )}
+              {showRegister && (
+                <Register
+                  onClose={closeRegister}
+                  openLogin={openLogin}
+                  setUserImage={setUserImage}
+                />
+              )}
+              <Footer />
+            </Router>
+          </UserImageProfileContext.Provider>
         </AllCarsContext.Provider>
       </CarListContext.Provider>
       <ToastContainer />

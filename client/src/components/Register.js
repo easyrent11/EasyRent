@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Login from "./Login";
 import { register } from "../api/CarApi";
 import { Cities } from "../res/Cities";
@@ -6,8 +6,9 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-
-export default function Register({ onClose, openLogin, setUserImage }) {
+import { UserImageProfileContext } from "../contexts/UserImageProfile";
+export default function Register({ onClose, openLogin }) {
+  const {setUserImage} = useContext(UserImageProfileContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ export default function Register({ onClose, openLogin, setUserImage }) {
   const [drivingLicense, setDrivingLicense] = useState("");
 
   const [showLogin, setShowLogin] = useState(false);
-
+  
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
     setCityName(selectedOption.label);
