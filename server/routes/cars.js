@@ -2,13 +2,17 @@ const express = require("express");
 const path = require("path");
 const router = express.Router();
 const fs = require("fs");
-const multer = require("multer");
 const db = require("../models/db");
+const axios = require('axios');
+const multer = require("multer");
+
 
 //call multer and  define  the images folder.
 const upload = multer({
   dest: path.join(__dirname, "../images"),
 }).array("carpics", 20);
+
+
 
 const sql = `
 SELECT c.*, m.model_name, mf.Manufacturer_Name, GROUP_CONCAT(ci.image_url) AS image_urls
@@ -35,14 +39,13 @@ GROUP BY c.Plates_Number;
 `;
 
 router.post("/searchcar", (req, res) => {
-  const { city, pickupDate, returnDate, carType, startTime, endTime } =
+  const { city, pickupDate, returnDate, startTime, endTime } =
     req.body;
 
   console.log("Start time = ", startTime, " End time = ", endTime);
   db.query(
     sql,
     [
-      carType,
       city,
       pickupDate,
       pickupDate,
@@ -62,6 +65,30 @@ router.post("/searchcar", (req, res) => {
     }
   );
 });
+
+router.get('/getallcars', (req, res) => {
+  const query = `
+    SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
+    FROM cars AS c
+    INNER JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
+    GROUP BY c.Plates_Number
+  `;
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error retrieving cars:', error);
+      res.status(500).json({ error: 'Error retrieving cars' });
+    } else {
+      const carsWithImages = results.map((car) => ({
+        ...car,
+        car_urls: car.car_urls ? car.car_urls.split(',') : [],
+      }));
+
+      res.status(200).json(carsWithImages);
+    }
+  });
+});
+
 
 
 router.post("/uploadImages", (req, res) => {
@@ -87,7 +114,7 @@ router.post("/uploadImages", (req, res) => {
         `../images/${newFileName}`
       ); // Construct the new file path
       fs.renameSync(file.path, newFilePath); // Rename the file
-      return `${req.protocol}://${req.get("host")}/images/${newFileName}`; // Return the URL of the renamed file example : http://localhost:3000/images/car1.jpg
+      return `${req.protocol}://${req.get("host")}/images/${newFileName}`; 
     });
 
     return res.json({ message: "Success", files: fileUrls });

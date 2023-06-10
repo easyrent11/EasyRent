@@ -1,18 +1,17 @@
 import React, { useState, useContext } from "react";
 import Select from "react-select";
 import { Cities } from "../res/Cities";
-import { CarTypes } from "../res/CarTypes";
 import { searchCars } from "../api/CarApi";
 import { CarListContext } from "../contexts/CarListContext";
 import { useNavigate } from 'react-router-dom';
-
-
-
 
 export default function SearchCar() {
   const navigate = useNavigate();
   // getting the update car list from the car list context so we can update it after searching for a car and getting the result back.
   const { updateCarList } = useContext(CarListContext);
+
+  // sorting the cities object list ascendingly
+  const sortedCities = Cities.sort((a, b) => a.label.localeCompare(b.label));
 
 
 
@@ -23,25 +22,14 @@ export default function SearchCar() {
   const [returnDate, setReturnDate] = useState("");
   const [fromTime, setFromTime] = useState("");
   const [toTime, setToTime] = useState("");
-  const [carType, setCarType] = useState("");
-  const [selectedCarTypeLabel, setSelectedCarTypeLabel] =
-    useState("Choose a car type");
 
   // on change event listener handlers for all the use states..
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
     setSelectedCityLabel(selectedOption.label);
   };
-  const handleCarTypeChange = (selectedOption) => {
-    setCarType(selectedOption.value);
-    setSelectedCarTypeLabel(selectedOption.label);
-  };
-  const handlePickUpDateChange = (e) => {
-    setPickUpDate(e.target.value);
-  };
-  const handleReturnDateChange = (e) => {
-    setReturnDate(e.target.value);
-  };
+  const handlePickUpDateChange = (e) => {setPickUpDate(e.target.value);};
+  const handleReturnDateChange = (e) => {setReturnDate(e.target.value);};
   const handleFromTimeChange = (e) => {setFromTime(e.target.value);}
   const handleToTimeChange = (e) => {setToTime(e.target.value);}
 
@@ -54,7 +42,6 @@ export default function SearchCar() {
       city: city,
       pickupDate: pickupDate,
       returnDate: returnDate,
-      carType: carType,
       startTime: fromTime,
       endTime: toTime,
     };
@@ -80,7 +67,7 @@ export default function SearchCar() {
           value={{ value: city, label: selectedCityLabel }}
           onChange={handleCityChange}
           noOptionsMessage={() => "Not Found"}
-          options={Cities}
+          options={sortedCities}
         />
       </div>
 
@@ -121,17 +108,6 @@ export default function SearchCar() {
           value={toTime}
           onChange={handleToTimeChange}
           className="w-full p-1.5 rounded-md"
-        />
-      </div>
-
-      <div className="flex-2 m-2 p-2">
-        <Select
-          id="carType"
-          value={{ value: carType, label: selectedCarTypeLabel }}
-          onChange={handleCarTypeChange}
-          options={CarTypes}
-          noOptionsMessage={() => "Not Found"}
-          placeholder="Select a car type"
         />
       </div>
 

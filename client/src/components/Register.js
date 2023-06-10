@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Login from "./Login";
-import {register} from '../api/CarApi';
+import { register } from "../api/CarApi";
 import { Cities } from "../res/Cities";
 import Select from "react-select";
-import { toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
-export default function Register({ onClose, openLogin }) {
+export default function Register({ onClose, openLogin, setUserImage }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ export default function Register({ onClose, openLogin }) {
   const [profilePicture, setProfilePicture] = useState(null);
   const [verifyPassword, setVerifyPassword] = useState("");
   const [city, setCity] = useState("");
+  const [city_name, setCityName] = useState("");
   const [selectedCityLabel, setSelectedCityLabel] = useState("Choose a city");
   const [streetName, setStreetName] = useState("");
   const [governmentId, setGovernmentId] = useState("");
@@ -24,44 +26,66 @@ export default function Register({ onClose, openLogin }) {
 
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
+    setCityName(selectedOption.label);
     setSelectedCityLabel(selectedOption.label);
   };
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0].name;
-    setProfilePicture(file);
+
+  const handleImageUpload = (event) => {
+    setProfilePicture(event.target.files[0]);
   };
 
   const notify = (message) => toast(message);
 
   const handleRegister = (e) => {
-
     e.preventDefault();
-    
+
     // Validate the password match
     if (password !== verifyPassword) {
-      console.log("The passwords you entered dont match try again.")
+      console.log("The passwords you entered dont match try again.");
       return;
     }
-    const registerInfo = {
-      id:governmentId,
-      phone_number:phoneNumber,
-      driving_license:drivingLicense,
-      picture:profilePicture,
-      email:email,
-      password: password,
-      city_code:city,
-      street_name:streetName,
-      first_name:firstName,
-      last_name:lastName,
-    }
+
+    // Create a new FormData instance
+    const formData = new FormData();
+    formData.append("profileImage", profilePicture);
 
     // Send the form data with the image to the server for registration
-    register(registerInfo)
-    .then((res) =>{
-      notify(res.data.message);
-      onClose();
-    })
-    .catch((err) => notify(err.data.message));
+    axios
+      .post("http://localhost:3001/user/uploadProfileImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        const { fileUrl } = response.data;
+        const pathname = new URL(fileUrl).pathname;
+        const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
+        setUserImage(filename);
+        const registerInfo = {
+          id: governmentId,
+          phone_number: phoneNumber,
+          driving_license: drivingLicense,
+          picture: filename,
+          email: email,
+          password: password,
+          city_code: city,
+          city_name: city_name, // Add the city name to the registerInfo object
+          street_name: streetName,
+          first_name: firstName,
+          last_name: lastName,
+        };
+    
+        // After successful image upload, proceed with registration
+        register(registerInfo)
+          .then((res) => {
+            notify(res.data.message);
+            onClose();
+          })
+          .catch((err) => notify(err.data.message));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const toggleLogin = () => {
@@ -177,10 +201,10 @@ export default function Register({ onClose, openLogin }) {
           <div>
             <label className="block mb-2">Profile Picture</label>
             <input
-               type="file"
-               className="border border-gray-300 px-4 py-2 rounded-md w-full"
-               name="profilepicture"
-               onChange={handleFileUpload}
+              type="file"
+              className="border border-gray-300 px-4 py-2 rounded-md w-full"
+              name="profilepicture"
+              onChange={handleImageUpload}
             />
           </div>
           <div>

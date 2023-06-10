@@ -5,17 +5,16 @@ import UserProfile from "./UserProfile";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import PersonIcon from '@mui/icons-material/Person';
 import  {TbManualGearbox} from "react-icons/tb";
-import {CarListContext}  from "../contexts/CarListContext";
-let url = 'http://localhost:3001/images/';
+import { AllCarsContext } from "../contexts/AllCarsContext";
+
 export default function CarView() {
-  const {carList}  = useContext(CarListContext);
+  const allCars = useContext(AllCarsContext);
   let flag = false;
   //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
-  const car = carList.find((car) => Number(car.Plates_Number) === Number(platesNumber));
-  const arr =  car.image_urls.split(',');
-
+  const car = allCars.find((car) => Number(car.Plates_Number) === Number(platesNumber));
+  console.log(car);
   
   //function that will make the image full screen when clicked on.
   const handleImageClick = (e) => {
@@ -31,12 +30,11 @@ export default function CarView() {
         {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel>
           
-          {!flag ? car.image_urls.split(',').map((image, index) => (
+          {!flag ? car.car_urls.map((image, index) => (
             <figure key={index} className="rounded-xl">
-              {console.log(image)}
               <img
                 onClick={handleImageClick}
-                src={`${url}${image}`}
+                src={`http://localhost:3001/images/${image}`}
                 alt={`Car Pic ${index + 1}`}
                 className="object-cover w-full h-80"
               />

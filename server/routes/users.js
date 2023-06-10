@@ -2,10 +2,12 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require('fs');
 const db = require("../models/db");
 const verifyToken = require("../middleware/auth");
+const multer = require("multer");
+const path = require('path');
 
-// Register a user
 router.post("/register", async (req, res) => {
   const {
     id,
@@ -15,6 +17,7 @@ router.post("/register", async (req, res) => {
     email,
     password,
     city_code,
+    city_name,
     street_name,
     first_name,
     last_name,
@@ -38,17 +41,67 @@ router.post("/register", async (req, res) => {
       last_name,
     };
 
-    // Insert the user into the "users" table
-    db.query("INSERT INTO users SET ?", user, (error, results) => {
-      if (error) {
-        console.error("Error registering user:", error);
-        res.status(500).json({ error: "Failed to register user" });
-      } else {
-        res
-          .status(200)
-          .json({ results: results, message: "User registered successfully" });
+    // Check if the city already exists
+    db.query(
+      "SELECT * FROM cities WHERE City_Code = ?",
+      [city_code],
+      (cityError, cityResults) => {
+        if (cityError) {
+          console.error("Error checking city:", cityError);
+          res.status(500).json({ error: "Failed to register user" });
+        } else {
+          if (cityResults.length > 0) {
+            // City already exists, update the user instead of inserting
+            db.query(
+              "INSERT INTO users SET ?",
+              user,
+              (userError, userResults) => {
+                if (userError) {
+                  console.error("Error registering user:", userError);
+                  res.status(500).json({ error: "Failed to register user" });
+                } else {
+                  res.status(200).json({
+                    results: userResults,
+                    message: "User registered successfully",
+                  });
+                }
+              }
+            );
+          } else {
+            // City does not exist, insert the city and user
+            db.query(
+              "INSERT INTO cities (City_Code, City_Name) VALUES (?, ?)",
+              [city_code, city_name],
+              (insertError) => {
+                if (insertError) {
+                  console.error("Error adding city:", insertError);
+                  res.status(500).json({ error: "Failed to register user" });
+                } else {
+                  // Insert the user into the "users" table
+                  db.query(
+                    "INSERT INTO users SET ?",
+                    user,
+                    (userError, userResults) => {
+                      if (userError) {
+                        console.error("Error registering user:", userError);
+                        res
+                          .status(500)
+                          .json({ error: "Failed to register user" });
+                      } else {
+                        res.status(200).json({
+                          results: userResults,
+                          message: "User registered successfully",
+                        });
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        }
       }
-    });
+    );
   } catch (error) {
     console.error("Error hashing password:", error);
     res.status(500).json({ error: "Failed to register user" });
@@ -101,6 +154,204 @@ router.get("/homepage", verifyToken, (req, res) => {
   res.json({ message: `Welcome, ${userEmail}! This is your home page.` });
 });
 
+// Route for adding a car
+router.post("/addcar", (req, res) => {
+  const {
+    Manufacturer_Name,
+    Manufacturer_Code,
+    model_name,
+    model_code,
+    Plates_Number,
+    Year,
+    Color,
+    Seats_Amount,
+    Engine_Type,
+    Transmission_type,
+    Description,
+    Rental_Price_Per_Day,
+    Renter_Id,
+    image_url,
+  } = req.body;
 
+  console.log(image_url, Renter_Id);
+
+  // Check if the manufacturer exists in the manufacturers table
+  db.query(
+    "SELECT * FROM car_manufacturer WHERE Manufacturer_Code = ?",
+    [Manufacturer_Code],
+    (error, manufacturerResults) => {
+      if (error) {
+        console.error("Error checking manufacturer:", error);
+        res.status(500).json({ error: "Failed to add car" });
+      } else {
+        if (manufacturerResults.length === 0) {
+          // Manufacturer does not exist, insert into manufacturers table
+          db.query(
+            "INSERT INTO car_manufacturer (Manufacturer_Code, Manufacturer_Name) VALUES (?, ?)",
+            [Manufacturer_Code, Manufacturer_Name],
+            (error) => {
+              if (error) {
+                console.error("Error adding manufacturer:", error);
+                res.status(500).json({ error: "Failed to add car" });
+              } else {
+                // Proceed to insert the model information
+                insertModel();
+              }
+            }
+          );
+        } else {
+          // Manufacturer exists, proceed to insert the model information
+          insertModel();
+        }
+      }
+    }
+  );
+
+  // Function to insert the model information
+  function insertModel() {
+    // Check if the model exists in the models table
+    db.query(
+      "SELECT * FROM car_models WHERE model_code = ?",
+      [model_code],
+      (error, modelResults) => {
+        if (error) {
+          console.error("Error checking model:", error);
+          res.status(500).json({ error: "Failed to add car" });
+        } else {
+          if (modelResults.length === 0) {
+            // Model does not exist, insert into models table
+            db.query(
+              "INSERT INTO car_models (model_code, model_name, Manufacturer_code) VALUES (?, ?, ?)",
+              [model_code, model_name, Manufacturer_Code],
+              (error) => {
+                if (error) {
+                  console.error("Error adding model:", error);
+                  res.status(500).json({ error: "Failed to add car" });
+                } else {
+                  // Proceed to insert the type information
+                  insertCar();
+                }
+              }
+            );
+          } else {
+            // Model exists, proceed to insert the type information
+            insertCar();
+          }
+        }
+      }
+    );
+  }
+  // Function to insert the car details into the cars table
+
+  function insertCar() {
+    db.query(
+      "SELECT id FROM users WHERE id = ?",
+      [Renter_Id],
+      (error, results) => {
+        if (error) {
+          console.error("Error checking user:", error);
+          res.status(500).json({ error: "Failed to add car" });
+        } else {
+          if (results.length === 0) {
+            // User with the specified Renter_Id doesn't exist
+            res.status(400).json({ error: "Renter_Id not found" });
+          } else {
+            // User exists, proceed to insert the car
+            db.query(
+              "INSERT INTO cars (Manufacturer_Code, model_code, Plates_Number, Year, Color, Seats_Amount, Engine_Type, Transmission_type, Description, Rental_Price_Per_Day, Renter_Id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+              [
+                Manufacturer_Code,
+                model_code,
+                Plates_Number,
+                Year,
+                Color,
+                Seats_Amount,
+                Engine_Type,
+                Transmission_type,
+                Description,
+                Rental_Price_Per_Day,
+                Renter_Id,
+              ],
+              (error, results) => {
+                if (error) {
+                  console.error("Error adding car:", error);
+                  res.status(500).json({ error: "Failed to add car" });
+                } else {
+                  // Proceed to insert the image URLs into the car_images table
+                  const fileUrls = image_url || [];
+                  const insertPromises = fileUrls.map((url) => {
+                    return new Promise((resolve, reject) => {
+                      db.query(
+                        "INSERT INTO car_images (Plates_Number, image_url) VALUES (?, ?)",
+                        [Plates_Number, url],
+                        (error) => {
+                          if (error) {
+                            console.error("Error adding image URL:", error);
+                            reject(error);
+                          } else {
+                            resolve();
+                          }
+                        }
+                      );
+                    });
+                  });
+
+                  //Execute all insert promises
+                  Promise.all(insertPromises)
+                    .then(() => {
+                      res
+                        .status(200)
+                        .json({ message: "Car added successfully" });
+                    })
+                    .catch((error) => {
+                      res
+                        .status(500)
+                        .json({ error: "Failed to add car images" });
+                    });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  }
+});
+
+router.post("/uploadProfileImage", (req, res) => {
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred during file upload
+      console.error(err);
+      return res.status(500).json({ message: "File upload error" });
+    } else if (err) {
+      // An unknown error occurred during file upload
+      console.error(err);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    // Check if a file was uploaded
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: "No file provided" });
+    }
+
+    //  If no errors occured , Process the uploaded file
+    const fileExtension = file.mimetype.split("/")[1];
+    const newFileName = `${file.filename}.${fileExtension}`;
+    const newFilePath = path.join(__dirname, "../images", newFileName);
+    fs.renameSync(file.path, newFilePath);
+
+    const fileUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/images/${newFileName}`;
+
+    return res.json({ message: "Success", fileUrl });
+  });
+});
+
+const upload = multer({
+  dest: path.join(__dirname, "../images"),
+}).single("profileImage");
 
 module.exports = router;

@@ -56,7 +56,7 @@ export default function Login({ onClose,handleLogin }) {
   return (
     <>
       <section className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900 border-3">
-        <div className="bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg h-2/">
+        <div className="bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg">
           <form>
             <div className="flex justify-end">
               <button

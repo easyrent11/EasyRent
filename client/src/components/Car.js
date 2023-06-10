@@ -9,12 +9,11 @@ export default function Car({car}) {
  
   return (
 
-      <div className='flex flex-col rounded-md w-1/4 items-center bg-[#FFFFFF] m-8 p-4 min-w-screen-2xl:w-1/5'>
+      <div className='flex flex-col rounded-md w-full items-center bg-[#FFFFFF]  m-8 p-4 min-w-screen-2xl:w-1/5'>
         
         <Link to={`/CarView/${car.Plates_Number}`}>
-          <figure className='flex items-center w-full h-40 justify-center'> 
-            <h1>car img</h1>
-            {/* <img className="w-full h-full rounded-md " src={car.Image} alt="Logo" /> */}
+          <figure className='flex flex-col items-center w-full  h-40 justify-center'> 
+            <img className="w-full h-full rounded-md " src={`http://localhost:3001/images/${car.car_urls[0]}`} alt="Car Image" />
           </figure>
         </Link>
 

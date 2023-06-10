@@ -10,7 +10,6 @@ export default function FirstSection() {
         <SearchCar/>
         <MainTitle/>
         </article>
-        <button className="bg-[#CC6200] rounded-md w-2/2 p-3"><a href="getstarted">Get Started Now</a></button>
       </div>
     </>
   )

@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import FirstSection from "../components/FirstSection";
-import SearchResultDisplay from './SearchResultDisplay';
+import AllCarsSection from '../components/AllCarsSection';
+
 export default function UserLayout() {
   return (
     <>
         <FirstSection/>
-        <SearchResultDisplay/>
+        <AllCarsSection/>
     </>
   )
 }
