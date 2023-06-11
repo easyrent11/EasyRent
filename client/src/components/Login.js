@@ -1,56 +1,59 @@
-import React, { useState } from "react";
+import React, { useState , useContext} from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/CarApi";
+import jwt_decode from "jwt-decode";
+import { UserProfileDetails } from "../contexts/UserProfileDetails";
 
-export default function Login({ onClose,handleLogin }) {
+
+
+export default function Login({ onClose, handleLogin }) {
   const navigate = useNavigate();
+  const {setUserId, setUserFirstName} = useContext(UserProfileDetails);
+
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   // function that takes a message and displays it as an alert popout.
-  const notify = (status,message) => status === 'success' ? toast.success(message) : toast.error(message);
+  const notify = (status, message) =>
+    status === "success" ? toast.success(message) : toast.error(message);
 
   // handle the login submit.
   const handleFormLogin = (e) => {
     e.preventDefault();
-
     // check if user is already signed in
-    const token = localStorage.getItem('token');
-
+    const token = localStorage.getItem("token");
     if (token) {
       // User is already signed in, display a message or handle accordingly
-      notify('error', 'You are already signed in');
+      notify("error", "You are already signed in");
       return;
     }
-
-
     // creating the login object.
     const loginInfo = {
       email: email,
       password: password,
     };
-
     // sending the login object to the backend and displaying the result .
     login(loginInfo)
       .then((res) => {
-        notify('success',res.data.message);
-        onClose();
-        localStorage.setItem('token', res.data.token)
+        localStorage.setItem("token", res.data.token);
+        notify("success", res.data.message);  
+        setUserFirstName(res.data.userFirstName);
+        setUserId(res.data.userId);
         handleLogin(true);
-        navigate('/homepage');
+        navigate("/homepage");
       })
       .catch((err) => {
-        notify('error',err.response.data.message);
+        notify("error", err.response.data.message);
       })
-      // reset the email and password field.
       .finally(() => {
         setEmail("");
         setPassword("");
       });
+      onClose();
   };
 
   return (
