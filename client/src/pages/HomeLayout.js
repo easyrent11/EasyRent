@@ -7,7 +7,6 @@ export default function HomeLayout() {
   return (
     <>
         <FirstSection/>
-        <SecondSection/>
         <SectionThree/>
     </>
   )

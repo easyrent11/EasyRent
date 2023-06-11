@@ -5,7 +5,7 @@ import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { UserImageProfileContext } from "../contexts/UserImageProfile";
+import { UserProfileDetails } from "../contexts/UserProfileDetails";
 
 const navigation = [
   { name: "Dashboard", href: "/homepage", current: true },
@@ -19,8 +19,45 @@ function classNames(...classes) {
 }
 
 export default function UserNav({ handleLogout }) {
-  const { userProfileImage } = useContext(UserImageProfileContext);
-  console.log(userProfileImage);
+  //getting the car profile image from the context.
+  const { userProfileImage, userFirstName } = useContext(UserProfileDetails);
+  console.log("In nav bar = ", userFirstName, userProfileImage);
+
+  // function that generates a random color for the user profile background in case theres no image.
+  // function getRandomColor() {
+  //   const letters = "0123456789ABCDEF";
+  //   let color = "#";
+
+  //   for (let i = 0; i < 6; i++) {
+  //     color += letters[Math.floor(Math.random() * 16)];
+  //   }
+  //   return color;
+  // }
+  // Generate placeholder image if userProfileImage is null
+  let placeholderImage = null;
+  if (!userProfileImage) {
+    const firstNameInitial = userFirstName.charAt(0).toUpperCase();
+    const backgroundColor = "#000000";
+
+    const styles = {
+      backgroundColor,
+      color: "white", // Set the text color to white
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "32px",
+      width: "32px",
+      borderRadius: "50%",
+      fontWeight: "bold",
+    };
+
+    placeholderImage = (
+      <div style={styles}>
+        <span>{firstNameInitial}</span>
+      </div>
+    );
+  }
+
   const navigate = useNavigate();
 
   const logout = () => {
@@ -92,11 +129,15 @@ export default function UserNav({ handleLogout }) {
                   <div>
                     <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src={`http://localhost:3001/images/${userProfileImage}`}
-                        alt=""
-                      />
+                      {userProfileImage ? (
+                        <img
+                          className="h-8 w-8 rounded-full"
+                          src={`http://localhost:3001/images/${userProfileImage}`}
+                          alt=""
+                        />
+                      ) : (
+                        placeholderImage
+                      )}
                     </Menu.Button>
                   </div>
                   <Transition

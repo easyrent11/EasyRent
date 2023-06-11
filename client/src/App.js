@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -10,16 +10,15 @@ import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
 import { CarListContext } from "./contexts/CarListContext";
 import { AllCarsContext } from "./contexts/AllCarsContext";
-import { UserImageProfileContext } from "./contexts/UserImageProfile";
+import { UserProfileDetails } from "./contexts/UserProfileDetails";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./components/PrivateRoute";
 import UserLayout from "./pages/UserLayout";
 import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
 import AddCarForm from "./components/AddCar";
-import { getAllCars } from "./api/CarApi";
 import axios from "axios";
 
 function App() {
@@ -30,14 +29,16 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notFound, setNotFound] = useState(false);
+
+  // user details states.
   const [userProfileImage, setUserProfileImage] = useState(null);
+  const [userFirstName, setUserFirstName] = useState("");
+  const [userId, setUserId] = useState("");
+
 
   const updateCarList = (updatedList) => setCarList(updatedList);
-  const setUserImage = (userImageUrl) => setUserProfileImage(userImageUrl);
   const closeLogin = () => setShowLogin(false);
   const closeRegister = () => setShowRegister(false);
-
-
 
   const openLogin = () => {
     setShowLogin(true);
@@ -56,9 +57,6 @@ function App() {
   const handleLogin = () => setIsLoggedIn(true);
   const handleNotFound = () => setNotFound(true);
 
-  
-
-
   useEffect(() => {
     // Fetch all cars from backend API using Axios
     axios
@@ -75,8 +73,10 @@ function App() {
   // try to get the token if the token exists change the isLogged state.
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) setIsLoggedIn(true);
-    else {
+    if (token) {
+      setIsLoggedIn(true);
+      
+    } else {
       setIsLoggedIn(false);
     }
   }, []);
@@ -85,9 +85,7 @@ function App() {
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <AllCarsContext.Provider value={allCars}>
-          <UserImageProfileContext.Provider
-            value={{ userProfileImage, setUserImage }}
-          >
+          <UserProfileDetails.Provider value={{userProfileImage, setUserProfileImage, userFirstName, setUserFirstName, userId, setUserId}}>
             <Router>
               {notFound ? (
                 <PageNotFound handleNotFound={handleNotFound} />
@@ -126,18 +124,17 @@ function App() {
 
               {/* conditional rendering login and register components. */}
               {showLogin && (
-                <Login handleLogin={handleLogin} onClose={closeLogin} />
+                <Login handleLogin={handleLogin} onClose={closeLogin}/>
               )}
               {showRegister && (
                 <Register
                   onClose={closeRegister}
                   openLogin={openLogin}
-                  setUserImage={setUserImage}
                 />
               )}
               <Footer />
             </Router>
-          </UserImageProfileContext.Provider>
+          </UserProfileDetails.Provider>
         </AllCarsContext.Provider>
       </CarListContext.Provider>
       <ToastContainer />

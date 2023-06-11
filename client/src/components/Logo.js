@@ -1,10 +1,13 @@
-import React from 'react';
-import logoImage from '../Assets/logo.png';
-
+import React from "react";
+import logoImage from "../Assets/logo.png";
+import { Link } from "react-router-dom";
 export default function Logo() {
   return (
-      <figure className='flex items-center w-1/5 h-20 justify-center'>
-        <img className="w-full h-auto" src={logoImage} alt="Logo" />
+    <Link to="/">
+      <figure className="flex items-center mr-10">
+        <img className="w-12  h-auto md:w-16 lg:w-20" src={logoImage} alt="Logo" />
+        <figcaption className="ml-2 text-xl font-bold">EasyRent</figcaption>
       </figure>
+    </Link>
   );
 }

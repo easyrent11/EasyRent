@@ -2,6 +2,8 @@ import React from "react";
 import { FaFacebook, FaInstagram, FaGithub } from "react-icons/fa";
 import { FiMapPin, FiPhone } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { Link as ScrollLink } from "react-scroll";
+
 export default function Footer() {
   return (
     <footer className="  bg-black py-6 w-full">
@@ -23,8 +25,7 @@ export default function Footer() {
           <h4 className="text-xl font-bold p-2 m-1 mb-4">Contact Info</h4>
           <p className="flex items-center justify-center p-2 m-1">
             {" "}
-            <FiMapPin className="m-1" />
-            Street Address: 123 EasyRent St, Haifa, Israel
+            <FiMapPin className="m-1"  />Street Address: 123 EasyRent St, Haifa, Israel
           </p>
           <p className="flex items-center justify-center p-2 m-1">
             {" "}
@@ -38,8 +39,17 @@ export default function Footer() {
             FAQ
           </Link>
           <Link to="/ContactUs" className="text-[#CC6200] mb-2 ">
-            Contact Us
+            Contact
           </Link>
+          <ScrollLink
+              className="cursor-pointer mb-2 text-[#CC6200]"
+              activeClass="active"
+              to="about"
+              spy={true}
+              smooth={true}
+              duration={500}
+            > About 
+            </ScrollLink>
         </div>
       </article>
 
@@ -58,7 +68,7 @@ export default function Footer() {
 
       <div className="m-4 p-4 ">
         <span className=" text-white text-lg p-2 m-w-full m-2 ">
-          © Copyright EasyRent 2023
+          © Copyright 2023, All rights reserved.
         </span>
       </div>
     </footer>
