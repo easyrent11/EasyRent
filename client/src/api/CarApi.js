@@ -46,3 +46,4 @@ export const register = (registerInfo) => {
 export const login = (loginInfo) => {
   return axios.post(`${BASE_URL_USER}/login`, loginInfo);
 };
+export const getAllUserDetails = (userId) => axios.get(`${BASE_URL_USER}/getuser/${userId}`);

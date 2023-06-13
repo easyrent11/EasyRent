@@ -142,7 +142,9 @@ router.post("/login", (req, res) => {
     // Send the token and success message as a response
     res.status(200).json({
       message: "Login successful",
-      token, userFirstName:user.first_name, userId:user.Id
+      token,
+      userFirstName: user.first_name,
+      userId: user.Id,
     });
   });
 });
@@ -317,6 +319,50 @@ router.post("/addcar", (req, res) => {
       }
     );
   }
+});
+
+router.get("/getuser/:id", (req, res) => {
+  const userId = req.params.id;
+  const query = `SELECT * FROM users WHERE id = ${userId}`;
+  db.query(query, (error, results) => {
+    if (error) {
+      // Handle the error
+      console.error('Error retrieving user info:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      // User info retrieved successfully
+      res.json(results);
+    }
+  });
+
+});
+
+// route to update user infomation.
+router.put("/updateuserdetails", (req, res) => {
+  // Retrieve the updated user details from the request body
+  const updatedUserDetails = req.body;
+  console.log(updatedUserDetails);
+  // Construct the SQL query to update the user details
+  const query = `
+    UPDATE users
+    SET
+      first_name = '${updatedUserDetails.first_name}',
+      last_name = '${updatedUserDetails.last_name}',
+      email = '${updatedUserDetails.email}',
+      phone_number = '${updatedUserDetails.phone_number}',
+      driving_license = '${updatedUserDetails.driving_license}'
+    WHERE id = ${updatedUserDetails.Id}
+  `;
+
+  // Execute the SQL query
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ message: 'Failed to update user profile' });
+    } else {
+      res.json({ message: 'User profile updated successfully' });
+    }
+  });
 });
 
 router.post("/uploadProfileImage", (req, res) => {

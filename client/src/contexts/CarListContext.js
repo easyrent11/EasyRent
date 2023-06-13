@@ -1,3 +1,3 @@
 import { createContext } from "react";
 
-export const CarListContext = createContext([]);
+export const CarListContext = createContext();

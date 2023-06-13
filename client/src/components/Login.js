@@ -4,16 +4,11 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/CarApi";
-import jwt_decode from "jwt-decode";
-import { UserProfileDetails } from "../contexts/UserProfileDetails";
 
 
 
 export default function Login({ onClose, handleLogin }) {
   const navigate = useNavigate();
-  const {setUserId, setUserFirstName} = useContext(UserProfileDetails);
-
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -40,9 +35,8 @@ export default function Login({ onClose, handleLogin }) {
     login(loginInfo)
       .then((res) => {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.userId);
         notify("success", res.data.message);  
-        setUserFirstName(res.data.userFirstName);
-        setUserId(res.data.userId);
         handleLogin(true);
         navigate("/homepage");
       })

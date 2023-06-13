@@ -20,6 +20,8 @@ import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
 import AddCarForm from "./components/AddCar";
 import axios from "axios";
+import {getAllUserDetails} from "./api/CarApi";
+import UserProfile from "./components/UserProfile";
 
 function App() {
   const [carList, setCarList] = useState([]);
@@ -29,12 +31,8 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notFound, setNotFound] = useState(false);
-
-  // user details states.
-  const [userProfileImage, setUserProfileImage] = useState(null);
-  const [userFirstName, setUserFirstName] = useState("");
-  const [userId, setUserId] = useState("");
-
+  const [userDetails, setUserDetails] = useState("");
+ 
 
   const updateCarList = (updatedList) => setCarList(updatedList);
   const closeLogin = () => setShowLogin(false);
@@ -81,11 +79,21 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    getAllUserDetails(userId)
+    .then((res) => {
+      console.log(res.data);
+      setUserDetails(res.data[0]);
+    })
+    .catch((err) => console.log("Couldnt get user details ", err));
+  },[]);
+
   return (
     <>
       <CarListContext.Provider value={{ carList, updateCarList }}>
         <AllCarsContext.Provider value={allCars}>
-          <UserProfileDetails.Provider value={{userProfileImage, setUserProfileImage, userFirstName, setUserFirstName, userId, setUserId}}>
+          <UserProfileDetails.Provider value={userDetails}>
             <Router>
               {notFound ? (
                 <PageNotFound handleNotFound={handleNotFound} />
@@ -100,6 +108,7 @@ function App() {
                 <Route path="/FAQ" element={<FAQ />} />
                 <Route path="/ContactUs" element={<ContactUs />} />
                 <Route path="/AddCar" element={<AddCarForm />} />
+                <Route path="/UserProfile" element={<UserProfile />} />
 
                 <Route
                   path="/SearchResultDisplay"

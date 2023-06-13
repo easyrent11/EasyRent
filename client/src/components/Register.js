@@ -6,10 +6,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { UserProfileDetails } from "../contexts/UserProfileDetails";
 export default function Register({ onClose, openLogin }) {
-
-  const {setUserProfileImage} = useContext(UserProfileDetails);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -63,7 +60,6 @@ export default function Register({ onClose, openLogin }) {
         const { fileUrl } = response.data;
         const pathname = new URL(fileUrl).pathname;
         const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
-        setUserProfileImage(filename);
         const registerInfo = {
           id: governmentId,
           phone_number: phoneNumber,
