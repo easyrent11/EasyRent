@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { addCar } from "../api/CarApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
+import {UserProfileDetails} from "../contexts/UserProfileDetails";
 
 export default function AddCarForm() {
+  const userDetails = useContext(UserProfileDetails);
+  const userId = userDetails.Id;
+
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
     label: make.brand,
@@ -23,7 +27,7 @@ export default function AddCarForm() {
   const [transmissionType, setTransmissionType] = useState("");
   const [description, setDescription] = useState("");
   const [rentalPricePerDay, setRentalPricePerDay] = useState(0);
-  const [carImages, setCarImages] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
 
   const notify = (status, message) =>
     status === "success" ? toast.success(message) : toast.error(message);
@@ -73,6 +77,7 @@ export default function AddCarForm() {
   };
 
   const uploadImages = (files) => {
+
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append("carpics", files[i]);
@@ -88,53 +93,54 @@ export default function AddCarForm() {
   const handleImageUpload = (event) => {
     const fileList = event.target.files;
     const files = Array.from(fileList);
-    uploadImages(files)
+    setUploadedImages(files); // Store the selected files temporarily
+  };
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  
+    uploadImages(uploadedImages)
       .then((response) => {
-        console.log(response.data);
         const { files } = response.data;
         const filenames = files.map((url) => {
           const pathname = new URL(url).pathname;
           return pathname.substring(pathname.lastIndexOf("/") + 1);
         });
-        setCarImages(filenames);
+  
+        const carData = {
+          Manufacturer_Name: selectedManufacturer ? selectedManufacturer.value : "",
+          Manufacturer_Code: selectedManufacturer
+            ? selectedManufacturer.value.toLowerCase()
+            : "",
+          model_name: selectedModel,
+          model_code: selectedModel ? selectedModel.toLowerCase() : "",
+          Plates_Number: platesNumber,
+          Year: year.value,
+          Color: color.value,
+          Seats_Amount: seatsAmount.value,
+          Engine_Type: engineType.value,
+          Transmission_type: transmissionType.value,
+          Description: description,
+          Rental_Price_Per_Day: rentalPricePerDay,
+          Renter_Id: userId,
+          image_url: filenames
+        };
+  
+        addCar(carData)
+          .then((res) => {
+            console.log(res);
+            notify("success", res.data.message);
+          })
+          .catch((err) => {
+            notify("error", err.response.data.message);
+          });
       })
       .catch((error) => {
         console.error(error);
       });
   };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Create an object to hold the form data
-    const carData = {
-      Manufacturer_Name: selectedManufacturer ? selectedManufacturer.value : "",
-      Manufacturer_Code: selectedManufacturer
-        ? selectedManufacturer.value.toLowerCase()
-        : "",
-      model_name: selectedModel,
-      model_code: selectedModel ? selectedModel.toLowerCase() : "",
-      Plates_Number: platesNumber,
-      Year: year.value,
-      Color: color.value,
-      Seats_Amount: seatsAmount.value,
-      Engine_Type: engineType.value,
-      Transmission_type: transmissionType.value,
-      Description: description,
-      Rental_Price_Per_Day: rentalPricePerDay,
-      Renter_Id: 123456789,
-      image_url: carImages,
-    };
-
-    addCar(carData)
-      .then((res) => {
-        console.log(res);
-        notify("success", res.data.message);
-      })
-      .catch((err) => {
-        notify("error", err.response.data.message);
-      });
-  };
-
+  
   return (
     <div className="flex flex-col w-1/2 justify-center bg-[#E7E7E7] shadow-md rounded-lg p-6">
       <h2 className="text-2xl text-center font-semibold mb-4">Add Car</h2>
