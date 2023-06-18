@@ -7,10 +7,13 @@ export default function UserProfile() {
   const userDetails = useContext(UserProfileDetails);
   const [editing, setEditing] = useState(false);
   const [updatedUserDetails, setUpdatedUserDetails] = useState(userDetails);
+  const [updatedImage, setUpdatedImage] = useState(null);
 
   const handleEdit = () => {
     setEditing(true);
+    setUpdatedUserDetails(userDetails);
   };
+
 
   const handleCancel = () => {
     setUpdatedUserDetails(userDetails);
@@ -18,25 +21,83 @@ export default function UserProfile() {
   };
 
   const handleSave = () => {
-
-    console.log("User details updated:", updatedUserDetails);
+    if (updatedImage) {
+      const formData = new FormData();
+      formData.append("profileImage", updatedImage);
   
-    axios.put('http://localhost:3001/user/updateuserdetails', updatedUserDetails)
-      .then(response => {
-        toast.success("User details saved successfully:", response.data);
-        setEditing(false);
-      })
-      .catch(error => {
-        toast.error("Failed to save user details:", error);
-      });
+      axios
+        .post("http://localhost:3001/user/uploadProfileImage", formData)
+        .then((response) => {
+          const { fileUrl } = response.data;
+          const pathname = new URL(fileUrl).pathname;
+          const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
+          // Once the image is uploaded, update the user details and send the updated details
+          const updatedDetailsWithPicture = {
+            ...updatedUserDetails,
+            picture: filename, // Assuming the response contains the updated file name
+          };
+          console.log(updatedDetailsWithPicture);
+  
+          // Send the updated user details
+          axios
+            .put("http://localhost:3001/user/updateuserdetails", updatedDetailsWithPicture)
+            .then((response) => {
+              toast.success("User details saved successfully:", response.data);
+              setEditing(false);
+            })
+            .catch((error) => {
+              toast.error("Failed to save user details:", error);
+            });
+        })
+        .catch((error) => {
+          toast.error("Failed to upload profile picture:", error);
+        });
+    } else {
+      axios
+        .put("http://localhost:3001/user/updateuserdetails", updatedUserDetails)
+        .then((response) => {
+          toast.success("User details saved successfully:", response.data);
+          setEditing(false);
+        })
+        .catch((error) => {
+          toast.error("Failed to save user details:", error);
+        });
+    }
   };
+  
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedUserDetails((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
+    const { name, value, files } = e.target;
+    if (name === "picture" && files.length > 0) {
+      // Get the first file from the selected files
+      const file = files[0];
+      setUpdatedImage(file);
+      setUpdatedUserDetails((prevState) => ({
+        ...prevState,
+        [name]: file,
+      }));
+    } else {
+      setUpdatedUserDetails((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
+  
+
+
+  const renderInputOrText = (fieldName, label) => {
+    return editing ? (
+      <input
+        type="text"
+        name={fieldName}
+        value={updatedUserDetails[fieldName]}
+        onChange={handleChange}
+        className="text-black"
+      />
+    ) : (
+      <p className="text-black">{userDetails[fieldName]}</p>
+    );
   };
 
   return (
@@ -63,93 +124,46 @@ export default function UserProfile() {
             <div className="flex flex-wrap mb-4">
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">ID:</p>
-                {editing ? (
-                  <input
-                    type="number"
-                    name="Id"
-                    value={updatedUserDetails.Id}
-                    onChange={handleChange}
-                    className="text-black"
-                  />
-                ) : (
-                  <p className="text-black">{userDetails.Id}</p>
-                )}
+                {renderInputOrText("Id", "ID")}
               </div>
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">First Name:</p>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={updatedUserDetails.first_name}
-                    onChange={handleChange}
-                    className="text-black"
-                  />
-                ) : (
-                  <p className="text-black">{userDetails.first_name}</p>
-                )}
+                {renderInputOrText("first_name", "First Name")}
               </div>
             </div>
             <div className="flex flex-wrap mb-4">
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">Last Name:</p>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={updatedUserDetails.last_name}
-                    onChange={handleChange}
-                    className="text-black"
-                  />
-                ) : (
-                  <p className="text-black">{userDetails.last_name}</p>
-                )}
+                {renderInputOrText("last_name", "Last Name")}
               </div>
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">Email:</p>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="email"
-                    value={updatedUserDetails.email}
-                    onChange={handleChange}
-                    className="text-black"
-                  />
-                ) : (
-                  <p className="text-black">{userDetails.email}</p>
-                )}
+                {renderInputOrText("email", "Email")}
               </div>
             </div>
             <div className="flex flex-wrap mb-4">
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">Phone Number:</p>
-                {editing ? (
-                  <input
-                    type="number"
-                    name="phone_number"
-                    value={updatedUserDetails.phone_number}
-                    onChange={handleChange}
-                    className="text-black"
-                  />
-                ) : (
-                  <p className="text-black">{userDetails.phone_number}</p>
-                )}
+                {renderInputOrText("phone_number", "Phone Number")}
               </div>
               <div className="w-1/2">
                 <p className="text-lg font-bold text-black">Driving License:</p>
-                {editing ? (
+                {renderInputOrText("driving_license", "Driving License")}
+              </div>
+            </div>
+            {editing && (
+              <div className="flex flex-wrap mb-4">
+                <div className="w-full">
+                  <p className="text-lg font-bold text-black">Profile Picture:</p>
                   <input
-                    type="number"
-                    name="driving_license"
-                    value={updatedUserDetails.driving_license}
+                    type="file"
+                    name="picture"
                     onChange={handleChange}
                     className="text-black"
                   />
-                ) : (
-                  <p className="text-black">{userDetails.driving_license}</p>
-                )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Buttons */}

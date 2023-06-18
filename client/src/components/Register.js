@@ -48,7 +48,6 @@ export default function Register({ onClose, openLogin }) {
     // Create a new FormData instance
     const formData = new FormData();
     formData.append("profileImage", profilePicture);
-
     // Send the form data with the image to the server for registration
     axios
       .post("http://localhost:3001/user/uploadProfileImage", formData, {

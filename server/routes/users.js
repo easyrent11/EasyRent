@@ -7,6 +7,7 @@ const db = require("../models/db");
 const verifyToken = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
+const e = require("express");
 
 router.post("/register", async (req, res) => {
   const {
@@ -327,14 +328,13 @@ router.get("/getuser/:id", (req, res) => {
   db.query(query, (error, results) => {
     if (error) {
       // Handle the error
-      console.error('Error retrieving user info:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error retrieving user info:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     } else {
       // User info retrieved successfully
       res.json(results);
     }
   });
-
 });
 
 // route to update user infomation.
@@ -342,7 +342,35 @@ router.put("/updateuserdetails", (req, res) => {
   // Retrieve the updated user details from the request body
   const updatedUserDetails = req.body;
   console.log(updatedUserDetails);
-  // Construct the SQL query to update the user details
+
+  // Get the previous picture filename from the database
+  const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
+
+  db.query(findPreviousPictureQuery, (error, results) => {
+    if (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Could not find user old picture" });
+    } else {
+      if (results.length > 0) {
+        const previousPictureFilename = results[0].picture;
+        const filePath = path.join(
+          __dirname,
+          "../images/",
+          previousPictureFilename
+        );
+        fs.unlink(filePath, (error) => {
+          if (error) {
+            console.error("Error deleting previous picture:", error);
+          } else {
+            console.log("Previous picture deleted successfully");
+          }
+        });
+      } else {
+        console.log("No previous picture found");
+      }
+    }
+  });
+
   const query = `
     UPDATE users
     SET
@@ -350,17 +378,17 @@ router.put("/updateuserdetails", (req, res) => {
       last_name = '${updatedUserDetails.last_name}',
       email = '${updatedUserDetails.email}',
       phone_number = '${updatedUserDetails.phone_number}',
-      driving_license = '${updatedUserDetails.driving_license}'
+      driving_license = '${updatedUserDetails.driving_license}',
+      picture = '${updatedUserDetails.picture}'
     WHERE id = ${updatedUserDetails.Id}
   `;
-
   // Execute the SQL query
   db.query(query, (error, results) => {
     if (error) {
-      console.error('Error updating user profile:', error);
-      res.status(500).json({ message: 'Failed to update user profile' });
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Failed to update user profile" });
     } else {
-      res.json({ message: 'User profile updated successfully' });
+      res.json({ message: "User profile updated successfully" });
     }
   });
 });
