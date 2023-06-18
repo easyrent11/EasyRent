@@ -101,96 +101,102 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="min-h-50vh flex border-2 border-blue-500 container mx-auto px-4 py-8">
-      <div className="w-1/2">
-        {/* Display user profile image */}
-        <div className="flex flex-col items-center justify-center border-2 h-full border-black">
-          <figure className="flex flex-col items-center justify-center">
-            <img
-              src={`http://localhost:3001/images/${userDetails.picture}`}
-              alt="User Image"
-              className="border-2 flex w-32 h-32 rounded-full"
-            />
-          </figure>
-          <figcaption className="text-xl">
-            {userDetails.street_name}, {userDetails.city_code}, Israel
-          </figcaption>
+    <div className="min-h-screen w-4/5">
+      <div className=" w-full flex border-2 border-blue-500 container mx-auto px-4 py-8">
+        <div className="w-1/2">
+          {/* Display user profile image */}
+          <div className="flex flex-col items-center justify-center border-2 h-full border-black">
+            <figure className="flex flex-col items-center justify-center">
+              <img
+                src={`http://localhost:3001/images/${userDetails.picture}`}
+                alt="User Image"
+                className="border-2 flex w-32 h-32 rounded-full"
+              />
+            </figure>
+            <figcaption className="text-xl">
+              {userDetails.city_name} {userDetails.street_name}  Israel
+            </figcaption>
+          </div>
         </div>
-      </div>
 
-      <div className="w-full border-2 border-red-500">
-        <div className="w-full max-h-full bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4">
-            <div className="flex flex-wrap mb-4">
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">ID:</p>
-                {renderInputOrText("Id", "ID")}
-              </div>
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">First Name:</p>
-                {renderInputOrText("first_name", "First Name")}
-              </div>
-            </div>
-            <div className="flex flex-wrap mb-4">
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">Last Name:</p>
-                {renderInputOrText("last_name", "Last Name")}
-              </div>
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">Email:</p>
-                {renderInputOrText("email", "Email")}
-              </div>
-            </div>
-            <div className="flex flex-wrap mb-4">
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">Phone Number:</p>
-                {renderInputOrText("phone_number", "Phone Number")}
-              </div>
-              <div className="w-1/2">
-                <p className="text-lg font-bold text-black">Driving License:</p>
-                {renderInputOrText("driving_license", "Driving License")}
-              </div>
-            </div>
-            {editing && (
+        <div className="w-full border-2 border-red-500">
+          <div className="w-full max-h-full bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-6 py-4">
               <div className="flex flex-wrap mb-4">
-                <div className="w-full">
-                  <p className="text-lg font-bold text-black">Profile Picture:</p>
-                  <input
-                    type="file"
-                    name="picture"
-                    onChange={handleChange}
-                    className="text-black"
-                  />
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">ID:</p>
+                  {renderInputOrText("Id", "ID")}
+                </div>
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">First Name:</p>
+                  {renderInputOrText("first_name", "First Name")}
                 </div>
               </div>
-            )}
-          </div>
+              <div className="flex flex-wrap mb-4">
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">Last Name:</p>
+                  {renderInputOrText("last_name", "Last Name")}
+                </div>
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">Email:</p>
+                  {renderInputOrText("email", "Email")}
+                </div>
+              </div>
+              <div className="flex flex-wrap mb-4">
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">Phone Number:</p>
+                  {renderInputOrText("phone_number", "Phone Number")}
+                </div>
+                <div className="w-1/2">
+                  <p className="text-lg font-bold text-black">
+                    Driving License:
+                  </p>
+                  {renderInputOrText("driving_license", "Driving License")}
+                </div>
+              </div>
+              {editing && (
+                <div className="flex flex-wrap mb-4">
+                  <div className="w-full">
+                    <p className="text-lg font-bold text-black">
+                      Profile Picture:
+                    </p>
+                    <input
+                      type="file"
+                      name="picture"
+                      onChange={handleChange}
+                      className="text-black"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* Buttons */}
-          <div className="flex justify-center pb-4">
-            {editing ? (
-              <>
+            {/* Buttons */}
+            <div className="flex justify-center pb-4">
+              {editing ? (
+                <>
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
                 <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-                  onClick={handleSave}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleEdit}
                 >
-                  Save
+                  Edit
                 </button>
-                <button
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleEdit}
-              >
-                Edit
-              </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

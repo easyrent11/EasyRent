@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 27, 2023 at 01:07 PM
+-- Generation Time: Jun 18, 2023 at 07:56 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -28,13 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `cars` (
-  `Type` int(3) DEFAULT NULL,
-  `Manufacturer` varchar(20) DEFAULT NULL,
-  `Model` varchar(20) DEFAULT NULL,
+  `Manufacturer_Code` varchar(20) DEFAULT NULL,
+  `model_code` varchar(20) DEFAULT NULL,
   `Plates_Number` int(8) NOT NULL,
   `Year` int(4) DEFAULT NULL,
   `Color` varchar(10) DEFAULT NULL,
-  `Pictures` varchar(20) DEFAULT NULL,
   `Seats_Amount` int(2) DEFAULT NULL,
   `Engine_Type` varchar(20) DEFAULT NULL,
   `Transmission_type` varchar(20) DEFAULT NULL,
@@ -47,12 +45,35 @@ CREATE TABLE `cars` (
 -- Dumping data for table `cars`
 --
 
-INSERT INTO `cars` (`Type`, `Manufacturer`, `Model`, `Plates_Number`, `Year`, `Color`, `Pictures`, `Seats_Amount`, `Engine_Type`, `Transmission_type`, `Description`, `Rental_Price_Per_Day`, `Renter_Id`) VALUES
-(1, 'M001', '1', 12345678, 2022, 'Red', 'car1.jpg', 3, 'Petrol', 'Automatic', 'Description for Car 1', 100, 123456789),
-(1, 'M002', '1', 21212155, 2021, 'White', 'car3.jpg', 5, 'Gasoline', 'Automatic', 'Description for Car 3', 150, 987654321),
-(1, 'M001', '2', 29977788, 2019, 'Black', 'car4.jpg', 7, 'Hybrid', 'Automatic', 'Description for Car 4', 130, 987654321),
-(1, 'M001', '2', 33333322, 2020, 'Blue', 'car2.jpg', 3, 'Diesel', 'Manual', 'Description for Car 2', 120, 555555555),
-(1, 'M002', '1', 88866633, 2023, 'Silver', 'car5.jpg', 3, 'Electric', 'Automatic', 'Description for Car 5', 200, 123456789);
+INSERT INTO `cars` (`Manufacturer_Code`, `model_code`, `Plates_Number`, `Year`, `Color`, `Seats_Amount`, `Engine_Type`, `Transmission_type`, `Description`, `Rental_Price_Per_Day`, `Renter_Id`) VALUES
+('bmw', 'm4', 22233355, 2012, 'red', 6, 'Diesel', 'Auto', 'hfghsdgdfsghda', 200, 123456787),
+('audi', 'a3', 33311124, 2009, 'yellow', 3, 'Petrol', 'Auto', 'dfhgfdhdfsh', 90, 123456787),
+('land rover', 'freelander', 33344476, 2014, 'blue', 7, 'Petrol', 'Auto', 'dfhdfh', 20, 123456787);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `car_images`
+--
+
+CREATE TABLE `car_images` (
+  `Plates_Number` int(8) DEFAULT NULL,
+  `image_url` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `car_images`
+--
+
+INSERT INTO `car_images` (`Plates_Number`, `image_url`) VALUES
+(22233355, '839af909ea591311d061ababc8a38841.jpeg'),
+(22233355, '23eb666dc876065ac5d208d5ebf411ee.jpeg'),
+(22233355, '41cbd960dff9b7b1d00696ab9207a92c.jpeg'),
+(22233355, 'b3eb8247de5364597d71414147b7999b.jpeg'),
+(33311124, '425d655a4d7888a5afe2b555fa015a8f.jpeg'),
+(33311124, 'ed224a13ac367e7654c33bb4b9f4cd2f.jpeg'),
+(33344476, 'e477f772d1b5620829dd2ecb5d066204.png'),
+(33344476, 'dc1894b830daff73c637af931b87df9b.jpeg');
 
 -- --------------------------------------------------------
 
@@ -70,8 +91,9 @@ CREATE TABLE `car_manufacturer` (
 --
 
 INSERT INTO `car_manufacturer` (`Manufacturer_Code`, `Manufacturer_Name`) VALUES
-('M001', 'Mercedes'),
-('M002', 'Bmw');
+('audi', 'Audi'),
+('bmw', 'BMW'),
+('land rover', 'Land Rover');
 
 -- --------------------------------------------------------
 
@@ -82,36 +104,17 @@ INSERT INTO `car_manufacturer` (`Manufacturer_Code`, `Manufacturer_Name`) VALUES
 CREATE TABLE `car_models` (
   `model_code` varchar(20) NOT NULL,
   `model_name` varchar(50) DEFAULT NULL,
-  `manufacturer_code` varchar(20) DEFAULT NULL
+  `Manufacturer_Code` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `car_models`
 --
 
-INSERT INTO `car_models` (`model_code`, `model_name`, `manufacturer_code`) VALUES
-('1', 'E300', 'M001'),
-('2', 'M4', 'M002');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `car_types`
---
-
-CREATE TABLE `car_types` (
-  `Type_Id` int(3) NOT NULL,
-  `Type_Name` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `car_types`
---
-
-INSERT INTO `car_types` (`Type_Id`, `Type_Name`) VALUES
-(1, 'Sedan'),
-(2, 'HatchBack'),
-(3, 'Suv');
+INSERT INTO `car_models` (`model_code`, `model_name`, `Manufacturer_Code`) VALUES
+('a3', 'A3', 'audi'),
+('freelander', 'Freelander', 'land rover'),
+('m4', 'M4', 'bmw');
 
 -- --------------------------------------------------------
 
@@ -129,9 +132,8 @@ CREATE TABLE `cities` (
 --
 
 INSERT INTO `cities` (`City_Code`, `City_Name`) VALUES
-(1, 'Tel Aviv'),
 (2, 'Haifa'),
-(3, 'ShfarAm');
+(57, 'Shfaram');
 
 -- --------------------------------------------------------
 
@@ -149,14 +151,6 @@ CREATE TABLE `orders` (
   `End_Time` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`Start_Date`, `End_Date`, `Order_Id`, `Car_Plates_Number`, `Rentee_id`, `Start_Time`, `End_Time`) VALUES
-('2023-05-27', '2023-05-30', 1, 12345678, 987654321, '09:00:00', '18:00:00'),
-('2023-06-01', '2023-06-05', 2, 29977788, 555555555, '12:00:00', '20:00:00');
-
 -- --------------------------------------------------------
 
 --
@@ -173,17 +167,17 @@ CREATE TABLE `users` (
   `city_code` int(2) DEFAULT NULL,
   `street_name` varchar(50) NOT NULL,
   `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL
+  `last_name` varchar(50) NOT NULL,
+  `isadmin` tinyint(1) DEFAULT 0,
+  `status` enum('active','disabled') DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`Id`, `phone_number`, `driving_license`, `picture`, `email`, `password`, `city_code`, `street_name`, `first_name`, `last_name`) VALUES
-(123456789, 1234567890, 'DL123', 'user1.jpg', 'user1@example.com', 'password1', 1, 'Street 1', 'John', 'Doe'),
-(555555555, 2147483647, 'DL789', 'user3.jpg', 'user3@example.com', 'password3', 3, 'Street 3', 'Mike', 'Johnson'),
-(987654321, 2147483647, 'DL456', 'user2.jpg', 'user2@example.com', 'password2', 2, 'Street 2', 'Jane', 'Smith');
+INSERT INTO `users` (`Id`, `phone_number`, `driving_license`, `picture`, `email`, `password`, `city_code`, `street_name`, `first_name`, `last_name`, `isadmin`, `status`) VALUES
+(123456787, 526789123, '35364', '3e4dd4fa9b8c39dd07c0cb55a222f59e.png', 'sobhi@gmail.com', '$2b$10$sweHc8.CoUZdepUJUZ5XFOaLFfntYTsGKaEbQjQUt2Or1/iLPv92S', 57, 'halab1', 'sobhi', 'sh', 0, 'active');
 
 --
 -- Indexes for dumped tables
@@ -194,10 +188,15 @@ INSERT INTO `users` (`Id`, `phone_number`, `driving_license`, `picture`, `email`
 --
 ALTER TABLE `cars`
   ADD PRIMARY KEY (`Plates_Number`),
-  ADD KEY `Renter_Id` (`Renter_Id`),
-  ADD KEY `cars_ibfk_3` (`Manufacturer`),
-  ADD KEY `cars_ibfk_4` (`Model`),
-  ADD KEY `cars_ibfk_2` (`Type`);
+  ADD KEY `fk_cars_car_manufacturer` (`Manufacturer_Code`),
+  ADD KEY `fk_cars_car_models` (`model_code`),
+  ADD KEY `FK_Cars_Users` (`Renter_Id`);
+
+--
+-- Indexes for table `car_images`
+--
+ALTER TABLE `car_images`
+  ADD KEY `fk_car_images_cars` (`Plates_Number`);
 
 --
 -- Indexes for table `car_manufacturer`
@@ -210,13 +209,7 @@ ALTER TABLE `car_manufacturer`
 --
 ALTER TABLE `car_models`
   ADD PRIMARY KEY (`model_code`),
-  ADD KEY `manufacturer_code` (`manufacturer_code`);
-
---
--- Indexes for table `car_types`
---
-ALTER TABLE `car_types`
-  ADD PRIMARY KEY (`Type_Id`);
+  ADD KEY `fk_car_models_manufacturer` (`Manufacturer_Code`);
 
 --
 -- Indexes for table `cities`
@@ -229,15 +222,15 @@ ALTER TABLE `cities`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`Order_Id`),
-  ADD KEY `Car_Plates_Number` (`Car_Plates_Number`),
-  ADD KEY `Rentee_id` (`Rentee_id`);
+  ADD KEY `fk_orders_rentee` (`Rentee_id`),
+  ADD KEY `fk_orders_car` (`Car_Plates_Number`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`Id`),
-  ADD KEY `city_code` (`city_code`);
+  ADD KEY `fk_city_code` (`city_code`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -257,29 +250,34 @@ ALTER TABLE `orders`
 -- Constraints for table `cars`
 --
 ALTER TABLE `cars`
-  ADD CONSTRAINT `cars_ibfk_1` FOREIGN KEY (`Renter_Id`) REFERENCES `users` (`Id`),
-  ADD CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`Type`) REFERENCES `car_types` (`Type_Id`),
-  ADD CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`Manufacturer`) REFERENCES `car_manufacturer` (`Manufacturer_Code`),
-  ADD CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`Model`) REFERENCES `car_models` (`model_code`);
+  ADD CONSTRAINT `FK_Cars_Users` FOREIGN KEY (`Renter_Id`) REFERENCES `users` (`Id`),
+  ADD CONSTRAINT `fk_cars_car_manufacturer` FOREIGN KEY (`Manufacturer_Code`) REFERENCES `car_manufacturer` (`Manufacturer_Code`),
+  ADD CONSTRAINT `fk_cars_car_models` FOREIGN KEY (`model_code`) REFERENCES `car_models` (`model_code`);
+
+--
+-- Constraints for table `car_images`
+--
+ALTER TABLE `car_images`
+  ADD CONSTRAINT `fk_car_images_cars` FOREIGN KEY (`Plates_Number`) REFERENCES `cars` (`Plates_Number`);
 
 --
 -- Constraints for table `car_models`
 --
 ALTER TABLE `car_models`
-  ADD CONSTRAINT `car_models_ibfk_1` FOREIGN KEY (`manufacturer_code`) REFERENCES `car_manufacturer` (`Manufacturer_Code`);
+  ADD CONSTRAINT `fk_car_models_manufacturer` FOREIGN KEY (`Manufacturer_Code`) REFERENCES `car_manufacturer` (`Manufacturer_Code`);
 
 --
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`Car_Plates_Number`) REFERENCES `cars` (`Plates_Number`),
-  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`Rentee_id`) REFERENCES `users` (`Id`);
+  ADD CONSTRAINT `fk_orders_car` FOREIGN KEY (`Car_Plates_Number`) REFERENCES `cars` (`Plates_Number`),
+  ADD CONSTRAINT `fk_orders_rentee` FOREIGN KEY (`Rentee_id`) REFERENCES `users` (`Id`);
 
 --
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`city_code`) REFERENCES `cities` (`City_Code`);
+  ADD CONSTRAINT `fk_city_code` FOREIGN KEY (`city_code`) REFERENCES `cities` (`City_Code`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

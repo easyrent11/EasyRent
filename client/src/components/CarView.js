@@ -1,13 +1,18 @@
 import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Carousel } from "@material-tailwind/react";
-import UserProfile from "./UserProfile";
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import PersonIcon from '@mui/icons-material/Person';
-import  {TbManualGearbox} from "react-icons/tb";
 import { AllCarsContext } from "../contexts/AllCarsContext";
+import { UserProfileDetails } from "../contexts/UserProfileDetails";
+import PersonIcon from "@mui/icons-material/Person";
+import { TbManualGearbox } from "react-icons/tb";
+import { FaCogs } from "react-icons/fa";
+
 
 export default function CarView() {
+  const userDetails = useContext(UserProfileDetails);
+   const userFirstName = userDetails.first_name;
+   const userProfileImage = userDetails.picture;
+
   const allCars = useContext(AllCarsContext);
   let flag = false;
   //getting the plates number out of the paramaters that are passed in the car component.
@@ -23,67 +28,71 @@ export default function CarView() {
 
   
   return (
-
-   
     <div className="min-h-screen flex flex-col items-center border-2 border-blue-500">
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel>
-          
-          {!flag ? car.car_urls.map((image, index) => (
-            <figure key={index} className="rounded-xl">
-              <img
-                onClick={handleImageClick}
-                src={`http://localhost:3001/images/${image}`}
-                alt={`Car Pic ${index + 1}`}
-                className="object-cover w-full h-80"
-              />
+          {!flag ? (
+            car.car_urls.map((image, index) => (
+              <figure key={index} className="rounded-xl">
+                <img
+                  onClick={handleImageClick}
+                  src={`http://localhost:3001/images/${image}`}
+                  alt={`Car Pic ${index + 1}`}
+                  className="object-cover w-full h-80"
+                />
+              </figure>
+            ))
+          ) : (
+            <figure>
+              <img src="/images/noImages.png" />
             </figure>
-          )) :  <figure>
-                  <img src="/images/noImages.png"/>
-                </figure>}
+          )}
         </Carousel>
       </section>
       {/* Displaying additional car information. */}
 
-
       <div className="flex p-2 m-2">
         <section className="w-full max-w-3xl mt-10 p-6 mr-4  bg-white shadow-md rounded-lg">
-          <UserProfile imagePath={"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"}/>
-          <div className="flex justify-between items-center mb-4">
+          <figure className="flex flex-col items-center justify-center border-2 border-green-500">
+            <img
+              src={`http://localhost:3001/images/${userProfileImage}`}
+              className="border-2 flex w-32 h-32 rounded-full"
+            />
+            <figcaption className="text-2xl">{userFirstName}</figcaption>
+          </figure>
+
+          <div className="flex flex-col justify-around items-start mb-4 border-2 border-orange-500">
             <h2 className="text-2xl font-bold">
-              {car.Manufacturer} {car.Model}
+              {car.Manufacturer_Code} {car.model_code}
             </h2>
             <p className="text-gray-500 text-lg">Year: {car.Year}</p>
           </div>
 
-          <div className="flex justify-between items-center">
-            <div>
+          <div className="flex items-center justify-between border-2 border-purple-500">
+            <div className="w-full">
               <p className="text-gray-700 text-xl mb-2">
                 Features and Specifications:
               </p>
-              <ul className="space-y-2">
+              <ul className="  flex flex-col justify-center items-start w-full border-2 border-green-500">
                 <li>
-                  <span className="font-bold">Seats:</span> {car.seats}
+                  <PersonIcon className="inline-block text-2xl" />
+                  {car.Seats_Amount}
                 </li>
                 <li>
-                  <span className="font-bold">Luggage:</span> {car.luggage}
+                  <TbManualGearbox className="inline-block text-2xl" />
+                   {car.Transmission_type}
                 </li>
                 <li>
-                  <span className="font-bold">Gearbox:</span> {car.gearbox}
+                  <FaCogs className="inline-block text-2xl" />
+                  
+                  {car.Engine_Type}
                 </li>
               </ul>
             </div>
-
-            <div>
-              <p className="text-gray-700 text-xl mb-2">Rental Price:</p>
-              <p className="text-3xl font-bold  text-[#CC6200]">
-                ₪{car.RentalPrice}/day
-              </p>
-            </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 flex justify-center border-2">
             <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg">
               Rent Now
             </button>
@@ -125,8 +134,10 @@ export default function CarView() {
               <p className="text-lg font-bold mb-2">
                 Total Price (including fees):
               </p>
-              {/* Calculate and display the total price including fees */}
-              {/* Example: ₪{car.RentalPrice * numberOfDays * (1 + 0.05)} */}
+              <p className="text-xl font-bold  text-[#CC6200]">
+                ₪{car.Rental_Price_Per_Day}/day
+              </p>
+              {/* ₪{car.RentalPrice * numberOfDays * (1 + 0.05)} */}
             </div>
 
             <div>

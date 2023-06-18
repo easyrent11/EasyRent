@@ -322,9 +322,28 @@ router.post("/addcar", (req, res) => {
   }
 });
 
+// router.get("/getuser/:id", (req, res) => {
+//   const userId = req.params.id;
+//   const query = `SELECT * FROM users WHERE id = ${userId}`;
+//   db.query(query, (error, results) => {
+//     if (error) {
+//       // Handle the error
+//       console.error("Error retrieving user info:", error);
+//       res.status(500).json({ error: "Internal Server Error" });
+//     } else {
+//       // User info retrieved successfully
+//       res.json(results);
+//     }
+//   });
+// });
+
 router.get("/getuser/:id", (req, res) => {
   const userId = req.params.id;
-  const query = `SELECT * FROM users WHERE id = ${userId}`;
+  const query = `SELECT users.*, cities.city_name
+                 FROM users
+                 INNER JOIN cities ON users.city_code = cities.city_code
+                 WHERE users.id = ${userId}`;
+
   db.query(query, (error, results) => {
     if (error) {
       // Handle the error

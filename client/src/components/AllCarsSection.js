@@ -7,13 +7,13 @@ export default function AllCarsSection() {
     if (!allCars || allCars.length === 0) {
       return (
         <div className='flex items-center justify-center'>
-          <h2 className='font-bold text-2xl text-black'>No cars Yet...</h2>
+          <h2 className='font-bold text-2xl text-black '>No cars Yet...</h2>
         </div>
       );
     }
     return (
-      <div className="min-h-screen min-w-screen">
-        <article className="min-wscreen flex flex-wrap items-center pl-20 max-w-full p-4 mr-2 ml-2">
+      <div className="min-h-screen min-w-screen  border-2 flex  border-blue-500">
+        <article className=" flex flex-wrap items-center justify-center w-full p-2 border-2 border-red-500">
           {allCars.map((car, index) => (
             <Car key={index} car={car} />
           ))}
