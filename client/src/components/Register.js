@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, {useState } from "react";
 import Login from "./Login";
 import { register } from "../api/CarApi";
 import { Cities } from "../res/Cities";
@@ -6,8 +6,8 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-export default function Register({ onClose, openLogin }) {
 
+export default function Register({ onClose, openLogin }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,9 +21,9 @@ export default function Register({ onClose, openLogin }) {
   const [streetName, setStreetName] = useState("");
   const [governmentId, setGovernmentId] = useState("");
   const [drivingLicense, setDrivingLicense] = useState("");
-
   const [showLogin, setShowLogin] = useState(false);
-  
+
+
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
     setCityName(selectedOption.label);
@@ -41,9 +41,12 @@ export default function Register({ onClose, openLogin }) {
 
     // Validate the password match
     if (password !== verifyPassword) {
-      console.log("The passwords you entered dont match try again.");
+      toast.error(
+        "you entered different passwords please verify the password correctly"
+      );
       return;
     }
+
 
     // Create a new FormData instance
     const formData = new FormData();
@@ -72,7 +75,7 @@ export default function Register({ onClose, openLogin }) {
           first_name: firstName,
           last_name: lastName,
         };
-    
+
         // After successful image upload, proceed with registration
         register(registerInfo)
           .then((res) => {

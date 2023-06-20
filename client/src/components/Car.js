@@ -10,18 +10,18 @@ import { Link } from 'react-router-dom';
 export default function Car({car}) {
  
   return (
-    <div className="flex flex-col items-center justify-center rounded-md w-1/2 bg-[#FFFFFF] border-2 border-green-500  m-2 p-2 ">
+    <div className="flex flex-col w-5/12 items-center justify-center rounded-md  bg-white  m-4  p-2 ">
         <Link to={`/CarView/${car.Plates_Number}`}>
-          <figure className="flex flex-col items-center w-full  h-40 justify-center border-2 border-blue-500">
+          <figure className="flex flex-col items-center w-full  h-40 justify-center ">
             <img
-              className="w-full h-full rounded-md "
+              className="w-full h-full rounded-md mt-8"
               src={`http://localhost:3001/images/${car.car_urls[0]}`}
               alt="Car Image"
             />
           </figure>
         </Link>
 
-      <div className="flex flex-col justify-center border-2 border-black w-full m-4 p-1">
+      <div className="flex flex-col justify-center  w-full m-4 p-1">
         <div className=" p-2">
           <h2 className="text-2xl">
             {car.Manufacturer_Code} {car.model_code}
@@ -30,7 +30,7 @@ export default function Car({car}) {
 
         <p className="p-2 text-md font-sans text-[#6d6d6d]">{car.Year}</p>
 
-        <div className="flex justify-around border-2 border-blue-500 w-full mb-2 p-2">
+        <div className="flex justify-around w-full mb-2 p-2">
           <p className="m-1 ">
             {" "}
             <PersonIcon className="m-1 text-[#777777]" />

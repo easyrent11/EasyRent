@@ -9,34 +9,30 @@ import { FaCogs } from "react-icons/fa";
 
 
 export default function CarView() {
-  const userDetails = useContext(UserProfileDetails);
+  const {userDetails} = useContext(UserProfileDetails);
    const userFirstName = userDetails.first_name;
    const userProfileImage = userDetails.picture;
 
-  const allCars = useContext(AllCarsContext);
+  const {allCars} = useContext(AllCarsContext);
   let flag = false;
   //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
   const car = allCars.find((car) => Number(car.Plates_Number) === Number(platesNumber));
   console.log(car);
-  
-  //function that will make the image full screen when clicked on.
-  const handleImageClick = (e) => {
-    e.target.requestFullScreen();
-  }
+  console.log("allcars= ", allCars);
+ 
 
   
   return (
-    <div className="min-h-screen flex flex-col items-center border-2 border-blue-500">
+    <div className="min-h-screen flex flex-col items-center">
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
-        <Carousel>
+        <Carousel className="rounded-md">
           {!flag ? (
             car.car_urls.map((image, index) => (
               <figure key={index} className="rounded-xl">
                 <img
-                  onClick={handleImageClick}
                   src={`http://localhost:3001/images/${image}`}
                   alt={`Car Pic ${index + 1}`}
                   className="object-cover w-full h-80"
@@ -54,7 +50,8 @@ export default function CarView() {
 
       <div className="flex p-2 m-2">
         <section className="w-full max-w-3xl mt-10 p-6 mr-4  bg-white shadow-md rounded-lg">
-          <figure className="flex flex-col items-center justify-center border-2 border-green-500">
+          <h2 className="text-2xl">Car Owner : </h2>
+          <figure className="flex flex-col items-center justify-center ">
             <img
               src={`http://localhost:3001/images/${userProfileImage}`}
               className="border-2 flex w-32 h-32 rounded-full"
@@ -62,29 +59,29 @@ export default function CarView() {
             <figcaption className="text-2xl">{userFirstName}</figcaption>
           </figure>
 
-          <div className="flex flex-col justify-around items-start mb-4 border-2 border-orange-500">
+          <div className="flex flex-col justify-around items-start mb-4 ">
             <h2 className="text-2xl font-bold">
               {car.Manufacturer_Code} {car.model_code}
             </h2>
             <p className="text-gray-500 text-lg">Year: {car.Year}</p>
           </div>
 
-          <div className="flex items-center justify-between border-2 border-purple-500">
+          <div className="flex items-center justify-between ">
             <div className="w-full">
               <p className="text-gray-700 text-xl mb-2">
                 Features and Specifications:
               </p>
-              <ul className="  flex flex-col justify-center items-start w-full border-2 border-green-500">
+              <ul className="  flex flex-col justify-center items-start w-full">
                 <li>
-                  <PersonIcon className="inline-block text-2xl" />
+                  <PersonIcon className="inline-block text-3xl m-2" />
                   {car.Seats_Amount}
                 </li>
                 <li>
-                  <TbManualGearbox className="inline-block text-2xl" />
+                  <TbManualGearbox className="inline-block text-3xl m-2" />
                    {car.Transmission_type}
                 </li>
                 <li>
-                  <FaCogs className="inline-block text-2xl" />
+                  <FaCogs className="inline-block text-3xl m-2" />
                   
                   {car.Engine_Type}
                 </li>
@@ -92,7 +89,7 @@ export default function CarView() {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-center border-2">
+          <div className="mt-6 flex justify-center ">
             <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg">
               Rent Now
             </button>

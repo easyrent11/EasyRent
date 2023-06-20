@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
-import { CarListContext } from "../contexts/CarListContext";
+import { SearchCarListResult } from "../contexts/SearchCarListResult";
 import Car from "../components/Car";
 
 export default function SearchResultDisplay() {
-    const {carList} = useContext(CarListContext);
+    const {carList} = useContext(SearchCarListResult);
     if (!carList || carList.length === 0) {
       return (
         <div className='flex items-center justify-center'>

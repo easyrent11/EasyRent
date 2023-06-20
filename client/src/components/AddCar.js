@@ -142,10 +142,10 @@ export default function AddCarForm() {
   };
   
   return (
-    <div className="flex flex-col w-1/2 justify-center bg-[#E7E7E7] shadow-md rounded-lg p-6">
+    <div className="flex flex-col w-1/4 justify-center items-center bg-[#f6f6f6] shadow-lg rounded-lg p-6">
       <h2 className="text-2xl text-center font-semibold mb-4">Add Car</h2>
 
-      <form className="w-full max-w-lg p-6 mx-auto rounded-lg">
+      <form className="w-full  p-6 mx-auto rounded-lg">
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -330,17 +330,24 @@ export default function AddCarForm() {
         </div>
 
         <div>
+        <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="carimages"
+          >
+            Choose Car Images : 
+          </label>
           <input
+            id="carimages"
             type="file"
             accept="image/*"
             multiple
             onChange={handleImageUpload}
           />
         </div>
-        <div className="flex justify-center items-center w-1/2 ">
+        <div className="flex justify-center items-center mt-4  w-full ">
           <button
             onClick={handleSubmit}
-            className="bg-[#CC6200] w-full hover:text-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-[#CC6200] w-1/2 hover:text-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Add

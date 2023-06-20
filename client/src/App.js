@@ -8,7 +8,7 @@ import NavBar from "./components/NavBar";
 import FAQ from "./components/FAQ";
 import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
-import { CarListContext } from "./contexts/CarListContext";
+import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
 import SearchResultDisplay from "./pages/SearchResultDisplay";
@@ -91,9 +91,9 @@ function App() {
 
   return (
     <>
-      <CarListContext.Provider value={{ carList, updateCarList }}>
-        <AllCarsContext.Provider value={allCars}>
-          <UserProfileDetails.Provider value={userDetails}>
+      <SearchCarListResult.Provider value={{ carList, updateCarList }}>
+        <AllCarsContext.Provider value={{allCars,setAllCars}}>
+          <UserProfileDetails.Provider value={{userDetails,setUserDetails}}>
             <Router>
               {notFound ? (
                 <PageNotFound handleNotFound={handleNotFound} />
@@ -145,7 +145,7 @@ function App() {
             </Router>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>
-      </CarListContext.Provider>
+      </SearchCarListResult.Provider>
       <ToastContainer />
     </>
   );
