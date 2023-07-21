@@ -1,15 +1,19 @@
-import React, { useCallback, useContext, useState } from "react";
-import { addCar } from "../api/CarApi";
+import React, {useState } from "react";
+import { addCar } from "../api/UserApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
-import {UserProfileDetails} from "../contexts/UserProfileDetails";
+import { useNavigate } from "react-router-dom";
 
-export default function AddCarForm() {
-  const userDetails = useContext(UserProfileDetails);
-  const userId = userDetails.Id;
+export default function AddCar() {
+
+  // get the userId from the local storage. so we can send it with the car object
+  const userId = localStorage.getItem("userId");
+
+  // create user navigate object.
+  const navigate = useNavigate();
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
@@ -129,8 +133,9 @@ export default function AddCarForm() {
   
         addCar(carData)
           .then((res) => {
-            console.log(res);
             notify("success", res.data.message);
+            // navigate to the homepage after adding a car.
+            navigate('/homepage');
           })
           .catch((err) => {
             notify("error", err.response.data.message);
