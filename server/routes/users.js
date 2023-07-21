@@ -48,13 +48,30 @@ router.post("/addcar", async (req, res) => {
   console.log(carData);
   try {
     const result = await UserServices.addCar(db, carData);
-    res.status(200).json({message:'Successfully added car'});
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to add car" });
   }
 });
 
+router.post("/searchcar", async (req, res) => {
+  const { city, pickupDate, returnDate, startTime, endTime } = req.body;
 
+  try {
+    const result = await UserServices.searchCar(
+      db,
+      city,
+      pickupDate,
+      returnDate,
+      startTime,
+      endTime
+    );
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching car list:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
 router.get("/getuser/:id", (req, res) => {
@@ -220,6 +237,16 @@ router.post("/uploadProfileImage", (req, res) => {
 
     return res.json({ message: "Success", fileUrl });
   });
+});
+
+
+router.post('/ordercar', async (req, res) => {
+  try {
+    const orderId = await orderCar(req.body);
+    res.status(201).json({ orderId });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create order" });
+  }
 });
 
 const upload = multer({

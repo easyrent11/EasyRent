@@ -19,3 +19,15 @@ export const resetPassword = (info) =>
 export const addCar = (carInfo) => {
   return axios.post(`${BASE_URL_USER}/addcar`, carInfo);
 };
+
+export const searchCars = (requestData) => {
+  return axios.post(`${BASE_URL_USER}/searchcar`, requestData);
+};
+
+export const sendOrderRequest = (orderInfo) => {
+  return axios.post(`${BASE_URL_USER}/ordercar`, orderInfo);
+}
+
+
+// // Make an API call to send the verification code to the user's email
+// const sendVerificationCode = (email) => axios.post(`${BASE_URL_USER}/sendVerificationCode`,email);

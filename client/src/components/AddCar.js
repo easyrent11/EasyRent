@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, {useState,useContext } from "react";
 import { addCar } from "../api/UserApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,6 +6,7 @@ import axios from "axios";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
+import { AllCarsContext } from "../contexts/AllCarsContext";
 
 export default function AddCar() {
 
@@ -14,6 +15,9 @@ export default function AddCar() {
 
   // create user navigate object.
   const navigate = useNavigate();
+
+  const {allCars,setAllCars} = useContext(AllCarsContext);
+
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
@@ -133,6 +137,8 @@ export default function AddCar() {
   
         addCar(carData)
           .then((res) => {
+            // update the allCars state
+            setAllCars((prevCars) => [...prevCars, res.data.car]);
             notify("success", res.data.message);
             // navigate to the homepage after adding a car.
             navigate('/homepage');

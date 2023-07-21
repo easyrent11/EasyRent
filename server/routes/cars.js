@@ -10,48 +10,7 @@ const upload = multer({
   dest: path.join(__dirname, "../images"),
 }).array("carpics", 20);
 
-const sql = `
-SELECT c.*, m.model_name, mf.Manufacturer_Name, GROUP_CONCAT(ci.image_url) AS image_urls
-FROM cars c
-JOIN users u ON c.Renter_Id = u.Id
-JOIN car_models m ON c.Model = m.model_code
-JOIN car_manufacturer mf ON m.manufacturer_code = mf.manufacturer_code
-LEFT JOIN car_images ci ON c.Plates_Number = ci.Plates_Number
-WHERE c.Type = ? 
-  AND u.City_Code = ? 
-  AND c.Plates_Number NOT IN (
-    SELECT o.Car_Plates_Number
-    FROM orders o
-    WHERE (
-      o.Start_Date < ?
-      OR (o.Start_Date = ? AND o.Start_Time <= ?)
-    )
-    AND (
-      o.End_Date > ?
-      OR (o.End_Date = ? AND o.End_Time >= ?)
-    )
-)
-GROUP BY c.Plates_Number;
-`;
 
-router.post("/searchcar", (req, res) => {
-  const { city, pickupDate, returnDate, startTime, endTime } = req.body;
-
-  console.log("Start time = ", startTime, " End time = ", endTime);
-  db.query(
-    sql,
-    [city, pickupDate, pickupDate, startTime, returnDate, returnDate, endTime],
-    (err, result) => {
-      if (err) {
-        console.log("Error fetching car list:", err);
-        res.status(500).send("Internal Server Error");
-        return;
-      }
-      console.log("Got data from frontend:", result);
-      res.send(result);
-    }
-  );
-});
 
 router.post("/checkcarexists", (req, res) => {
   const { platesNumber } = req.body;

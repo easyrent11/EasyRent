@@ -221,13 +221,27 @@ async function addCar(db, carData) {
       Rental_Price_Per_Day,
       Renter_Id
     );
+    const addedCar = {
+      Manufacturer_Code,
+      model_code,
+      Plates_Number,
+      Year,
+      Color,
+      Seats_Amount,
+      Engine_Type,
+      Transmission_type,
+      Description,
+      Rental_Price_Per_Day,
+      Renter_Id,
+      car_urls:image_url
+    };
 
     // Insert the image URLs into the car_images table
     if (image_url && image_url.length > 0) {
       await insertCarImages(db, Plates_Number, image_url);
     }
 
-    return { message: "Car added successfully" };
+    return { message: "Car added successfully", car:addedCar};
   } catch (error) {
     console.error("Error adding car:", error);
     throw new Error("Failed to add car");
@@ -424,8 +438,145 @@ async function loginUser(db, email, password) {
 #####################################################################
 */
 
+/*
+#####################################################################
+#                   USER CAR SEARCH SERVICE                         #
+#####################################################################
+*/
+async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
+  const sql = `
+    SELECT c.*, m.model_name, mf.Manufacturer_Name, GROUP_CONCAT(ci.image_url) AS car_urls
+    FROM cars c
+    JOIN users u ON c.Renter_Id = u.Id
+    JOIN car_models m ON c.model_code = m.model_code
+    JOIN car_manufacturer mf ON m.manufacturer_code = mf.manufacturer_code
+    LEFT JOIN car_images ci ON c.Plates_Number = ci.Plates_Number
+    WHERE u.City_Code = ? 
+      AND c.Plates_Number NOT IN (
+        SELECT o.Car_Plates_Number
+        FROM orders o
+        WHERE (
+          (o.Start_Date > ? AND o.Start_Time >= ? AND o.End_Time >= ?) OR
+          (o.Start_Date = ? AND o.Start_Time >= ?) OR
+          (o.End_Date = ? AND o.End_Time <= ?)
+        )
+      )
+    GROUP BY c.Plates_Number;
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.query(
+      sql,
+      [city, returnDate, startTime, endTime, pickupDate, startTime, returnDate, endTime],
+      (err, result) => {
+        if (err) {
+          console.log("Error fetching car list:", err);
+          reject("Failed to fetch car list");
+        } else {
+          // Parse the comma-separated image URLs and create an array
+          result.forEach((car) => {
+            if (car.car_urls) {
+              car.car_urls = car.car_urls.split(',');
+            } else {
+              car.car_urls = [];
+            }
+          });
+          resolve(result);
+        }
+      }
+    );
+  });
+}
+/*
+#####################################################################
+#                 END OF USER CAR SEARCH SERVICE                    #
+#####################################################################
+*/
+
+
+/*
+#####################################################################
+#                   Order CAR SEARCH SERVICE                        #
+#####################################################################
+*/
+async function orderCar(orderDetails) {
+  const {
+    Start_Date,
+    End_Date,
+    Car_Plates_Number,
+    Rentee_id,
+    Start_Time,
+    End_Time,
+    status = 'pending', // Default value for status is 'pending'
+    Renter_Id,
+  } = orderDetails;
+
+  // Check if the Renter_Id exists in the users table
+  const checkRenterQuery = `SELECT Id FROM users WHERE Id = ?`;
+  const renterExists = await new Promise((resolve, reject) => {
+    db.query(checkRenterQuery, [Renter_Id], (err, result) => {
+      if (err) {
+        console.log("Error checking Renter_Id:", err);
+        reject("Failed to check Renter_Id");
+      } else {
+        resolve(result.length > 0);
+      }
+    });
+  });
+
+  // Check if the Rentee_id exists in the users table
+  const checkRenteeQuery = `SELECT Id FROM users WHERE Id = ?`;
+  const renteeExists = await new Promise((resolve, reject) => {
+    db.query(checkRenteeQuery, [Rentee_id], (err, result) => {
+      if (err) {
+        console.log("Error checking Rentee_id:", err);
+        reject("Failed to check Rentee_id");
+      } else {
+        resolve(result.length > 0);
+      }
+    });
+  });
+
+  // Check if the Car_Plates_Number exists in the cars table
+  const checkCarQuery = `SELECT Plates_Number FROM cars WHERE Plates_Number = ?`;
+  const carExists = await new Promise((resolve, reject) => {
+    db.query(checkCarQuery, [Car_Plates_Number], (err, result) => {
+      if (err) {
+        console.log("Error checking Car_Plates_Number:", err);
+        reject("Failed to check Car_Plates_Number");
+      } else {
+        resolve(result.length > 0);
+      }
+    });
+  });
+
+  // If any of the required data is not found in the corresponding tables, reject the promise
+  if (!renterExists || !renteeExists || !carExists) {
+    return Promise.reject("Invalid Renter_Id, Rentee_id, or Car_Plates_Number");
+  }
+
+  const insertOrderQuery = `
+    INSERT INTO orders (Start_Date, End_Date, Car_Plates_Number, Rentee_id, Start_Time, End_Time, status, Renter_Id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  return new Promise((resolve, reject) => {
+    db.query(insertOrderQuery, [Start_Date, End_Date, Car_Plates_Number, Rentee_id, Start_Time, End_Time, status, Renter_Id], (err, result) => {
+      if (err) {
+        console.log("Error creating order:", err);
+        reject("Failed to create order");
+      } else {
+        resolve(result.insertId); // Return the ID of the newly inserted order
+      }
+    });
+  });
+}
+
+
 module.exports = {
   registerUser,
   loginUser,
-  addCar
+  addCar,
+  searchCar,
+  orderCar,
 };

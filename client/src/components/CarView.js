@@ -1,31 +1,48 @@
-import React, { useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { useContext,useState,useEffect } from "react";
+import { useParams,useNavigate } from "react-router-dom";
 import { Carousel } from "@material-tailwind/react";
 import { AllCarsContext } from "../contexts/AllCarsContext";
-import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import PersonIcon from "@mui/icons-material/Person";
-import { TbManualGearbox } from "react-icons/tb";
+import {TbManualGearbox } from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
-
+import { getAllUserDetails } from "../api/UserApi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CarView() {
-  const {userDetails} = useContext(UserProfileDetails);
-   const userFirstName = userDetails.first_name;
-   const userProfileImage = userDetails.picture;
+  const navigate = useNavigate();
+  // State variables for car owner and for error message.
+  const [carOwnerName, setCarOwnerName] = useState("");
+  const [carOwnerPicture, setCarOwnerPicture] = useState("");
+  const notify = (status, message) =>
+  status === "success" ? toast.success(message) : toast.error(message);
+  let flag = false;
 
   const {allCars} = useContext(AllCarsContext);
-  let flag = false;
+
   //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
   const car = allCars.find((car) => Number(car.Plates_Number) === Number(platesNumber));
-  console.log(car);
-  console.log("allcars= ", allCars);
- 
+  
+  useEffect(() => {
+    getAllUserDetails(car.Renter_Id)
+      .then((result) => {
+        setCarOwnerName(result.data[0].first_name);
+        setCarOwnerPicture(result.data[0].picture);
+      })
+      .catch((err) => {
+        notify('error', err);
+      });
+  }, [car.Renter_Id]);
 
+  const handleCloseCarView = () => navigate('/homepage');
   
   return (
     <div className="min-h-screen flex flex-col items-center">
+      <div className="text-right m-2  w-full ">
+      <button className="p-2 m-2 rounded-md   text-[#ffffff] bg-black" onClick={handleCloseCarView}>X</button>
+      </div>
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel className="rounded-md">
@@ -53,10 +70,10 @@ export default function CarView() {
           <h2 className="text-2xl">Car Owner : </h2>
           <figure className="flex flex-col items-center justify-center ">
             <img
-              src={`http://localhost:3001/images/${userProfileImage}`}
+              src={`http://localhost:3001/images/${carOwnerPicture}`}
               className="border-2 flex w-32 h-32 rounded-full"
             />
-            <figcaption className="text-2xl">{userFirstName}</figcaption>
+            <figcaption className="text-2xl">{carOwnerName}</figcaption>
           </figure>
 
           <div className="flex flex-col justify-around items-start mb-4 ">
@@ -89,11 +106,7 @@ export default function CarView() {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-center ">
-            <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg">
-              Rent Now
-            </button>
-          </div>
+        
         </section>
 
         <section className="w-full max-w-3xl mt-10 p-6 bg-white shadow-md rounded-lg">
