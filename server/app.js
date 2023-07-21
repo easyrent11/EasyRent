@@ -4,8 +4,6 @@ const cors = require("cors");
 const carRoutes = require('./routes/cars');
 const userRoutes = require('./routes/users');
 
-//const addCarRoutes = require('./routes/addcar');
-
 // defining the server port.
 const port = process.env.PORT || 3001;
 

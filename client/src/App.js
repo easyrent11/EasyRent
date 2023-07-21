@@ -1,64 +1,84 @@
-import React, { useState, useEffect, useContext } from "react";
+// ########################################################################################
+// #                             IMPORTS OF REACT/OTHER LIBRARIES.                        #
+// ########################################################################################
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
+// ########################################################################################
+// #                             IMPORTS OF COMPONENTS.                                   #
+// ########################################################################################
 import Register from "./components/Register";
 import Login from "./components/Login";
 import CarView from "./components/CarView";
-import HomeLayout from "./pages/HomeLayout";
 import NavBar from "./components/NavBar";
 import FAQ from "./components/FAQ";
 import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
-import { SearchCarListResult } from "./contexts/SearchCarListResult";
-import { AllCarsContext } from "./contexts/AllCarsContext";
-import { UserProfileDetails } from "./contexts/UserProfileDetails";
-import SearchResultDisplay from "./pages/SearchResultDisplay";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./components/PrivateRoute";
-import UserLayout from "./pages/UserLayout";
 import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
 import AddCarForm from "./components/AddCar";
-import axios from "axios";
-import {getAllUserDetails} from "./api/CarApi";
 import UserProfile from "./components/UserProfile";
+// ########################################################################################
+// #                             Imports of contexts.                                     #
+// ########################################################################################
+import { SearchCarListResult } from "./contexts/SearchCarListResult";
+import { AllCarsContext } from "./contexts/AllCarsContext";
+import { UserProfileDetails } from "./contexts/UserProfileDetails";
+// ########################################################################################
+// #                             Imports Of pages.                                        #
+// ########################################################################################
+import UserLayout from "./pages/UserLayout";
+import HomeLayout from "./pages/HomeLayout";
+import SearchResultDisplay from "./pages/SearchResultDisplay";
+// ########################################################################################
+// #                             IMPORTS OF API CALLS/HELPER FUNCTIONS.                   #
+// ########################################################################################
+import { getAllCars } from "./api/CarApi";
+import { getAllUserDetails } from "./api/UserApi";
+
 
 function App() {
-  const [carList, setCarList] = useState([]);
-  const [allCars, setAllCars] = useState([]);
+  // ########################################################################################
+  // #                             UseState Declarations.                                   #
+  // ########################################################################################
+  const [showLogin, setShowLogin] = useState(false); // useState to show the login component
+  const [showRegister, setShowRegister] = useState(false); //useState to show the register component
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // useState to check if a user is logged in or not.
+  const [notFound, setNotFound] = useState(false); // useState for when a page is not found.
+  const [userDetails, setUserDetails] = useState(""); // useState to save all of the retrieved User Details.
+  const [carList, setCarList] = useState([]); // useState to save all of the retrieved cars from the *USER SEARCH*.
+  const [allCars, setAllCars] = useState([]); // useState to save all of the cars in the database to display them
 
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [userDetails, setUserDetails] = useState("");
- 
-
-  const updateCarList = (updatedList) => setCarList(updatedList);
-  const closeLogin = () => setShowLogin(false);
-  const closeRegister = () => setShowRegister(false);
-
+  // ########################################################################################
+  // #                             OnClick Functions.                                       #
+  // ########################################################################################
+  const updateCarList = (updatedList) => setCarList(updatedList); // on click function to update the car list .
+  const closeLogin = () => setShowLogin(false); // on click function to set the show login window to false.
+  const closeRegister = () => setShowRegister(false); // on click function to set the show login window to false.
+  const handleLogin = () => setIsLoggedIn(true); // function to handle when a user has logged in
+  const handleNotFound = () => setNotFound(true); // function to handle when a page was not found
+  // on click function to open the login window and close the register.
   const openLogin = () => {
     setShowLogin(true);
     setShowRegister(false);
   };
-
+  // on click function to open the register window and close the login window.
   const openRegister = () => {
     setShowRegister(true);
     setShowLogin(false);
   };
-
+  // on click function to handle when a user has logged out.
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
-
-  const handleLogin = () => setIsLoggedIn(true);
-  const handleNotFound = () => setNotFound(true);
-
+  // ########################################################################################
+  // #                                     USE-EFFECTS                                      #
+  // ########################################################################################
   useEffect(() => {
     // Fetch all cars from backend API using Axios
-    axios
-      .get("http://localhost:3001/cars/getallcars")
+    getAllCars()
       .then((response) => {
         console.log(response.data);
         setAllCars(response.data);

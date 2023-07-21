@@ -3,7 +3,7 @@ import Select from "react-select";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { resetPassword } from "../api/CarApi";
+import { resetPassword } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 
 export default function UserProfile() {

@@ -1,6 +1,6 @@
 import React, {useState } from "react";
 import Login from "./Login";
-import { register } from "../api/CarApi";
+import { register } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 import Select from "react-select";
 import { toast } from "react-toastify";
