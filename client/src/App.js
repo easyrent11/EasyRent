@@ -20,6 +20,7 @@ import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
 import AddCarForm from "./components/AddCar";
 import UserProfile from "./components/UserProfile";
+import DisplaySearchResults from "./components/DisplaySearchResults";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -131,8 +132,8 @@ function App() {
                 <Route path="/UserProfile" element={<UserProfile />} />
 
                 <Route
-                  path="/SearchResultDisplay"
-                  element={<SearchResultDisplay />}
+                  path="/DisplaySearchResults"
+                  element={<DisplaySearchResults />}
                 />
                 {/* Private Home route for the logged in users */}
                 <Route

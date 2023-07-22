@@ -79,7 +79,7 @@ export default function Register({ onClose, openLogin }) {
         // After successful image upload, proceed with registration
         register(registerInfo)
           .then((res) => {
-            notify(res.data.message);
+            notify("success",res.data.message);
             onClose();
           })
           .catch((err) => notify(err.data.message));

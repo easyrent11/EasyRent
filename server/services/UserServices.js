@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 // ########################################################################################
 // #                                ADD CAR SERVICE FUNCTIONS                             #
@@ -200,7 +201,7 @@ async function addCar(db, carData) {
 
     // Check if the user exists
     const userExists = await checkUserExists(db, Renter_Id);
-    console.log("Renter id = ",Renter_Id);
+    console.log("Renter id = ", Renter_Id);
     if (!userExists) {
       // User with the specified Renter_Id doesn't exist
       throw new Error("Renter_Id not found");
@@ -233,7 +234,7 @@ async function addCar(db, carData) {
       Description,
       Rental_Price_Per_Day,
       Renter_Id,
-      car_urls:image_url
+      car_urls: image_url,
     };
 
     // Insert the image URLs into the car_images table
@@ -241,7 +242,7 @@ async function addCar(db, carData) {
       await insertCarImages(db, Plates_Number, image_url);
     }
 
-    return { message: "Car added successfully", car:addedCar};
+    return { message: "Car added successfully", car: addedCar };
   } catch (error) {
     console.error("Error adding car:", error);
     throw new Error("Failed to add car");
@@ -251,8 +252,6 @@ async function addCar(db, carData) {
 // ########################################################################################
 // #                          END OF ADD CAR SERVICE FUNCTIONS                            #
 // ########################################################################################
-
-
 
 /*
 #####################################################################
@@ -394,7 +393,7 @@ async function comparePasswords(password, hashedPassword) {
 // Function to generate JWT token
 function generateToken(userId) {
   return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "12h",
+    expiresIn: "1h",
   });
 }
 
@@ -467,7 +466,16 @@ async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
   return new Promise((resolve, reject) => {
     db.query(
       sql,
-      [city, returnDate, startTime, endTime, pickupDate, startTime, returnDate, endTime],
+      [
+        city,
+        returnDate,
+        startTime,
+        endTime,
+        pickupDate,
+        startTime,
+        returnDate,
+        endTime,
+      ],
       (err, result) => {
         if (err) {
           console.log("Error fetching car list:", err);
@@ -476,7 +484,7 @@ async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
           // Parse the comma-separated image URLs and create an array
           result.forEach((car) => {
             if (car.car_urls) {
-              car.car_urls = car.car_urls.split(',');
+              car.car_urls = car.car_urls.split(",");
             } else {
               car.car_urls = [];
             }
@@ -493,13 +501,13 @@ async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
 #####################################################################
 */
 
-
 /*
 #####################################################################
-#                   Order CAR SEARCH SERVICE                        #
+#                   Order CAR SERVICE                               #
 #####################################################################
 */
-async function orderCar(orderDetails) {
+async function orderCar(db, orderDetails) {
+  console.log(orderDetails);
   const {
     Start_Date,
     End_Date,
@@ -507,7 +515,7 @@ async function orderCar(orderDetails) {
     Rentee_id,
     Start_Time,
     End_Time,
-    status = 'pending', // Default value for status is 'pending'
+    status = "pending", // Default value for status is 'pending'
     Renter_Id,
   } = orderDetails;
 
@@ -519,6 +527,7 @@ async function orderCar(orderDetails) {
         console.log("Error checking Renter_Id:", err);
         reject("Failed to check Renter_Id");
       } else {
+        console.log("Renter exists.");
         resolve(result.length > 0);
       }
     });
@@ -532,6 +541,7 @@ async function orderCar(orderDetails) {
         console.log("Error checking Rentee_id:", err);
         reject("Failed to check Rentee_id");
       } else {
+        console.log("Rentee exists.");
         resolve(result.length > 0);
       }
     });
@@ -545,6 +555,7 @@ async function orderCar(orderDetails) {
         console.log("Error checking Car_Plates_Number:", err);
         reject("Failed to check Car_Plates_Number");
       } else {
+        console.log("Car plates exist.");
         resolve(result.length > 0);
       }
     });
@@ -561,18 +572,30 @@ async function orderCar(orderDetails) {
   `;
 
   return new Promise((resolve, reject) => {
-    db.query(insertOrderQuery, [Start_Date, End_Date, Car_Plates_Number, Rentee_id, Start_Time, End_Time, status, Renter_Id], (err, result) => {
-      if (err) {
-        console.log("Error creating order:", err);
-        reject("Failed to create order");
-      } else {
-        resolve(result.insertId); // Return the ID of the newly inserted order
+    db.query(
+      insertOrderQuery,
+      [
+        Start_Date,
+        End_Date,
+        Car_Plates_Number,
+        Rentee_id,
+        Start_Time,
+        End_Time,
+        status,
+        Renter_Id,
+      ],
+      (err, result) => {
+        if (err) {
+          console.log("Error creating order:", err);
+          reject("Failed to create order");
+        } else {
+          console.log("Order created successfully:", result);
+          resolve(result.insertId); // Return the ID of the newly inserted order
+        }
       }
-    });
+    );
   });
 }
-
-
 module.exports = {
   registerUser,
   loginUser,

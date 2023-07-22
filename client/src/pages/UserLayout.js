@@ -1,14 +1,15 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import AllCarsSection from '../components/AllCarsSection';
 import CarSortSection from "../components/CarSortSection";
 import CarFilterSection from '../components/CarFilterSection';
 import SearchCar from '../components/SearchCar';
 import { UserProfileDetails } from '../contexts/UserProfileDetails';
+import { SearchStatusContext } from "../contexts/SearchStatusContext";
+
 export default function UserLayout() {
   const userDetails = useContext(UserProfileDetails);
   return (
-    <>  
-
+    <SearchStatusContext>
         <h1 className="font-lobster text-6xl">Welcome {userDetails.userDetails.first_name} </h1>
           <SearchCar/>
 
@@ -24,6 +25,8 @@ export default function UserLayout() {
             <AllCarsSection/>
           </div>
         </div>
-    </>
+      </SearchStatusContext>
   )
 }
+
+

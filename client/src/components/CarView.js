@@ -36,12 +36,24 @@ export default function CarView() {
       });
   }, [car.Renter_Id]);
 
-  const handleCloseCarView = () => navigate('/homepage');
+  // sending the order request.
+  
+
+  // handling the User View window close click.
+  const handleCloseCarView = () => {
+    const token = localStorage.getItem('token');
+    if(token){
+      navigate('/homepage');
+    }
+    else{
+      navigate('/DisplaySearchResults');
+    }
+  }
   
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <div className="min-h-full mb-4 bg-[#e3e3e3] rounded-lg flex flex-col items-center">
       <div className="text-right m-2  w-full ">
-      <button className="p-2 m-2 rounded-md   text-[#ffffff] bg-black" onClick={handleCloseCarView}>X</button>
+      <button className="p-2 m-2 rounded-md text-white bg-black hover:bg-gray-800 transform hover:scale-110" onClick={handleCloseCarView}>X</button>
       </div>
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}

@@ -42,22 +42,26 @@ router.get("/homepage", verifyToken, (req, res) => {
   res.json({message: `Welcome, ${first_name}` });
 });
 
-
+// Route for adding a car.
 router.post("/addcar", async (req, res) => {
+  // grabbing the car details  from the body.
   const carData = req.body;
   console.log(carData);
   try {
+    // calling the function that will do the logic.
     const result = await UserServices.addCar(db, carData);
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to add car" });
   }
 });
-
+// Route for searching a car.
 router.post("/searchcar", async (req, res) => {
+  // grabbing the search details from the body.
   const { city, pickupDate, returnDate, startTime, endTime } = req.body;
 
   try {
+    // calling the function that will do the logic.
     const result = await UserServices.searchCar(
       db,
       city,
@@ -73,7 +77,7 @@ router.post("/searchcar", async (req, res) => {
   }
 });
 
-
+// Route for getting all user details of a user based on the provided user id.
 router.get("/getuser/:id", (req, res) => {
   const userId = req.params.id;
   const query = `SELECT users.Id, users.phone_number, users.driving_license, users.picture, users.email, users.city_code,cities.City_Name, users.street_name, users.first_name, users.last_name, users.isadmin, users.status
@@ -93,13 +97,10 @@ router.get("/getuser/:id", (req, res) => {
   });
 });
 
-
-
 // route to update user infomation.
 router.put("/updateuserdetails", (req, res) => {
   // Retrieve the updated user details from the request body
   const updatedUserDetails = req.body;
-  console.log(updatedUserDetails);
 
   // Get the previous picture filename from the database
   const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
@@ -126,7 +127,7 @@ router.put("/updateuserdetails", (req, res) => {
       }
     }
   });
-
+  // updating all fields of the user.
   const query = `
     UPDATE users
     SET
@@ -208,6 +209,7 @@ router.post('/changepassword', (req, res) => {
   });
 });
 
+// route to upload a profile image of the user and return the full url of the uploaded image.
 router.post("/uploadProfileImage", (req, res) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
@@ -225,7 +227,7 @@ router.post("/uploadProfileImage", (req, res) => {
       return res.status(400).json({ message: "No file provided" });
     }
 
-    //  If no errors occured , Process the uploaded file
+    //  If no errors occured , Process the uploaded file and construct a url.
     const fileExtension = file.mimetype.split("/")[1];
     const newFileName = `${file.filename}.${fileExtension}`;
     const newFilePath = path.join(__dirname, "../images", newFileName);
@@ -234,21 +236,48 @@ router.post("/uploadProfileImage", (req, res) => {
     const fileUrl = `${req.protocol}://${req.get(
       "host"
     )}/images/${newFileName}`;
-
+    // return the status message and the url of the image.
     return res.json({ message: "Success", fileUrl });
   });
 });
 
-
+// Route for ordering a car.
 router.post('/ordercar', async (req, res) => {
+  // Extracting the order details from the body.
+  const {
+    Start_Date,
+    End_Date,
+    Car_Plates_Number,
+    Rentee_Id,
+    Start_Time,
+    End_Time,
+    status,
+    Renter_Id,
+  } = req.body;
+
+  // Constructing the order details object
+  const orderDetails = {
+    Start_Date,
+    End_Date,
+    Car_Plates_Number,
+    Rentee_id: Rentee_Id, // Make sure to use the correct key here (Rentee_Id)
+    Start_Time,
+    End_Time,
+    status,
+    Renter_Id,
+  };
+
+
   try {
-    const orderId = await orderCar(req.body);
-    res.status(201).json({ orderId });
+    // calling the function that will do the logic and getting back the id of the order.
+    const orderId = await UserServices.orderCar(db,orderDetails);
+    res.status(201).json({message:"Your request was sent to the renter",orderId:orderId});
   } catch (error) {
-    res.status(500).json({ error: "Failed to create order" });
+    res.status(500).json({ error: "Failed to send request to the renter" });
   }
 });
 
+// multer function for uploading a single profile image.
 const upload = multer({
   dest: path.join(__dirname, "../images"),
 }).single("profileImage");
