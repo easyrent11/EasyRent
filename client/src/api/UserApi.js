@@ -29,5 +29,6 @@ export const sendOrderRequest = (orderInfo) => {
 }
 
 
+
 // // Make an API call to send the verification code to the user's email
 // const sendVerificationCode = (email) => axios.post(`${BASE_URL_USER}/sendVerificationCode`,email);
