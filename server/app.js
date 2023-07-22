@@ -4,8 +4,6 @@ const cors = require("cors");
 const carRoutes = require('./routes/cars');
 const userRoutes = require('./routes/users');
 
-//const addCarRoutes = require('./routes/addcar');
-
 // defining the server port.
 const port = process.env.PORT || 3001;
 
@@ -18,8 +16,7 @@ app.use('/cars', carRoutes);
 app.use('/user', userRoutes);
 
 
-
-
+// Listen for incoming connections on the same port for both Express app and Socket.IO
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
