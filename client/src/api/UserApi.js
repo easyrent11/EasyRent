@@ -27,6 +27,16 @@ export const searchCars = (requestData) => {
 export const sendOrderRequest = (orderInfo) => {
   return axios.post(`${BASE_URL_USER}/ordercar`, orderInfo);
 }
+// Function to fetch orders with renter_id matching userId
+export const getOrdersByRenterId = (userId) => {
+  return axios.get(`${BASE_URL_USER}/getOrdersByRenterId/${userId}`);
+};
+// Function to fetch orders with rentee_id matching userId
+export const getOrdersByRenteeId = (userId) => {
+  return axios.get(`${BASE_URL_USER}/getOrdersByRenteeId/${userId}`);
+};
+
+
 
 
 

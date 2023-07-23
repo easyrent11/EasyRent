@@ -8,12 +8,18 @@ import { FaCogs } from "react-icons/fa";
 import { getAllUserDetails } from "../api/UserApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import {sendOrderRequest} from "../api/UserApi";
 export default function CarView() {
   const navigate = useNavigate();
+  const [startTime, setStartTime] = useState("10:00");
+  const [endTime, setEndTime] = useState("10:00");
+  const[startDate, setStartDate] = useState("");
+  const[endDate, setEndDate] = useState("");
+
   // State variables for car owner and for error message.
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
+  const [ownerId, setOwnerId] = useState("");
   const notify = (status, message) =>
   status === "success" ? toast.success(message) : toast.error(message);
   let flag = false;
@@ -30,15 +36,48 @@ export default function CarView() {
       .then((result) => {
         setCarOwnerName(result.data[0].first_name);
         setCarOwnerPicture(result.data[0].picture);
+        setOwnerId(result.data[0].Id);
       })
       .catch((err) => {
         notify('error', err);
       });
   }, [car.Renter_Id]);
 
-  // sending the order request.
-  
+  const resetFields = () => {
+    setStartTime("10:00");
+    setEndTime("10:00");
+    setStartDate("");
+    setEndDate("");
+  };
 
+
+  // get the rentee id.
+  const renteeId = localStorage.getItem('userId');
+  
+  const sendCarOrderRequest = () => {
+    const orderRequest = {
+      Start_Date: startDate,
+      End_Date: endDate,
+      Car_Plates_Number: car.Plates_Number,
+      Rentee_Id: renteeId,
+      Start_Time: startTime,
+      End_Time: endTime,
+      status: "pending",
+      Renter_Id: ownerId,
+    };
+
+    sendOrderRequest(orderRequest) // Use the renamed function here
+      .then((res) => {
+        console.log(res);
+        notify("success", "Order request sent successfully!");
+        resetFields();
+      })
+      .catch((err) => {
+        console.log(err);
+        notify("error", "Failed to send order request!");
+        // ... additional error handling
+      });
+  };
   // handling the User View window close click.
   const handleCloseCarView = () => {
     const token = localStorage.getItem('token');
@@ -133,9 +172,21 @@ export default function CarView() {
             <input
               className="border-2 border-gray-300 rounded-md p-2 w-full"
               type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
-
+          <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Start Time:
+          </label>
+          <input
+            className="border-2 border-gray-300 rounded-md p-2 w-full"
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+        </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               To Date:
@@ -143,8 +194,23 @@ export default function CarView() {
             <input
               className="border-2 border-gray-300 rounded-md p-2 w-full"
               type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
+
+          
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            End Time:
+          </label>
+          <input
+            className="border-2 border-gray-300 rounded-md p-2 w-full"
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </div>
 
           <p className="text-gray-500 mb-4">
             You'll pickup and return the key by meeting with the owner face to
@@ -163,7 +229,7 @@ export default function CarView() {
             </div>
 
             <div>
-              <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
+              <button onClick={sendCarOrderRequest} className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
                 Send Request
               </button>
               <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">

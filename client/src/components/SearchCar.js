@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function SearchCar() {
-  const { setIsSearch } = useContext(SearchStatusContext);
   const navigate = useNavigate();
   // getting the update car list from the car list context so we can update it after searching for a car and getting the result back.
   const { allCars, setAllCars } = useContext(AllCarsContext);
@@ -64,7 +63,6 @@ export default function SearchCar() {
           navigate('/DisplaySearchResults');
         }
         // updating the Cars List with the new search Array
-        setIsSearch(true);
         setAllCars(res.data);
       })
       .catch((err) => console.log("Failed", err));

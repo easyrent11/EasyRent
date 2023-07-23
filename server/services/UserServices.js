@@ -390,13 +390,17 @@ async function comparePasswords(password, hashedPassword) {
   return await bcrypt.compare(password, hashedPassword);
 }
 
-// Function to generate JWT token
-function generateToken(userId) {
-  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+function generateToken(userId, expiresIn) {
+  const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn,
   });
-}
 
+  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY, 
+  });
+
+  return { accessToken, refreshToken };
+}
 // Function to handle user login
 async function loginUser(db, email, password) {
   try {
@@ -414,8 +418,7 @@ async function loginUser(db, email, password) {
       throw new Error("Invalid password");
     }
 
-    // Password is correct, user is authenticated
-    // Generate a token with the userId
+    //If we got here then password is correct, Generate a token with the userId
     const token = generateToken(user.Id);
 
     // Return the token and user details
@@ -596,10 +599,48 @@ async function orderCar(db, orderDetails) {
     );
   });
 }
+
+/*
+##################################################################################
+#           Function to get all orders based on renter id and rentee id          #                            
+##################################################################################
+*/
+  // Function to fetch orders with renter_id matching userId
+  async function getOrdersByRenterId(db, userId){
+    const query = `SELECT * FROM orders WHERE Renter_Id = ${userId}`;
+    return new Promise((resolve, reject) => {
+      db.query(query, (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+
+  // Function to fetch orders with rentee_id matching userId
+  async function getOrdersByRenteeId(db, userId){
+    const query = `SELECT * FROM orders WHERE Rentee_Id = ${userId}`;
+    return new Promise((resolve, reject) => {
+      db.query(query, (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+
+
+
 module.exports = {
   registerUser,
   loginUser,
   addCar,
   searchCar,
   orderCar,
+  getOrdersByRenteeId,
+  getOrdersByRenterId,
 };

@@ -277,6 +277,52 @@ router.post('/ordercar', async (req, res) => {
   }
 });
 
+// Route for fetching orders with renter_id matching userId
+router.get("/getOrdersByRenterId/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const orders = await UserServices.getOrdersByRenterId(db, userId);
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching orders by renter_id:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route for fetching orders with rentee_id matching userId
+router.get("/getOrdersByRenteeId/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const orders = await UserServices.getOrdersByRenteeId(db, userId);
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching orders by rentee_id:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// API route to get an order by orderId
+router.get("/orders/:orderId", (req, res) => {
+  const { orderId } = req.params;
+
+  const query = "SELECT * FROM orders WHERE Order_Id = ?";
+
+  connection.query(query, [orderId], (err, results) => {
+    if (err) {
+      console.error("Error fetching order:", err);
+      return res.status(500).json({ message: "Error fetching order" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    return res.status(200).json(results[0]);
+  });
+});
+
+
+
 // multer function for uploading a single profile image.
 const upload = multer({
   dest: path.join(__dirname, "../images"),

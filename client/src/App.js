@@ -18,21 +18,23 @@ import Footer from "./components/Footer";
 import PrivateRoute from "./components/PrivateRoute";
 import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
-import AddCarForm from "./components/AddCar";
+import AddCar from "./components/AddCar";
 import UserProfile from "./components/UserProfile";
 import DisplaySearchResults from "./components/DisplaySearchResults";
+import Orders from "./components/Orders";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
 import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
+import { UserOrdersProvider } from './contexts/UserOrdersContext';
+
 // ########################################################################################
 // #                             Imports Of pages.                                        #
 // ########################################################################################
 import UserLayout from "./pages/UserLayout";
 import HomeLayout from "./pages/HomeLayout";
-import SearchResultDisplay from "./pages/SearchResultDisplay";
 // ########################################################################################
 // #                             IMPORTS OF API CALLS/HELPER FUNCTIONS.                   #
 // ########################################################################################
@@ -115,6 +117,7 @@ function App() {
       <SearchCarListResult.Provider value={{ carList, updateCarList }}>
         <AllCarsContext.Provider value={{allCars,setAllCars}}>
           <UserProfileDetails.Provider value={{userDetails,setUserDetails}}>
+          <UserOrdersProvider>
             <Router>
               {notFound ? (
                 <PageNotFound handleNotFound={handleNotFound} />
@@ -128,8 +131,9 @@ function App() {
                 <Route path="/CarView/:platesNumber" element={<CarView />} />
                 <Route path="/FAQ" element={<FAQ />} />
                 <Route path="/ContactUs" element={<ContactUs />} />
-                <Route path="/AddCar" element={<AddCarForm />} />
+                <Route path="/AddCar" element={<AddCar />} />
                 <Route path="/UserProfile" element={<UserProfile />} />
+                <Route path="/Orders" element={<Orders />} />
 
                 <Route
                   path="/DisplaySearchResults"
@@ -164,6 +168,7 @@ function App() {
               )}
               <Footer />
             </Router>
+            </UserOrdersProvider>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>
       </SearchCarListResult.Provider>
