@@ -27,7 +27,6 @@ export default function UserNav({ handleLogout }) {
   const { userDetails } = useContext(UserProfileDetails);
   const userProfileImage = userDetails.picture;
 
-
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
@@ -54,8 +53,14 @@ export default function UserNav({ handleLogout }) {
     navigate("/");
   };
 
+  // Calculate the total number of notifications
+  const totalNotifications = userOrders.length + userRenteeOrders.length;
+
   return (
-    <Disclosure as="nav" className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0">
+    <Disclosure
+      as="nav"
+      className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
@@ -102,6 +107,11 @@ export default function UserNav({ handleLogout }) {
                 >
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
+                  {totalNotifications > 0 && (
+                    <span className="absolute top-0 right-9 p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {totalNotifications}
+                    </span>
+                  )}
                 </button>
                 <Menu as="div" className="relative ml-3">
                   <div>

@@ -629,6 +629,33 @@ async function orderCar(db, orderDetails) {
     });
   }
 
+  // Function to get order by Order_Id
+async function getOrderById(db, orderId) {
+  const query = `SELECT * FROM orders WHERE Order_Id = ${orderId}`;
+  return new Promise((resolve, reject) => {
+    db.query(query, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results[0]); // Return the first order if found
+      }
+    });
+  });
+}
+
+// Function to update the order status
+async function updateOrderStatus(db, orderId, status) {
+  const query = `UPDATE orders SET Status = '${status}' WHERE Order_Id = ${orderId}`;
+  return new Promise((resolve, reject) => {
+    db.query(query, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
 
 
 module.exports = {
@@ -639,4 +666,6 @@ module.exports = {
   orderCar,
   getOrdersByRenteeId,
   getOrdersByRenterId,
+  updateOrderStatus,
+  getOrderById,
 };

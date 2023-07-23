@@ -36,9 +36,11 @@ export const getOrdersByRenteeId = (userId) => {
   return axios.get(`${BASE_URL_USER}/getOrdersByRenteeId/${userId}`);
 };
 
+export const getOrderById = (orderId) => {
+  return axios.get(`${BASE_URL_USER}/orders/${orderId}`)
+}
 
+export const changeOrderStatus = (newOrderStatus) => {
+  return axios.put(`${BASE_URL_USER}/changeorderstatus`,newOrderStatus);
+}
 
-
-
-// // Make an API call to send the verification code to the user's email
-// const sendVerificationCode = (email) => axios.post(`${BASE_URL_USER}/sendVerificationCode`,email);

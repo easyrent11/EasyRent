@@ -16,6 +16,7 @@ export function useUserOrders() {
 export function UserOrdersProvider({ children }) {
   const [userOrders, setUserOrders] = useState([]);
   const [userRenteeOrders, setUserRenteeOrders] = useState([]);
+  const [readNotifications, setReadNotifications] = useState([]); // New state for read notifications
   const userId = localStorage.getItem('userId');
 
   useEffect(() => {
@@ -41,8 +42,13 @@ export function UserOrdersProvider({ children }) {
       });
   }, []);
 
+   // Function to mark a notification as "read"
+   const markNotificationAsRead = (orderId) => {
+    setReadNotifications((prevNotifications) => [...prevNotifications, orderId]);
+  };
+
   return (
-    <UserOrdersContext.Provider value={{ userOrders, userRenteeOrders }}>
+    <UserOrdersContext.Provider value={{ userOrders, userRenteeOrders, readNotifications, markNotificationAsRead }}>
       {children}
     </UserOrdersContext.Provider>
   );

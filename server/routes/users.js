@@ -302,23 +302,44 @@ router.get("/getOrdersByRenteeId/:userId", async (req, res) => {
 });
 
 // API route to get an order by orderId
-router.get("/orders/:orderId", (req, res) => {
+router.get("/orders/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
-  const query = "SELECT * FROM orders WHERE Order_Id = ?";
+  try {
+    const order = await UserServices.getOrderById(db, orderId);
 
-  db.query(query, [orderId], (err, results) => {
-    if (err) {
-      console.error("Error fetching order:", err);
-      return res.status(500).json({ message: "Error fetching order" });
-    }
-
-    if (results.length === 0) {
+    if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    return res.status(200).json(results[0]);
-  });
+    return res.status(200).json(order);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    return res.status(500).json({ message: "Error fetching order" });
+  }
+});
+
+
+// Route to change the order status
+router.put("/changeorderstatus", async (req, res) => {
+  const { orderId, status } = req.body;
+
+  try {
+    // Check if the order with the given orderId exists in the database
+    const order = await UserServices.getOrderById(db, orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    // Update the status of the order
+    await UserServices.updateOrderStatus(db, orderId, status);
+
+    return res.json({ message: "Order status updated successfully." });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
 });
 
 

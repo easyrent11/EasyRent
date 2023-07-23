@@ -29,7 +29,7 @@ import Notifications from "./components/Notifications";
 import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
-import { UserOrdersProvider } from './contexts/UserOrdersContext';
+import { UserOrdersProvider } from "./contexts/UserOrdersContext";
 
 // ########################################################################################
 // #                             Imports Of pages.                                        #
@@ -41,7 +41,6 @@ import HomeLayout from "./pages/HomeLayout";
 // ########################################################################################
 import { getAllCars } from "./api/CarApi";
 import { getAllUserDetails } from "./api/UserApi";
-
 
 function App() {
   // ########################################################################################
@@ -61,10 +60,10 @@ function App() {
   const updateCarList = (updatedList) => setCarList(updatedList); // on click function to update the car list .
   const closeLogin = () => setShowLogin(false); // on click function to set the show login window to false.
   const closeRegister = () => setShowRegister(false); // on click function to set the show login window to false.
-// function to handle when a user has logged in
+  // function to handle when a user has logged in
   const handleLogin = () => {
     setIsLoggedIn(true);
-  } 
+  };
   const handleNotFound = () => setNotFound(true); // function to handle when a page was not found
   // on click function to open the login window and close the register.
   const openLogin = () => {
@@ -101,8 +100,6 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      
-      
     } else {
       setIsLoggedIn(false);
     }
@@ -111,70 +108,70 @@ function App() {
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     getAllUserDetails(userId)
-    .then((res) => {
-      console.log(res.data);
-      setUserDetails(res.data[0]);
-    })
-    .catch((err) => console.log("Couldnt get user details ", err));
-  },[]);
+      .then((res) => {
+        console.log(res.data);
+        setUserDetails(res.data[0]);
+      })
+      .catch((err) => console.log("Couldnt get user details ", err));
+  }, []);
 
   return (
     <>
       <SearchCarListResult.Provider value={{ carList, updateCarList }}>
-        <AllCarsContext.Provider value={{allCars,setAllCars}}>
-          <UserProfileDetails.Provider value={{userDetails,setUserDetails}}>
-          <UserOrdersProvider>
-            <Router>
-              {notFound ? (
-                <PageNotFound handleNotFound={handleNotFound} />
-              ) : isLoggedIn ? (
-                <UserNav handleLogout={handleLogout} />
-              ) : (
-                <NavBar openLogin={openLogin} openRegister={openRegister} />
-              )}
-              <Routes>
-                <Route path="/" element={<HomeLayout />} />
-                <Route path="/CarView/:platesNumber" element={<CarView />} />
-                <Route path="/FAQ" element={<FAQ />} />
-                <Route path="/ContactUs" element={<ContactUs />} />
-                <Route path="/AddCar" element={<AddCar />} />
-                <Route path="/UserProfile" element={<UserProfile />} />
-                <Route path="/Orders" element={<Orders />} />
-                <Route path="/Notifications/:orderId" element={<Notifications />} />
+        <AllCarsContext.Provider value={{ allCars, setAllCars }}>
+          <UserProfileDetails.Provider value={{ userDetails, setUserDetails }}>
+            <UserOrdersProvider>
+              <Router>
+                {notFound ? (
+                  <PageNotFound handleNotFound={handleNotFound} />
+                ) : isLoggedIn ? (
+                  <UserNav handleLogout={handleLogout} />
+                ) : (
+                  <NavBar openLogin={openLogin} openRegister={openRegister} />
+                )}
+                <Routes>
+                  <Route path="/" element={<HomeLayout />} />
+                  <Route path="/CarView/:platesNumber" element={<CarView />} />
+                  <Route path="/FAQ" element={<FAQ />} />
+                  <Route path="/ContactUs" element={<ContactUs />} />
+                  <Route path="/AddCar" element={<AddCar />} />
+                  <Route path="/UserProfile" element={<UserProfile />} />
+                  <Route path="/Orders" element={<Orders />} />
+                  <Route
+                    path="/Notifications/:orderId/:typeOfNotification"
+                    element={<Notifications />}
+                  />
 
-                <Route
-                  path="/DisplaySearchResults"
-                  element={<DisplaySearchResults />}
-                />
-                {/* Private Home route for the logged in users */}
-                <Route
-                  path="/homepage"
-                  element={
-                    <PrivateRoute
-                      openLogin={openLogin}
-                      component={UserLayout}
-                    />
-                  }
-                />
-                {/* catch all */}
-                <Route
-                  path="*"
-                  element={<PageNotFound handleNotFound={handleNotFound} />}
-                />
-              </Routes>
+                  <Route
+                    path="/DisplaySearchResults"
+                    element={<DisplaySearchResults />}
+                  />
+                  {/* Private Home route for the logged in users */}
+                  <Route
+                    path="/homepage"
+                    element={
+                      <PrivateRoute
+                        openLogin={openLogin}
+                        component={UserLayout}
+                      />
+                    }
+                  />
+                  {/* catch all */}
+                  <Route
+                    path="*"
+                    element={<PageNotFound handleNotFound={handleNotFound} />}
+                  />
+                </Routes>
 
-              {/* conditional rendering login and register components. */}
-              {showLogin && (
-                <Login handleLogin={handleLogin} onClose={closeLogin}/>
-              )}
-              {showRegister && (
-                <Register
-                  onClose={closeRegister}
-                  openLogin={openLogin}
-                />
-              )}
-              <Footer />
-            </Router>
+                {/* conditional rendering login and register components. */}
+                {showLogin && (
+                  <Login handleLogin={handleLogin} onClose={closeLogin} />
+                )}
+                {showRegister && (
+                  <Register onClose={closeRegister} openLogin={openLogin} />
+                )}
+                <Footer />
+              </Router>
             </UserOrdersProvider>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>
