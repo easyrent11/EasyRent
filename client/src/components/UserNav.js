@@ -10,8 +10,11 @@ import { useUserOrders } from "../contexts/UserOrdersContext";
 import NotificationDropdown from "./NotificationDropdown";
 
 const navigation = [
-  // Your navigation items
-  // ...
+  { name: "Dashboard", href: "/homepage", current: true },
+  { name: "Share your car", href: "/AddCar", current: false },
+  { name: "Orders", href: "/Orders", current: false },
+  { name: "Chat", href: "/chatapp", current: false },
+  { name: "Contact Us", href: "/ContactUs", current: false },
 ];
 
 function classNames(...classes) {
@@ -23,6 +26,7 @@ export default function UserNav({ handleLogout }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userDetails } = useContext(UserProfileDetails);
   const userProfileImage = userDetails.picture;
+
 
   const navigate = useNavigate();
   const dropdownRef = useRef(null);

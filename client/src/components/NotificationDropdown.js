@@ -2,25 +2,34 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const NotificationDropdown = ({ userOrders, userRenteeOrders }) => {
-  const hasNewOrderRequest = userOrders.length > 0;
-  const hasAcceptedRenteeOrder = userRenteeOrders.some(
-    (order) => order.status === "accepted"
-  );
-
   return (
-    <div className="py-1 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-      <div className="px-4 py-3 text-sm text-gray-700">
-        {hasNewOrderRequest && (
-          <Link to={`/Notifications/${userOrders[0].Order_Id}`}>
-            <p className="mb-2">You have a new car order request</p>
-          </Link>
+    <div className="py-1 w-full bg-white rounded-md  shadow-lg ring-1 ring-black ring-opacity-5 space-y-2">
+      <div className="px-4 py-3 text-sm  text-gray-700">
+        {userOrders.length > 0 ? (
+          userOrders.map((order) => (
+            <div key={order.Order_Id} className="mb-2 p-2 rounded-lg bg-black">
+              <Link to={`/Notifications/${order.Order_Id}`}>
+                <p className="mb-2 text-white">You have a new car order request</p>
+              </Link>
+            </div>
+          ))
+        ) : (
+          <p>No new order requests.</p>
         )}
-        {hasAcceptedRenteeOrder && (
-          <Link to={`/Notifications/${userRenteeOrders[0].Order_Id}`}>
-            <p>The renter accepted your car.</p>
-          </Link>
+
+        {userRenteeOrders.length > 0 ? (
+          userRenteeOrders.map((order) => (
+            <div key={order.Order_Id} className="text-white p-2 rounded-lg bg-black mb-2">
+              <Link to={`/Notifications/${order.Order_Id}`}>
+                <p className="mb-2">The renter accepted your car.</p>
+              </Link>
+            </div>
+          ))
+        ) : (
+          <p></p>
         )}
-        {!hasNewOrderRequest && !hasAcceptedRenteeOrder && (
+
+        {userOrders.length === 0 && userRenteeOrders.length === 0 && (
           <p>No notifications.</p>
         )}
       </div>

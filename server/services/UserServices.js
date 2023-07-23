@@ -395,11 +395,7 @@ function generateToken(userId, expiresIn) {
     expiresIn,
   });
 
-  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRY, 
-  });
-
-  return { accessToken, refreshToken };
+  return accessToken;
 }
 // Function to handle user login
 async function loginUser(db, email, password) {
@@ -419,7 +415,7 @@ async function loginUser(db, email, password) {
     }
 
     //If we got here then password is correct, Generate a token with the userId
-    const token = generateToken(user.Id);
+    const token = generateToken(user.Id,'1h');
 
     // Return the token and user details
     return {

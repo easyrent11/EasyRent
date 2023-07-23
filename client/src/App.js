@@ -22,6 +22,7 @@ import AddCar from "./components/AddCar";
 import UserProfile from "./components/UserProfile";
 import DisplaySearchResults from "./components/DisplaySearchResults";
 import Orders from "./components/Orders";
+import Notifications from "./components/Notifications";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -60,7 +61,10 @@ function App() {
   const updateCarList = (updatedList) => setCarList(updatedList); // on click function to update the car list .
   const closeLogin = () => setShowLogin(false); // on click function to set the show login window to false.
   const closeRegister = () => setShowRegister(false); // on click function to set the show login window to false.
-  const handleLogin = () => setIsLoggedIn(true); // function to handle when a user has logged in
+// function to handle when a user has logged in
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  } 
   const handleNotFound = () => setNotFound(true); // function to handle when a page was not found
   // on click function to open the login window and close the register.
   const openLogin = () => {
@@ -75,6 +79,7 @@ function App() {
   // on click function to handle when a user has logged out.
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setUserDetails(""); // resetting the state.
   };
   // ########################################################################################
   // #                                     USE-EFFECTS                                      #
@@ -96,6 +101,7 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+      
       
     } else {
       setIsLoggedIn(false);
@@ -134,6 +140,7 @@ function App() {
                 <Route path="/AddCar" element={<AddCar />} />
                 <Route path="/UserProfile" element={<UserProfile />} />
                 <Route path="/Orders" element={<Orders />} />
+                <Route path="/Notifications/:orderId" element={<Notifications />} />
 
                 <Route
                   path="/DisplaySearchResults"

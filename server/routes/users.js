@@ -307,7 +307,7 @@ router.get("/orders/:orderId", (req, res) => {
 
   const query = "SELECT * FROM orders WHERE Order_Id = ?";
 
-  connection.query(query, [orderId], (err, results) => {
+  db.query(query, [orderId], (err, results) => {
     if (err) {
       console.error("Error fetching order:", err);
       return res.status(500).json({ message: "Error fetching order" });
