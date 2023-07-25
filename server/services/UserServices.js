@@ -516,6 +516,7 @@ async function orderCar(db, orderDetails) {
     End_Time,
     status = "pending", // Default value for status is 'pending'
     Renter_Id,
+    Order_Date,
   } = orderDetails;
 
   // Check if the Renter_Id exists in the users table
@@ -566,8 +567,8 @@ async function orderCar(db, orderDetails) {
   }
 
   const insertOrderQuery = `
-    INSERT INTO orders (Start_Date, End_Date, Car_Plates_Number, Rentee_id, Start_Time, End_Time, status, Renter_Id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO orders (Start_Date, End_Date, Car_Plates_Number, Rentee_id, Start_Time, End_Time, status, Renter_Id,Order_Date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
   `;
 
   return new Promise((resolve, reject) => {
@@ -582,6 +583,7 @@ async function orderCar(db, orderDetails) {
         End_Time,
         status,
         Renter_Id,
+        Order_Date,
       ],
       (err, result) => {
         if (err) {
@@ -589,7 +591,16 @@ async function orderCar(db, orderDetails) {
           reject("Failed to create order");
         } else {
           console.log("Order created successfully:", result);
-          resolve(result.insertId); // Return the ID of the newly inserted order
+           // Get the ID of the newly inserted order
+           const orderId = result.insertId;
+
+           // Create an object containing the order and its ID
+           const createdOrder = {
+             ...orderDetails,
+             Order_Id: orderId,
+           };
+ 
+           resolve(createdOrder);
         }
       }
     );
@@ -617,7 +628,7 @@ async function orderCar(db, orderDetails) {
 
   // Function to fetch orders with rentee_id matching userId
   async function getOrdersByRenteeId(db, userId){
-    const query = `SELECT * FROM orders WHERE Rentee_Id = ${userId}`;
+    const query = `SELECT * FROM orders WHERE Rentee_id = ${userId}`;
     return new Promise((resolve, reject) => {
       db.query(query, (error, results) => {
         if (error) {
@@ -631,7 +642,7 @@ async function orderCar(db, orderDetails) {
 
   // Function to get order by Order_Id
 async function getOrderById(db, orderId) {
-  const query = `SELECT * FROM orders WHERE Order_Id = ${orderId}`;
+  const query = `SELECT * from orders WHERE Order_Id = ${orderId}`;
   return new Promise((resolve, reject) => {
     db.query(query, (error, results) => {
       if (error) {

@@ -5,14 +5,14 @@ import { getOrderById, changeOrderStatus } from "../api/UserApi";
 export default function Notifications() {
   const { orderId, typeOfNotification } = useParams(); // Extract typeOfNotification here
   const [orderDetails, setOrderDetails] = useState(null); // Initialize as null
-  const [showButtons, setShowButtons] = useState(typeOfNotification === "orderRequest");
+  const [showButtons, setShowButtons] = useState(typeOfNotification === 'orderRequest');
   const navigate = useNavigate();
 
   useEffect(() => {
     getOrderById(orderId)
       .then((res) => {
         console.log(res.data);
-        setOrderDetails(res.data); // Assuming the actual data is stored directly in res.data
+        setOrderDetails(res.data); 
       })
       .catch((error) => console.error("Error fetching order data:", error));
   }, [orderId]);
@@ -90,6 +90,12 @@ export default function Notifications() {
                   >
                     Status
                   </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Order Date : 
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -111,6 +117,9 @@ export default function Notifications() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {orderDetails.status}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {orderDetails.Order_Date}
                   </td>
                 </tr>
               </tbody>

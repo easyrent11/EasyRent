@@ -1,16 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Select from "react-select";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { resetPassword } from "../api/UserApi";
 import { Cities } from "../res/Cities";
-
+import { getCarWithUserId } from "../api/CarApi";
+import Car from "./Car";
+import { AllCarsContext } from "../contexts/AllCarsContext";
 export default function UserProfile() {
-  const {userDetails,setUserDetails} = useContext(UserProfileDetails);
+  const { userDetails, setUserDetails } = useContext(UserProfileDetails);
   const [editing, setEditing] = useState(false);
   const [updatedUserDetails, setUpdatedUserDetails] = useState(userDetails);
   const [updatedImage, setUpdatedImage] = useState(null);
+  let [userCars, setUserCars] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const carsPerPage = 4; // Number of cars to show per page
   // const [city, setCity] = useState("");
   // const [city_name, setCityName] = useState("");
   // const [selectedCityLabel, setSelectedCityLabel] = useState("Choose a city");
@@ -20,6 +25,12 @@ export default function UserProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordChanged, setPasswordChanged] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Handle page navigation
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const handleChangePassword = () => {
     const info = {
@@ -53,15 +64,9 @@ export default function UserProfile() {
     setEditing(false);
   };
 
-  // const handleCityChange = (selectedOption) => {
-  //   setCity(selectedOption.value);
-  //   setCityName(selectedOption.label);
-  //   setSelectedCityLabel(selectedOption.label);
-  //   setUpdatedUserDetails((prevState) => ({
-  //     ...prevState,
-  //     City_Name: selectedOption.value,
-  //   }));
-  // };
+  // gets all the cars in the website.
+  const { allCars } = useContext(AllCarsContext);
+  // filters the all cars to get only the cars of the logged in person.
 
   const handleSave = () => {
     if (updatedImage) {
@@ -77,7 +82,7 @@ export default function UserProfile() {
           // Once the image is uploaded, update the user details and send the updated details
           const updatedDetailsWithPicture = {
             ...updatedUserDetails,
-            picture: filename, 
+            picture: filename,
           };
           console.log(updatedDetailsWithPicture);
 
@@ -105,7 +110,6 @@ export default function UserProfile() {
           toast.success("User details saved successfully:", response.data);
           setEditing(false);
           setUserDetails(updatedUserDetails);
-          
         })
         .catch((error) => {
           toast.error("Failed to save user details:", error);
@@ -147,16 +151,38 @@ export default function UserProfile() {
       </p>
     );
   };
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const userCars = allCars.filter((car) => car.Renter_Id == userId);
+    console.log("User cars = ", userCars);
+    setUserCars(userCars);
+    setLoading(false); // Set loading to false when data is available
+  }, [allCars]);
+
+  // // Add a condition to check if userCars is still loading
+  if (loading) {
+     return <p>No Cars yet...</p>;
+  }
+  const allUserCars = Array.from(userCars);
+  const totalPages = Math.ceil(allUserCars.length / carsPerPage);
+
+  // Get the cars to display for the current page
+  const indexOfLastCar = currentPage * carsPerPage;
+  const indexOfFirstCar = indexOfLastCar - carsPerPage;
+  const currentCars = allUserCars.slice(indexOfFirstCar, indexOfLastCar);
+  const navigationLocation = "/CarOwnerView"; // Set your navigation location
 
   return (
-    <div className="min-h-screen w-4/5">
-      <div className="w-full flex container mx-auto px-4 py-8">
+    <div className="min-h-screen w-4/5 border-2 border-red-500 ">
+      <div className="w-full flex container mx-auto px-4 py-8 ">
         <div className="w-1/2">
           {/* Display user profile image */}
           <div className="flex flex-col items-center justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
             <figure className="flex flex-col items-center justify-center">
               <img
-                src={`http://localhost:3001/images/${userDetails.picture}`}
+                src={`http://localhost:3001/images/${
+                  userDetails.picture != null ? userDetails.picture : null
+                }`}
                 alt="User Image"
                 className="border-2 flex w-32 h-32 rounded-full"
               />
@@ -165,10 +191,11 @@ export default function UserProfile() {
               Location : {userDetails.City_Name}, Israel
             </figcaption>
             <div className="flex flex-col justify-between items-center p-1 rounded-md mt-4 w-3/5 ">
-          
               <div className="flex bg-[#f6f6f6] w-full items-center rounded-md p-2 shadow-lg justify-around ">
                 <p className="text-blackp-2 text-black font-bold">Status :</p>
-                <span className=" bg-green-500 text-center text-white m-1 w-1/2 p-2 rounded-md">  {userDetails.status} </span>
+                <span className=" bg-green-500 text-center text-white m-1 w-1/2 p-2 rounded-md">
+                  {userDetails.status}{" "}
+                </span>
               </div>
 
               {editing && (
@@ -186,7 +213,6 @@ export default function UserProfile() {
                   </div>
                 </div>
               )}
-              
             </div>
           </div>
         </div>
@@ -250,7 +276,6 @@ export default function UserProfile() {
                   {renderInputOrText("street_name", "StreetName")}
                 </div>
               </div>
-             
             </div>
 
             {/* Buttons */}
@@ -282,7 +307,36 @@ export default function UserProfile() {
           </div>
         </div>
       </div>
+      {/* Renter's Cars Section */}
+      <div className="flex flex-col items-center min-h-screen w-1/2 p-4 bg-[#f5f5f5] rounded-md">
+        <h2 className="p-2 m-2 text-2xl">Your cars : </h2>
+        <article className="flex border-2 border-blue-900 min-h-screen  flex-wrap w-full p-4">
+          {allUserCars.map((car, index) => (
+            <Car
+              key={index}
+              car={car}
+              btnText={"Edit Car"}
+              navigationLocation={navigationLocation}
+            />
+          ))}
+        </article>
+        <div className="flex self-center align-self-end mt-4">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              className={`mx-1 p-2 border ${
+                page === currentPage
+                  ? "bg-black rounded-md text-white"
+                  : "bg-white"
+              }`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* End of Renter's Cars Section */}
     </div>
   );
 }
-

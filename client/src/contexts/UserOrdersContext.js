@@ -19,8 +19,8 @@ export function UserOrdersProvider({ children }) {
   const [readNotifications, setReadNotifications] = useState([]); // New state for read notifications
   const userId = localStorage.getItem('userId');
 
+  // fetching all the orders where the logged in user is the renter (the one who owns the car.)
   useEffect(() => {
-    // Fetch orders with renter_id matching userId from localStorage
     getOrdersByRenterId(userId)
       .then((res) => {
         setUserOrders(res.data); // Store the fetched orders in state
@@ -29,9 +29,8 @@ export function UserOrdersProvider({ children }) {
         console.log(err);
       });
   }, []);
-
+  // fetching all the orders where the logged in user is the rentee (the one who wants to rent the car.)
   useEffect(() => {
-    // Fetch orders with rentee_id matching userId from localStorage
     getOrdersByRenteeId(userId)
       .then((res) => {
         setUserRenteeOrders(res.data); // Store the fetched orders in state
@@ -47,8 +46,18 @@ export function UserOrdersProvider({ children }) {
     setReadNotifications((prevNotifications) => [...prevNotifications, orderId]);
   };
 
+  // Provide the state and the function separately
+  const contextValue = {
+    userOrders,
+    userRenteeOrders,
+    readNotifications,
+    markNotificationAsRead,
+    setUserRenteeOrders, // Add the function here
+  };
+
+
   return (
-    <UserOrdersContext.Provider value={{ userOrders, userRenteeOrders, readNotifications, markNotificationAsRead }}>
+    <UserOrdersContext.Provider value={contextValue}>
       {children}
     </UserOrdersContext.Provider>
   );

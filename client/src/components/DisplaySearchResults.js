@@ -31,6 +31,8 @@ export default function AllCarsSection() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+  const navigationLocation = "/CarView";
+
 
   return (
     <>
@@ -41,7 +43,7 @@ export default function AllCarsSection() {
     <div className="flex flex-col items-center min-h-screen w-4/5 p-4 bg-[#f5f5f5] rounded-md">
       <article className="flex border-2 border-blue-900 min-h-screen  flex-wrap w-full p-4">
         {currentCars.map((car, index) => (
-          <Car key={index} car={car} />
+          <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation}/>
         ))}
       </article>
       <div className="flex self-center align-self-end mt-4">

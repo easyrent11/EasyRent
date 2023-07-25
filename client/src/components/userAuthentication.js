@@ -17,9 +17,9 @@ const useAuthentication = () => {
     axios.defaults.headers.common['Authorization'] = token;
   }, [navigate]);
 
-  // Optionally, you can return the token or user data if needed in your components
+
   const token = localStorage.getItem('token');
-  // const user = ... fetch user data based on the token
+
 
   return {
     token,

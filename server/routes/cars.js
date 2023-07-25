@@ -33,10 +33,45 @@ router.get("/getallcars", async (req, res) => {
     const carsWithImages = await carServices.getAllCarsWithImages();
     res.status(200).json(carsWithImages);
   } catch (error) {
-    console.error("Error retrieving cars:", error);
     res.status(500).json({ error: "Error retrieving cars" });
   }
 });
+
+router.get("/getcar/:PlatesNumber",async(req,res) => {
+  const PlatesNumber = req.params.PlatesNumber;
+  try{
+    const car = await carServices.getCarWithPlatesNumber(db, PlatesNumber);
+    res.status(200).json(car);
+  }catch (error) {
+    res.status(500).json({ error: "Error retrieving car" });
+  }
+});
+router.get("/getcarwithuserid/:userId",async(req,res) => {
+  const userId = req.params.userId;
+  try{
+    const car = await carServices.getCarsWithUserId(db, userId);
+    res.status(200).json(car);
+  }catch (error) {
+    res.status(500).json({ error: "Error retrieving car" });
+  }
+});
+
+// Route to update car details
+router.put("/updatecardetails", async (req, res) => {
+  // Retrieve the updated car details from the request body
+  const updatedCarDetails = req.body;
+  console.log("Updated Details =",updatedCarDetails);
+
+  try {
+    await carServices.updateCarDetails(db, updatedCarDetails);
+    res.json({ message: "Car details and image updated successfully" });
+  } catch (error) {
+    console.error("Error updating car details:", error);
+    res.status(500).json({ message: "Failed to update car details and image" });
+  }
+});
+
+
 
 router.post("/uploadImages", (req, res) => {
   upload(req, res, function (err) {

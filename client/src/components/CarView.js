@@ -1,36 +1,42 @@
-import React, { useContext,useState,useEffect } from "react";
-import { useParams,useNavigate } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Carousel } from "@material-tailwind/react";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import PersonIcon from "@mui/icons-material/Person";
-import {TbManualGearbox } from "react-icons/tb";
+import { TbManualGearbox } from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
 import { getAllUserDetails } from "../api/UserApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {sendOrderRequest} from "../api/UserApi";
+import { sendOrderRequest } from "../api/UserApi";
+import { useUserOrders } from "../contexts/UserOrdersContext";
+import { FaTimes } from 'react-icons/fa';
+
 export default function CarView() {
   const navigate = useNavigate();
   const [startTime, setStartTime] = useState("10:00");
   const [endTime, setEndTime] = useState("10:00");
-  const[startDate, setStartDate] = useState("");
-  const[endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // State variables for car owner and for error message.
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
   const [ownerId, setOwnerId] = useState("");
   const notify = (status, message) =>
-  status === "success" ? toast.success(message) : toast.error(message);
+    status === "success" ? toast.success(message) : toast.error(message);
   let flag = false;
 
-  const {allCars} = useContext(AllCarsContext);
+  const { allCars } = useContext(AllCarsContext);
+  const { setUserRenteeOrders } = useUserOrders();
 
   //getting the plates number out of the paramaters that are passed in the car component.
   let { platesNumber } = useParams();
   // extracting the car from the car list using the plates Number to match it to the one we click on.
-  const car = allCars.find((car) => Number(car.Plates_Number) === Number(platesNumber));
-  
+  const car = allCars.find(
+    (car) => Number(car.Plates_Number) === Number(platesNumber)
+  );
+
   useEffect(() => {
     getAllUserDetails(car.Renter_Id)
       .then((result) => {
@@ -39,7 +45,7 @@ export default function CarView() {
         setOwnerId(result.data[0].Id);
       })
       .catch((err) => {
-        notify('error', err);
+        notify("error", err);
       });
   }, [car.Renter_Id]);
 
@@ -50,11 +56,45 @@ export default function CarView() {
     setEndDate("");
   };
 
-
   // get the rentee id.
-  const renteeId = localStorage.getItem('userId');
-  
+  let renteeId = localStorage.getItem("userId");
+  renteeId = renteeId ? parseInt(renteeId) : null;
+
   const sendCarOrderRequest = () => {
+    // checking if the user provided the order details.
+    if (!startDate || !endDate || !startTime || !endTime) {
+      notify("error", "Error: Please fill in all required fields.");
+      return;
+    }
+    // Check if the startDate is smaller than the endDate
+    if (new Date(startDate) >= new Date(endDate)) {
+      notify("error", "Error: Start date must be smaller than the end date.");
+      return;
+    }
+    // Check if the startDate is smaller than the endDate
+    if (new Date(startDate) < new Date() || new Date(endDate) < new Date()) {
+      notify(
+        "error",
+        "Error: Please pick a valid start date,end date that is not in the past"
+      );
+      return;
+    }
+    // Converting start and end times to Date objects
+    const startTimeDate = new Date(`1970-01-01T${startTime}:00Z`);
+    const endTimeDate = new Date(`1970-01-01T${endTime}:00Z`);
+
+    // Calculating the time difference in milliseconds
+    const timeDifferenceMs = endTimeDate - startTimeDate;
+
+    // Checking if the startDate and endDate are the same
+    const isSameDate = startDate === endDate;
+
+    // Checking  if the time difference is less than one hour (3600000 milliseconds) when the start date and end date are the same
+    if (isSameDate && timeDifferenceMs < 3600000) {
+      console.log("Error: Car rents should be only from 1 hour and above.");
+      return;
+    }
+
     const orderRequest = {
       Start_Date: startDate,
       End_Date: endDate,
@@ -64,35 +104,43 @@ export default function CarView() {
       End_Time: endTime,
       status: "pending",
       Renter_Id: ownerId,
+      Order_Date: new Date().toISOString(),
     };
 
     sendOrderRequest(orderRequest) // Use the renamed function here
       .then((res) => {
-        console.log(res);
         notify("success", "Order request sent successfully!");
+        console.log(res.data.order);
+        setUserRenteeOrders((prevRenteeOrders) => [
+          ...prevRenteeOrders,
+          res.data.order,
+        ]);
         resetFields();
       })
       .catch((err) => {
         console.log(err);
         notify("error", "Failed to send order request!");
-        // ... additional error handling
       });
   };
   // handling the User View window close click.
   const handleCloseCarView = () => {
-    const token = localStorage.getItem('token');
-    if(token){
-      navigate('/homepage');
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/homepage");
+    } else {
+      navigate("/DisplaySearchResults");
     }
-    else{
-      navigate('/DisplaySearchResults');
-    }
-  }
-  
+  };
+
   return (
-    <div className="min-h-full mb-4 bg-[#e3e3e3] rounded-lg flex flex-col items-center">
+    <div className="shadow-lg min-h-full mb-4 border-2  bg-[#f6f6f6] rounded-lg flex flex-col items-center">
       <div className="text-right m-2  w-full ">
-      <button className="p-2 m-2 rounded-md text-white bg-black hover:bg-gray-800 transform hover:scale-110" onClick={handleCloseCarView}>X</button>
+        <button
+          className="p-2 m-2 rounded-md text-2xl text-gray-500 transform hover:scale-110"
+          onClick={handleCloseCarView}
+        >
+          <FaTimes />
+        </button>
       </div>
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
@@ -146,18 +194,16 @@ export default function CarView() {
                 </li>
                 <li>
                   <TbManualGearbox className="inline-block text-3xl m-2" />
-                   {car.Transmission_type}
+                  {car.Transmission_type}
                 </li>
                 <li>
                   <FaCogs className="inline-block text-3xl m-2" />
-                  
+
                   {car.Engine_Type}
                 </li>
               </ul>
             </div>
           </div>
-
-        
         </section>
 
         <section className="w-full max-w-3xl mt-10 p-6 bg-white shadow-md rounded-lg">
@@ -177,16 +223,16 @@ export default function CarView() {
             />
           </div>
           <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Start Time:
-          </label>
-          <input
-            className="border-2 border-gray-300 rounded-md p-2 w-full"
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-          />
-        </div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Start Time:
+            </label>
+            <input
+              className="border-2 border-gray-300 rounded-md p-2 w-full"
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               To Date:
@@ -199,18 +245,17 @@ export default function CarView() {
             />
           </div>
 
-          
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            End Time:
-          </label>
-          <input
-            className="border-2 border-gray-300 rounded-md p-2 w-full"
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-          />
-        </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              End Time:
+            </label>
+            <input
+              className="border-2 border-gray-300 rounded-md p-2 w-full"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
 
           <p className="text-gray-500 mb-4">
             You'll pickup and return the key by meeting with the owner face to
@@ -219,17 +264,17 @@ export default function CarView() {
 
           <section className="flex flex-col ">
             <div>
-              <p className="text-lg font-bold mb-2">
-                Total Price (including fees):
-              </p>
+              <p className="text-lg font-bold mb-2">Total Price :</p>
               <p className="text-xl font-bold  text-[#CC6200]">
                 ₪{car.Rental_Price_Per_Day}/day
               </p>
-              {/* ₪{car.RentalPrice * numberOfDays * (1 + 0.05)} */}
             </div>
 
             <div>
-              <button onClick={sendCarOrderRequest} className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
+              <button
+                onClick={sendCarOrderRequest}
+                className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1"
+              >
                 Send Request
               </button>
               <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">

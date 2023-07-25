@@ -23,6 +23,8 @@ import UserProfile from "./components/UserProfile";
 import DisplaySearchResults from "./components/DisplaySearchResults";
 import Orders from "./components/Orders";
 import Notifications from "./components/Notifications";
+import Reports from "./components/Reports";
+import CarOwnerView from "./components/CarOwnerView";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -132,6 +134,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomeLayout />} />
                   <Route path="/CarView/:platesNumber" element={<CarView />} />
+                  <Route path="/CarOwnerView/:platesNumber" element={<CarOwnerView setAllCars={setAllCars} />} />
                   <Route path="/FAQ" element={<FAQ />} />
                   <Route path="/ContactUs" element={<ContactUs />} />
                   <Route path="/AddCar" element={<AddCar />} />
@@ -140,6 +143,10 @@ function App() {
                   <Route
                     path="/Notifications/:orderId/:typeOfNotification"
                     element={<Notifications />}
+                  />
+                  <Route
+                    path="/Reports/:orderId"
+                    element={<Reports />}
                   />
 
                   <Route

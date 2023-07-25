@@ -253,6 +253,7 @@ router.post('/ordercar', async (req, res) => {
     End_Time,
     status,
     Renter_Id,
+    Order_Date,
   } = req.body;
 
   // Constructing the order details object
@@ -265,13 +266,14 @@ router.post('/ordercar', async (req, res) => {
     End_Time,
     status,
     Renter_Id,
+    Order_Date,
   };
 
 
   try {
     // calling the function that will do the logic and getting back the id of the order.
-    const orderId = await UserServices.orderCar(db,orderDetails);
-    res.status(201).json({message:"Your request was sent to the renter",orderId:orderId});
+    const order = await UserServices.orderCar(db,orderDetails);
+    res.status(201).json({message:"Your request was sent to the renter",order:order});
   } catch (error) {
     res.status(500).json({ error: "Failed to send request to the renter" });
   }
