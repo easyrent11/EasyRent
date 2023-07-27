@@ -25,6 +25,7 @@ import Orders from "./components/Orders";
 import Notifications from "./components/Notifications";
 import Reports from "./components/Reports";
 import CarOwnerView from "./components/CarOwnerView";
+import ChatApp from "./components/ChatApp";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -140,6 +141,7 @@ function App() {
                   <Route path="/AddCar" element={<AddCar />} />
                   <Route path="/UserProfile" element={<UserProfile />} />
                   <Route path="/Orders" element={<Orders />} />
+                  <Route path="/ChatApp" element={<ChatApp />} />
                   <Route
                     path="/Notifications/:orderId/:typeOfNotification"
                     element={<Notifications />}

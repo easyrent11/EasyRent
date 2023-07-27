@@ -668,6 +668,34 @@ async function updateOrderStatus(db, orderId, status) {
   });
 }
 
+// function to start chat.
+const startChat = (db,user1Id, user2Id) => {
+  return new Promise((resolve, reject) => {
+    // Check if a chat room already exists between user1 and user2
+    const query = `SELECT id FROM chat_rooms WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)`;
+    db.query(query, [user1Id, user2Id, user2Id, user1Id], (error, results) => {
+      if (error) {
+        console.error("Error checking chat room:", error);
+        reject("Internal Server Error");
+      }
+
+      if (results.length > 0) {
+        // If a chat room exists, return its ID
+        resolve({ room: results[0].id });
+      } else {
+        // If a chat room doesn't exist, create a new one
+        const createQuery = `INSERT INTO chat_rooms (user1_id, user2_id) VALUES (?, ?)`;
+        db.query(createQuery, [user1Id, user2Id], (createError, createResults) => {
+          if (createError) {
+            console.error("Error creating chat room:", createError);
+            reject("Internal Server Error");
+          }
+          resolve({ room: createResults.insertId });
+        });
+      }
+    });
+  });
+};
 
 module.exports = {
   registerUser,
@@ -679,4 +707,5 @@ module.exports = {
   getOrdersByRenterId,
   updateOrderStatus,
   getOrderById,
+  startChat,
 };
