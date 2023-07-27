@@ -97,7 +97,7 @@ export default function ChatApp() {
           user_id: data.user_id,
         },
       ]);
-
+      
       fetchMessagesForRoom();
     });
 
@@ -108,17 +108,22 @@ export default function ChatApp() {
   }, [room]);
 
   return (
-<main className="flex justify-center min-h-screen border-2 border-red-500">
-      <div className="flex  w-full rounded-md shadow-lg m-2">
+    <main
+      className="min-h-screen flex justify-center w-4/5 border-2 bg-[#f6f6f6] show-lg rounded-md m-4"
+      style={{ minHeight: "90vh" }}
+    >
+      <div className="flex  w-full rounded-md shadow-lg">
         {/* Left Section - List of Available Users */}
-        <div className="w-1/4 p-4 border-r rounded-md shadow-lg bg-black">
-          <h2 className="text-xl text-white font-bold mb-4">All Available Users:</h2>
+        <div className="w-1/4 p-4 border-r rounded-md h-4/5">
+          <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <ul>
             {users.map((user) => (
               <li
                 key={user.Id}
                 className={`flex items-center mb-2 cursor-pointer ${
-                  selectedUser === user.Id ? "bg-blue-500 text-white" : ""
+                  selectedUser === user.Id
+                    ? "bg-[#c6c3c3] rounded-md p-2 text-white"
+                    : " p-2 text-black"
                 }`}
                 onClick={() => startChat(user.Id)}
               >
@@ -129,37 +134,39 @@ export default function ChatApp() {
                   alt={user.first_name}
                   className="w-8 h-8 rounded-full mr-2"
                 />
-                <span className="text-white text-lg">{user.first_name}</span>
+                <span className="text-black font-bold text-lg">
+                  {user.first_name}
+                </span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* Right Section - Chat Messages */}
-        <div className="flex-1 rounded-md">
+        <div className="flex flex-col flex-1  rounded-md">
           {room ? (
             <>
-              <h2 className="text-xl text-white font-bold flex rounded-md p-2 bg-black border-2 items-center ">
+              <h2 className="text-xl text-black font-bold flex rounded-md  p-2 items-center ">
                 {users.find((user) => user.Id === selectedUser) ? (
                   <img
-                  className="w-10 h-10 rounded-full mr-2"
+                    className="w-10 h-10 rounded-full mr-2"
                     src={`http://localhost:3001/images/${
                       users.find((user) => user.Id === selectedUser).picture
                     }`}
                     alt="User Avatar"
                   />
-                ) : null
-                }
-                <p>{users.find((user) => user.Id === selectedUser).first_name}</p>
-                
+                ) : null}
+                <p>
+                  {users.find((user) => user.Id === selectedUser).first_name}
+                </p>
               </h2>
-              <div className="rounded p-4  border-2 border-pink-700 overflow-y-auto">
+              <div className="rounded p-4  h-full ">
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`mb-2 border-2  flex ${
+                    className={`mb-2 flex ${
                       msg.user_id == user1Id ? "justify-start" : "justify-end"
-                    } border-green-500`}
+                    }`}
                   >
                     <span
                       className={`font-bold  p-2 m-2 ${
@@ -172,28 +179,38 @@ export default function ChatApp() {
                       />
                     </span>
                     <p
-                      className={`flex items-center justify-center m-2 max-w-sm rounded-lg p-2 ${
+                      className={`flex flex-col w-1/12 items-center justify-center m-2 max-w-sm rounded-lg p-2 ${
                         msg.user_id == user1Id
-                          ? "order-2 bg-blue-500 text-white"
+                          ? "order-2 bg-black text-white"
                           : "order-1 bg-gray-200"
                       }`}
                     >
                       {msg.text}
+                      <span
+                        className={`text-xs ml-auto mt-1 ${
+                          msg.user_id === user1Id
+                            ? "text-[#CC6200]"
+                            : "text-blue-500"
+                        }`}
+                      >
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </p>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex">
+              <div className="mt-4  p-2 bg-white flex">
                 <input
                   placeholder="Message"
+                  value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="border rounded p-2 flex-1 mr-2"
                 />
                 <button
                   onClick={sendMessage}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                  className="bg-black hover:bg-[#CC6200] text-white font-bold py-2 px-4 rounded"
                 >
-                  <FiSend /> {/* Add the send icon */}
+                  <FiSend />
                 </button>
               </div>
             </>

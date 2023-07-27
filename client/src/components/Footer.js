@@ -6,7 +6,7 @@ import { Link as ScrollLink } from "react-scroll";
 
 export default function Footer() {
   return (
-    <footer className="  bg-black py-6 w-full">
+    <footer className="bg-black  py-6 w-full">
       <article className="flex items-center justify-around m-2 p-2  ">
         {/* About Us */}
         <div className="text-white w-1/4 p-4">
