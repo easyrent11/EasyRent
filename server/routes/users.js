@@ -379,8 +379,8 @@ router.get("/getAllUsers", (req, res) => {
 });
 
 router.post("/startChat",async(req,res) => {
-  const { user1Id, user2Id } = req.body;
-  console.log(user1Id, user2Id);
+  let { user1Id, user2Id } = req.body;
+  user1Id = parseInt(user1Id);
   try {
     const result = await UserServices.startChat(db, user1Id, user2Id);
     res.status(200).json(result);
