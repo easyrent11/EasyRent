@@ -36,6 +36,7 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     // Save the message in the database
     saveMessageToDB(data);
+    console.log("data we got",data);
 
     // Emit the received message to all users in the chat room
     io.to(data.room).emit("receive_message", data);
@@ -44,12 +45,12 @@ io.on("connection", (socket) => {
 
 // Function to save the message in the database
 function saveMessageToDB(data) {
-  const { room, message, user1Id } = data;
+  const { room, message, user_id } = data;
 
   // You can use your database query method here to insert the message into the database
   // For example, using MySQL with the "mysql2" package:
   const query = `INSERT INTO messages (chat_room_id, user_id, text) VALUES (?, ?, ?)`;
-  db.query(query, [room, user1Id, message], (error, results) => {
+  db.query(query, [room, user_id, message], (error, results) => {
     if (error) {
       console.error("Error saving message:", error);
       // Handle the error if necessary
@@ -58,8 +59,6 @@ function saveMessageToDB(data) {
     }
   });
 }
-
-
 
 // Listen for incoming connections on the same port for both Express app and Socket.IO
 server.listen(port, () => {

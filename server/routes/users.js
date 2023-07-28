@@ -350,8 +350,7 @@ router.get("/messages/:room", (req, res) => {
   const room = req.params.room;
 
   // Use your database query method to retrieve messages for the specified chat room
-  // For example, using MySQL with the "mysql2" package:
-  const query = `SELECT * FROM messages WHERE chat_room_id = ?`;
+  const query = `SELECT text AS message,chat_room_id as room, user_id FROM messages WHERE chat_room_id = ?`;
   db.query(query, [room], (error, results) => {
     if (error) {
       console.error("Error retrieving messages:", error);

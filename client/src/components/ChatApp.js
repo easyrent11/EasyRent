@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { FiSend } from "react-icons/fi";
 import io from "socket.io-client";
@@ -11,23 +11,20 @@ export default function ChatApp() {
   const [room, setRoom] = useState(null);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null); // the selected user to chat with
-  const user1Id = localStorage.getItem("userId");
   const { userDetails, setUserDetails } = useContext(UserProfileDetails);
-  useEffect(() => {
-    // Call the function to fetch all users and messages when the component mounts
-    displayAllUsers();
-    fetchMessagesForRoom();
-  }, [room]);
+  const user1Id = parseInt(localStorage.getItem("userId"));
 
+  useEffect(() => {
+    displayAllUsers();
+  }, [room]);
   function displayAllUsers() {
-    const loggedInUserId = parseInt(localStorage.getItem("userId")); // Convert the user ID to an integer
     axios
       .get("http://localhost:3001/user/getAllUsers")
       .then((response) => {
         console.log(response.data);
         // Filter out the logged-in user from the users array
         const filteredUsers = response.data.filter(
-          (user) => user.Id !== loggedInUserId
+          (user) => user.Id !== user1Id
         );
         setUsers(filteredUsers);
       })
@@ -45,60 +42,67 @@ export default function ChatApp() {
       return `http://localhost:3001/images/${userDetails.picture}`;
     }
   }
-
+  function fetchMessagesForRoom() {
+    if (room) {
+      axios
+        .get(`http://localhost:3001/user/messages/${room}`)
+        .then((response) => {
+          console.log("response in fetch messages",response);
+          setMessages(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching messages:", error);
+        });
+    }
+  }
   function startChat(user2Id) {
     // Data to send to the backend for creating/retrieving the chat room
     const roomInfo = {
       user1Id: user1Id,
       user2Id: user2Id,
     };
+
     axios
       .post("http://localhost:3001/user/startChat", roomInfo)
       .then((response) => {
-        console.log(response.data);
         setRoom(response.data.room);
         setSelectedUser(user2Id); // Set the selected user when starting the chat
-        // Join the chat room on the frontend
+        // Join the chat room on the frontend and add the "receive_message" event listener
         socket.emit("join_room", response.data.room);
       })
       .catch((error) => {
         console.error("Error creating/retrieving chat room:", error);
       });
   }
-
-  // Fetch all messages for the given chat room
-  function fetchMessagesForRoom() {
-    axios
-      .get(`http://localhost:3001/user/messages/${room}`)
-      .then((response) => {
-        setMessages(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching messages:", error);
-      });
-  }
-
-  const sendMessage = () => {
-    // Emit an event to the backend to save the message
-    socket.emit("send_message", { message, room, user1Id });
-    // Clear the input field after sending the message
+  useMemo(() => {
     fetchMessagesForRoom();
+  },[room])
+
+  function sendMessage() {
+    // Emit an event to the backend to save the message
+    socket.emit("send_message", { message, room, user_id: user1Id });
+    // Clear the input field after sending the message
     setMessage("");
-  };
+  }
 
   useEffect(() => {
     // Add the event listener to receive messages
     socket.on("receive_message", (data) => {
-      // Add the received message to the frontend state (messages)
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          message: data.message,
-          user_id: data.user_id,
-        },
-      ]);
-      
-      fetchMessagesForRoom();
+      // Update the room state if the received message is for a different room
+      if (data.room !== room) {
+        setRoom(data.room);
+      }
+      // Add the received message to the frontend state (messages) if it's for the current room
+      if (data.room === room) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            message: data.message,
+            room: data.room,
+            user_id: data.user_id,
+          },
+        ]);
+      }
     });
 
     // Clean up the event listener when the component unmounts
@@ -185,16 +189,7 @@ export default function ChatApp() {
                           : "order-1 bg-gray-200"
                       }`}
                     >
-                      {msg.text}
-                      <span
-                        className={`text-xs ml-auto mt-1 ${
-                          msg.user_id === user1Id
-                            ? "text-[#CC6200]"
-                            : "text-blue-500"
-                        }`}
-                      >
-                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      {msg.message}
                     </p>
                   </div>
                 ))}
