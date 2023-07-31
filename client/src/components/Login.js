@@ -1,13 +1,15 @@
-import React, { useState} from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/UserApi";
-
-
+import { UserProfileDetails } from "../contexts/UserProfileDetails";
+import { getAllUserDetails } from "../api/UserApi";
 
 export default function Login({ onClose, handleLogin }) {
+  const { setUserDetails } = useContext(UserProfileDetails);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,8 +38,10 @@ export default function Login({ onClose, handleLogin }) {
       .then((res) => {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userId", res.data.userId);
-        notify("success", res.data.message);  
+        notify("success", res.data.message);
         handleLogin(true);
+        // get the user details after obtaining the userId.
+        fetchUserDetails(res.data.userId);
         navigate("/homepage");
       })
       .catch((err) => {
@@ -47,8 +51,22 @@ export default function Login({ onClose, handleLogin }) {
         setEmail("");
         setPassword("");
       });
-      onClose();
+    onClose();
   };
+
+  // Function that fetches all the user details based on the userId.
+  function fetchUserDetails(userId) {
+    if(!userId){
+      notify('error', 'couldnt get userId');
+      return;
+    }
+    getAllUserDetails(userId)
+      .then((res) => {
+        console.log("in login",res.data);
+        setUserDetails(res.data[0]);
+      })
+      .catch((err) => console.log("Couldnt get user details ", err));
+  }
 
   return (
     <>

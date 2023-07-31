@@ -110,6 +110,9 @@ function App() {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
+    if(!userId){
+      return;
+    }
     getAllUserDetails(userId)
       .then((res) => {
         console.log(res.data);
@@ -117,6 +120,9 @@ function App() {
       })
       .catch((err) => console.log("Couldnt get user details ", err));
   }, []);
+
+
+  
 
   return (
     <>
@@ -174,7 +180,7 @@ function App() {
 
                 {/* conditional rendering login and register components. */}
                 {showLogin && (
-                  <Login handleLogin={handleLogin} onClose={closeLogin} />
+                  <Login handleLogin={handleLogin} onClose={closeLogin}/>
                 )}
                 {showRegister && (
                   <Register onClose={closeRegister} openLogin={openLogin} />
