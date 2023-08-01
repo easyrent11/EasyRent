@@ -306,60 +306,6 @@ function insertUser(db, user) {
   });
 }
 
-// ######################################################################################################
-// #        Helper functions to check if theres a field that exists in the registered user's details    #
-// ######################################################################################################
-// Function to check if the Id exists.
-function checkIdExists(db, id) {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT 1 FROM users WHERE Id = ?", [id], (error, result) => {
-      if (error) {
-        reject("Failed to check Id");
-      } else {
-        resolve(result.length > 0);
-      }
-    });
-  });
-}
-
-// Function to check if the driving license exists.
-function checkDrivingLicenseExists(db, drivingLicense) {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT 1 FROM users WHERE driving_license = ?", [drivingLicense], (error, result) => {
-      if (error) {
-        reject("Failed to check driving license");
-      } else {
-        resolve(result.length > 0);
-      }
-    });
-  });
-}
-
-// Function to check if the email exists.
-function checkEmailExists(db, email) {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT 1 FROM users WHERE email = ?", [email], (error, result) => {
-      if (error) {
-        reject("Failed to check email");
-      } else {
-        resolve(result.length > 0);
-      }
-    });
-  });
-}
-
-// Function to check if the phone number exists.
-function checkPhoneNumberExists(db, phoneNumber) {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT 1 FROM users WHERE phone_number = ?", [phoneNumber], (error, result) => {
-      if (error) {
-        reject("Failed to check phone number");
-      } else {
-        resolve(result.length > 0);
-      }
-    });
-  });
-}
 // Function to register a user
 async function registerUser(db, userData) {
   const {
@@ -393,40 +339,7 @@ async function registerUser(db, userData) {
       first_name,
       last_name,
     };
-    
 
-    async function checkFieldsAndReturnExisting(db, user) {
-      const IdExistsResult = await checkIdExists(db, user.id);
-      const drivingLicenseExistsResult = await checkDrivingLicenseExists(db, user.driving_license);
-      const emailExistsResult = await checkEmailExists(db, user.email);
-      const phoneNumberExistsResult = await checkPhoneNumberExists(db, user.phone_number);
-    
-      // Filter the results to get only the fields that exist (not null)
-      const existingFields = [
-        { Id: IdExistsResult },
-        { driving_license: drivingLicenseExistsResult },
-        { email: emailExistsResult },
-        { phone_number: phoneNumberExistsResult },
-      ].filter((field) => Object.values(field)[0]);
-    
-      if (existingFields.length > 0) {
-        return { existingFields: existingFields.map(field => Object.keys(field)[0]), message: `${existingFields.map(field => Object.keys(field)[0]).join(', ')} already exists` };
-      } else {
-        return { existingFields: existingFields.map(field => Object.keys(field)[0]), message: "No existing fields found" };
-      }
-
-      
-    }
-
-    try {
-      const result = await checkFieldsAndReturnExisting(db, user);
-      if (result.existingFields.length !== 0) { // Checking the length of the existingFields array
-        return result;
-      }
-    } catch (error) {
-      throw new Error("There was a problem while checking existing user details");
-    }
-    
     // Check if the city already exists
     const cityExists = await checkCityExists(db, city_code);
 
