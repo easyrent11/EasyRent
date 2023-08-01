@@ -18,7 +18,7 @@ export default function CarView() {
   const [endTime, setEndTime] = useState("10:00");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
+  
   // State variables for car owner and for error message.
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");

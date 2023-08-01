@@ -21,6 +21,7 @@ export default function Register({ onClose, openLogin }) {
   const [streetName, setStreetName] = useState("");
   const [governmentId, setGovernmentId] = useState("");
   const [drivingLicense, setDrivingLicense] = useState("");
+  const [responseMessage,setResponseMessage] = useState("");
   const [showLogin, setShowLogin] = useState(false);
 
 
@@ -48,6 +49,7 @@ export default function Register({ onClose, openLogin }) {
     }
 
 
+
     // Create a new FormData instance
     const formData = new FormData();
     formData.append("profileImage", profilePicture);
@@ -58,34 +60,27 @@ export default function Register({ onClose, openLogin }) {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then((response) => {
-        const { fileUrl } = response.data;
-        const pathname = new URL(fileUrl).pathname;
-        const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
-        const registerInfo = {
-          id: governmentId,
-          phone_number: phoneNumber,
-          driving_license: drivingLicense,
-          picture: filename,
-          email: email,
-          password: password,
-          city_code: city,
-          city_name: city_name, // Add the city name to the registerInfo object
-          street_name: streetName,
-          first_name: firstName,
-          last_name: lastName,
-        };
-
-        // After successful image upload, proceed with registration
-        register(registerInfo)
-          .then((res) => {
-            notify("success",res.data.message);
-            onClose();
-          })
-          .catch((err) => notify(err.data.message));
+      .then((res) => {
+        // checking if some inputed fields exist
+        if (res.data && res.data.existingFields && res.data.existingFields.length !== 0) {
+          if (res.data.existingFields[0].trim() === "Id")
+            setResponseMessage(
+              "User Already Exists, If you think you may have registered before try logging in or resetting the password"
+            );
+          else {
+            setResponseMessage(`${res.data.existingFields[0].trim()} Already Exists`);
+          }
+        }
+        // if no fields exist then the user is good to go and he is now registered and we exit the component.
+        else {
+          notify(res.data.message);
+          onClose();
+        }
       })
       .catch((error) => {
+        // Handing any unexpected errors here, if necessary
         console.error(error);
+        notify("An error occurred during registration.");
       });
   };
 
@@ -237,6 +232,7 @@ export default function Register({ onClose, openLogin }) {
         >
           Register
         </button>
+        <p className="text-center text-red-900 mt-3 font-bold">{responseMessage}</p>
       </form>
       {showLogin && <Login onClose={toggleLogin} />}
     </div>
