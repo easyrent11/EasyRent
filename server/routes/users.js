@@ -6,7 +6,7 @@ const verifyToken = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
 const UserServices = require("../services/UserServices");
-
+const bcrypt = require('bcrypt');
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
@@ -16,7 +16,7 @@ router.post("/register", async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ error: "Failed to register user" });
+    res.status(500).json({ error: "Failed to register user"});
   }
 });
 
@@ -38,9 +38,11 @@ router.post("/login", async (req, res) => {
   try {
     const result = await UserServices.loginUser(db, email, password);
     res.status(200).json(result);
-  } catch (error) {
-    console.error("Error during login:", error);
-    res.status(401).json({ message: "Invalid credentials" });
+  }catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const colonIndex = errorMessage.indexOf(':');
+    const formattedErrorMessage = colonIndex !== -1 ? errorMessage.slice(colonIndex + 1).trim() : errorMessage;
+    res.status(401).json({ message: formattedErrorMessage });
   }
 });
 
@@ -57,15 +59,15 @@ router.get("/homepage", verifyToken, (req, res) => {
 router.post("/addcar", async (req, res) => {
   // grabbing the car details  from the body.
   const carData = req.body;
-  console.log(carData);
   try {
     // calling the function that will do the logic.
     const result = await UserServices.addCar(db, carData);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ error: "Failed to add car" });
+    res.status(500).json(error);
   }
 });
+
 // Route for searching a car.
 router.post("/searchcar", async (req, res) => {
   // grabbing the search details from the body.
@@ -204,15 +206,15 @@ router.post("/changepassword", (req, res) => {
           return;
         }
 
-        // Update the user's password in the database with the new hashed password
-        const updateQuery = `UPDATE users SET password = ${newHashedPassword} WHERE id = ${userId}`;
-        db.query(updateQuery, (error) => {
+        const updateQuery = `UPDATE users SET password = ? WHERE Id = ?`;
+
+        db.query(updateQuery, [newHashedPassword, userId], (error) => {
           if (error) {
             console.error("Error updating user's password:", error);
             res.status(500).json({ error: "Internal Server Error" });
             return;
           }
-
+        
           // Password update successful
           res.json({ message: "Password updated successfully" });
         });

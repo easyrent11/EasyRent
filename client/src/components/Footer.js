@@ -38,9 +38,9 @@ export default function Footer() {
           <Link to="/FAQ" className="text-[#CC6200] mb-2">
             FAQ
           </Link>
-          <Link to="/ContactUs" className="text-[#CC6200] mb-2 ">
+          {/* <Link to="/ContactUs" className="text-[#CC6200] mb-2 ">
             Contact
-          </Link>
+          </Link> */}
           <ScrollLink
               className="cursor-pointer mb-2 text-[#CC6200]"
               activeClass="active"

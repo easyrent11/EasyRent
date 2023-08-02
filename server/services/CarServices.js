@@ -3,10 +3,30 @@
 #                       CAR SERVICE                                 #
 #####################################################################
 */
-
 const db = require("../models/db");
 const path = require('path');
 const fs = require('fs');
+
+// ########################################################################################
+// #                  Check if car exists  SERVICE FUNCTION                               #
+// ########################################################################################
+// Function to check if a car plates number exists in the db.
+function checkIfCarExists(db, platesNumber) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM cars WHERE Plates_Number = ?",
+      [platesNumber],
+      (error, results) => {
+        if (error) {
+          console.error("Error checking car plates number:", error);
+          reject("Failed to add car");
+        } else {
+          resolve(results);
+        }
+      }
+    );
+  });
+}
 
 function getAllCarsWithImages() {
   return new Promise((resolve, reject) => {
@@ -338,5 +358,6 @@ module.exports = {
   updateCarDetails,
   getCarWithPlatesNumber,
   getCarsWithUserId,
+  checkIfCarExists,
 };
   

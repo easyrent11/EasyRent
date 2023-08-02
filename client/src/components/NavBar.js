@@ -22,9 +22,9 @@ export default function NavBar({ openLogin, openRegister }) {
               duration={500}
             > About 
             </ScrollLink>
-          <Link className="m-2 p-2 rounded-md  text-[#404040]  hover:bg-[#f6f6f6]" to="/ContactUs">
+          {/* <Link className="m-2 p-2 rounded-md  text-[#404040]  hover:bg-[#f6f6f6]" to="/ContactUs">
             Contact
-          </Link>
+          </Link> */}
         </div>
         <div className=" flex items-center justify-end mr-56 w-1/2">
           <button className="m-2 hover:border-[#b8b8b8] border-2 rounded-md p-2" onClick={openLogin}>

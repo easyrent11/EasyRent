@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { sendOrderRequest } from "../api/UserApi";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import { FaTimes } from 'react-icons/fa';
+import { Link } from "react-router-dom";
 
 export default function CarView() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function CarView() {
   const [endTime, setEndTime] = useState("10:00");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  
+
   // State variables for car owner and for error message.
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
@@ -278,7 +279,7 @@ export default function CarView() {
                 Send Request
               </button>
               <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
-                Start Chat with Seller
+                <Link to="/ChatApp">Start Chat with Seller</Link>
               </button>
             </div>
           </section>

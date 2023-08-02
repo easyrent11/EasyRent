@@ -9,9 +9,7 @@ const BASE_URL = "http://localhost:3001/cars";
 export const getAllCars = () => {
   return axios.get(`${BASE_URL}/getallcars`);
 }
-
 export const getCar = (PlatesNumber) => {
-  console.log(PlatesNumber);
   return axios.get(`${BASE_URL}/getcar/${PlatesNumber}`);
 } 
 export const getCarWithUserId = (userId) => {

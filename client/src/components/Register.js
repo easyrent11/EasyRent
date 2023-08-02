@@ -1,6 +1,6 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import Login from "./Login";
-import { register,checkUserDetailsExist } from "../api/UserApi";
+import { register, checkUserDetailsExist } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 import Select from "react-select";
 import { toast } from "react-toastify";
@@ -24,7 +24,7 @@ export default function Register({ onClose, openLogin }) {
   const [drivingLicense, setDrivingLicense] = useState("");
   const [showLogin, setShowLogin] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const[profileUrl, setProfileUrl] = useState(null);
+  const [profileUrl, setProfileUrl] = useState(null);
 
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
@@ -37,9 +37,88 @@ export default function Register({ onClose, openLogin }) {
   };
   const notify = (message) => toast(message);
 
+  function userDetailsEmpty() {
+    if (
+      firstName === "" ||
+      lastName === "" ||
+      email === "" ||
+      phoneNumber === "" ||
+      password === "" ||
+      verifyPassword === "" ||
+      city === "" ||
+      streetName === "" ||
+      governmentId === "" ||
+      drivingLicense === ""
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+
   const handleRegister = (e) => {
     e.preventDefault();
-     
+
+    // Check if user details arent null
+    if (userDetailsEmpty()) {
+      setErrorMessage("Please fill out all fields (picture is optional)")
+      return;
+    }
+    // Validation Functions
+    const validateName = (name) => /^[a-zA-Z]{2,}$/.test(name);
+    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validatePhoneNumber = (phoneNumber) => /^05\d{1}-?\d{7}$/.test(phoneNumber);
+    const validatePassword = (password) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(password);
+    const validateGovernmentId = (governmentId) => /^\d{9}$/.test(governmentId);
+    const validateDrivingLicense = (drivingLicense) => /^\d{9}$/.test(drivingLicense);
+    const validateStreetName = (streetName) => /^[a-zA-Z\s\d]+$/.test(streetName);
+    
+    const validateForm = () => {
+      let errors = {};
+
+      if (!validateName(firstName)) {
+        errors.firstName = "Invalid first name,it must be only letters";
+      }
+
+      if (!validateName(lastName)) {
+        errors.lastName = "Invalid last name, it must be only letters";
+      }
+
+      if (!validateEmail(email)) {
+        errors.email = "Invalid email address";
+      }
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        errors.phoneNumber = "Invalid phone number,it must be an israeli phone number format";
+      }
+
+      if (!validatePassword(password)) {
+        errors.password = "Invalid password, it must have both uppercase/lowercase letters, numbers and symbols";
+      }
+
+      if (password !== verifyPassword) {
+        errors.passwordNotMatch = "You entered 2 different passwords";
+      }
+      if (!validateGovernmentId(governmentId)) {
+        errors.governmentId = "Invalid government ID, it must be 9 digits";
+      }
+
+      if (!validateDrivingLicense(drivingLicense)) {
+        errors.drivingLicense = "Invalid driving license, it must be 9 digits";
+      }
+      if(!validateStreetName(streetName)){
+        errors.streetName = "Invalid Street Name, must be only letters and spaces and digits"
+      }
+      return errors;
+    };
+
+    const errors = validateForm();
+    if(Object.keys(errors).length > 0){
+      const errMsg = errors[Object.keys(errors)[0]];
+      setErrorMessage(errMsg);
+      return;
+    }
+ 
     // building the important user details to be checked if they exist or not.
     const userDetails = {
       email: email,
@@ -48,83 +127,66 @@ export default function Register({ onClose, openLogin }) {
       drivingLicense: drivingLicense,
     };
     checkUserDetailsExist(userDetails)
-    .then((res) => {
-      const existingFields=res.data.results;
-      if(Object.keys(existingFields).length > 0){
-        console.log(Object.keys(existingFields))
-        if(Object.keys(existingFields)[0] === ""){
-          setErrorMessage("The user already exists try logging in or resetting your password");
+      .then((res) => {
+        const existingFields = res.data.results;
+        if (Object.keys(existingFields).length > 0) {
+          console.log(Object.keys(existingFields))
+          if (Object.keys(existingFields)[0] === "Id") {
+            setErrorMessage("The user already exists try logging in or resetting your password");
+          }
+          else {
+            setErrorMessage(`${Object.keys(existingFields)[0]} Already Exists`);
+          }
+          return;
         }
-        else{
-          setErrorMessage(`${Object.keys(existingFields)[0]} Already Exists`);
-        }
-        return;
-      }
-      // no details exist continue with the register.
-      // Validate the password match
-    if (password !== verifyPassword) {
-      setErrorMessage(
-        "you entered different passwords please verify the password correctly"
-      );
-      return;
-    }
 
-    
-    const formData = new FormData();
-    formData.append("profileImage", profilePicture);
+        const formData = new FormData();
+        formData.append("profileImage", profilePicture);
 
-    axios
-    .post("http://localhost:3001/user/uploadProfileImage", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((response) => {
-      if (response.data.fileUrl == null) {
-        setProfileUrl("default.png");
-        console.log("i added the default picture = ", profileUrl);
-      } else {
-        const { fileUrl } = response.data;
-        const pathname = new URL(fileUrl).pathname;
-        const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
-        setProfileUrl(filename);
-        console.log("got hereeee");
-      }
-      
-      // Use the updated profileUrl value within this scope
-      console.log("profileUrl inside .then:", profileUrl);
-
-      if (profileUrl == null) {
-        return;
-      }
-        const registerInfo = {
-          id: governmentId,
-          phone_number: phoneNumber,
-          driving_license: drivingLicense,
-          picture:profileUrl,
-          email: email,
-          password: password,
-          city_code: city,
-          city_name: city_name,
-          street_name: streetName,
-          first_name: firstName,
-          last_name: lastName,
-        };
-        // After successful image upload, proceed with registration
-        register(registerInfo)
-          .then((res) => {
-            notify("success",res.data.message);
-            onClose();
+        axios
+          .post("http://localhost:3001/user/uploadProfileImage", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           })
-          .catch((err) => notify(err.data.message));
+          .then((response) => {
+            if (response.data.fileUrl == null) {
+              setProfileUrl("default.png");
+            } else {
+              const { fileUrl } = response.data;
+              const pathname = new URL(fileUrl).pathname;
+              const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
+              setProfileUrl(filename);
+            }
+
+            const registerInfo = {
+              id: governmentId,
+              phone_number: phoneNumber,
+              driving_license: drivingLicense,
+              picture: profileUrl,
+              email: email,
+              password: password,
+              city_code: city,
+              city_name: city_name,
+              street_name: streetName,
+              first_name: firstName,
+              last_name: lastName,
+            };
+            // After successful image upload, proceed with registration
+            register(registerInfo)
+              .then((res) => {
+                notify("success", res.data.message);
+                onClose();
+              })
+              .catch((err) => notify(err.data.message));
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       })
       .catch((error) => {
-        console.error(error);
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+        console.log(error);
+      })
   };
 
   const toggleLogin = () => {
@@ -157,9 +219,7 @@ export default function Register({ onClose, openLogin }) {
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={firstName}
-              pattern="^[a-zA-Z]{2,}$"
               onChange={(e) => setFirstName(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -168,9 +228,7 @@ export default function Register({ onClose, openLogin }) {
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={lastName}
-              pattern="^[a-zA-Z]{2,}$"
               onChange={(e) => setLastName(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -179,9 +237,7 @@ export default function Register({ onClose, openLogin }) {
               type="email"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={email}
-              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -190,20 +246,16 @@ export default function Register({ onClose, openLogin }) {
               type="tel"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={phoneNumber}
-              pattern="^05\d{1}-?\d{7}$"
               onChange={(e) => setPhoneNumber(e.target.value)}
-              required
             />
           </div>
           <div>
             <label className="block mb-2">Password</label>
             <input
               type="password"
-              pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -213,7 +265,6 @@ export default function Register({ onClose, openLogin }) {
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={verifyPassword}
               onChange={(e) => setVerifyPassword(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -225,7 +276,6 @@ export default function Register({ onClose, openLogin }) {
               onChange={handleCityChange}
               noOptionsMessage={() => "Not Found"}
               options={Cities}
-              required
             />
           </div>
           <div>
@@ -238,7 +288,7 @@ export default function Register({ onClose, openLogin }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Profile Picture</label>
+            <label className="block mb-2">Profile Picture *(optional)*</label>
             <input
               type="file"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -252,8 +302,6 @@ export default function Register({ onClose, openLogin }) {
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={governmentId}
-              pattern="^\d{9}$"
-              required
               onChange={(e) => setGovernmentId(e.target.value)}
             />
           </div>
@@ -263,7 +311,6 @@ export default function Register({ onClose, openLogin }) {
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
               value={drivingLicense}
-              required
               onChange={(e) => setDrivingLicense(e.target.value)}
             />
           </div>

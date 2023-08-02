@@ -15,8 +15,7 @@ export default function Login({ onClose, handleLogin }) {
   const [password, setPassword] = useState("");
 
   // function that takes a message and displays it as an alert popout.
-  const notify = (status, message) =>
-    status === "success" ? toast.success(message) : toast.error(message);
+  const notify = (error,message) => error === "success" ? toast.success(message) : toast.error(message);
 
   // handle the login submit.
   const handleFormLogin = (e) => {
@@ -45,7 +44,7 @@ export default function Login({ onClose, handleLogin }) {
         navigate("/homepage");
       })
       .catch((err) => {
-        notify("error", err.response.data.message);
+        notify("error",err.response.data.message);
       })
       .finally(() => {
         setEmail("");

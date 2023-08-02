@@ -1,4 +1,4 @@
-import React, {useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import { addCar } from "../api/UserApi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,7 +7,7 @@ import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { AllCarsContext } from "../contexts/AllCarsContext";
-
+import { getCar } from "../api/CarApi";
 export default function AddCar() {
 
   // get the userId from the local storage. so we can send it with the car object
@@ -16,7 +16,7 @@ export default function AddCar() {
   // create user navigate object.
   const navigate = useNavigate();
 
-  const {allCars,setAllCars} = useContext(AllCarsContext);
+  const { allCars, setAllCars } = useContext(AllCarsContext);
 
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
@@ -36,6 +36,7 @@ export default function AddCar() {
   const [description, setDescription] = useState("");
   const [rentalPricePerDay, setRentalPricePerDay] = useState(0);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const notify = (status, message) =>
     status === "success" ? toast.success(message) : toast.error(message);
@@ -108,50 +109,78 @@ export default function AddCar() {
   const handleSubmit = (event) => {
     event.preventDefault();
   
-    uploadImages(uploadedImages)
-      .then((response) => {
-        const { files } = response.data;
-        const filenames = files.map((url) => {
-          const pathname = new URL(url).pathname;
-          return pathname.substring(pathname.lastIndexOf("/") + 1);
-        });
+    if (
+      !selectedManufacturer ||
+      !selectedModel ||
+      platesNumber === "" ||
+      !year ||
+      !color ||
+      !seatsAmount ||
+      !engineType ||
+      !transmissionType ||
+      description === "" ||
+      rentalPricePerDay === ""
+    ) {
+      setErrorMessage("Please fill in all the car details(pictures are optional)");
+      return;
+    }
   
-        const carData = {
-          Manufacturer_Name: selectedManufacturer ? selectedManufacturer.value : "",
-          Manufacturer_Code: selectedManufacturer
-            ? selectedManufacturer.value.toLowerCase()
-            : "",
-          model_name: selectedModel,
-          model_code: selectedModel ? selectedModel.toLowerCase() : "",
-          Plates_Number: platesNumber,
-          Year: year.value,
-          Color: color.value,
-          Seats_Amount: seatsAmount.value,
-          Engine_Type: engineType.value,
-          Transmission_type: transmissionType.value,
-          Description: description,
-          Rental_Price_Per_Day: rentalPricePerDay,
-          Renter_Id: userId,
-          image_url: filenames
-        };
-  
-        addCar(carData)
-          .then((res) => {
-            // update the allCars state
-            setAllCars((prevCars) => [...prevCars, res.data.car]);
-            notify("success", res.data.message);
-            // navigate to the homepage after adding a car.
-            navigate('/homepage');
-          })
-          .catch((err) => {
-            notify("error", err.response.data.message);
-          });
+    getCar(platesNumber)
+      .then((res) => {
+        if (res.data.length > 0) {
+          setErrorMessage(
+            "A car with this plates number already exists, check your cars list or enter a different one"
+          );
+          return;
+        } else {
+          console.log("we got here");
+          uploadImages(uploadedImages)
+            .then((response) => {
+              const { files } = response.data;
+              const filenames = files.map((url) => {
+                const pathname = new URL(url).pathname;
+                return pathname.substring(pathname.lastIndexOf("/") + 1);
+              });
+              const carData = {
+                Manufacturer_Name: selectedManufacturer.value,
+                Manufacturer_Code: selectedManufacturer.value.toLowerCase(),
+                model_name: selectedModel,
+                model_code: selectedModel.toLowerCase(),
+                Plates_Number: platesNumber,
+                Year: year.value,
+                Color: color.value,
+                Seats_Amount: seatsAmount.value,
+                Engine_Type: engineType.value,
+                Transmission_type: transmissionType.value,
+                Description: description,
+                Rental_Price_Per_Day: rentalPricePerDay,
+                Renter_Id: userId,
+                image_url: filenames,
+              };
+              console.log(carData);
+              addCar(carData)
+                .then((res) => {
+                  console.log("add car res ", res);
+                  // update the allCars state
+                  setAllCars((prevCars) => [...prevCars, res.data.car]);
+                  notify("success", res.data.message);
+                  // navigate to the homepage after adding a car.
+                  navigate("/homepage");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            })
+            .catch((error) => {
+              notify("error", "Failed to add car");
+            });
+        }
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
   };
-  
+
   return (
     <div className="flex flex-col w-1/4 justify-center items-center bg-[#f6f6f6] shadow-lg rounded-lg p-6">
       <h2 className="text-2xl text-center font-semibold mb-4">Add Car</h2>
@@ -209,6 +238,7 @@ export default function AddCar() {
             type="number"
             value={platesNumber}
             onChange={handlePlatesNumberChange}
+            required
           />
         </div>
         <div className="mb-4">
@@ -341,11 +371,11 @@ export default function AddCar() {
         </div>
 
         <div>
-        <label
+          <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="carimages"
           >
-            Choose Car Images : 
+            Choose Car Images :
           </label>
           <input
             id="carimages"
@@ -364,6 +394,7 @@ export default function AddCar() {
             Add
           </button>
         </div>
+        <p className="m-2 text-center text-red-700 font-bold">{errorMessage}</p>
       </form>
     </div>
   );

@@ -12,22 +12,6 @@ const upload = multer({
 
 
 
-router.post("/checkcarexists", (req, res) => {
-  const { platesNumber } = req.body;
-  const query = "SELECT * FROM cars WHERE Plates_Number = ?";
-  db.query(query, [platesNumber], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err });
-    } else {
-      if (results.length > 0) {
-        res.status(200).json({ exists: true }); // Car exists
-      } else {
-        res.status(200).json({ exists: false }); // Car doesn't exist
-      }
-    }
-  });
-});
-
 router.get("/getallcars", async (req, res) => {
   try {
     const carsWithImages = await carServices.getAllCarsWithImages();

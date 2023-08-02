@@ -13,44 +13,52 @@ export default function UserProfile() {
   const [editing, setEditing] = useState(false);
   const [updatedUserDetails, setUpdatedUserDetails] = useState(userDetails);
   const [updatedImage, setUpdatedImage] = useState(null);
-  let [userCars, setUserCars] = useState([]);
+  const [userCars, setUserCars] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const carsPerPage = 4; // Number of cars to show per page
-  // const [city, setCity] = useState("");
-  // const [city_name, setCityName] = useState("");
-  // const [selectedCityLabel, setSelectedCityLabel] = useState("Choose a city");
+  const carsPerPage = 4;
 
-  // reset password states.
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordChanged, setPasswordChanged] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Handle page navigation
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
   const handleChangePassword = () => {
+    if (!newPassword || !confirmNewPassword) {
+      setPasswordError("Please fill in all password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
     const info = {
       userId: userDetails.Id,
       currentPassword: currentPassword,
       newPassword: newPassword,
     };
+    console.log("info = ",info);
     resetPassword(info)
       .then((res) => {
         console.log(res.message);
         setPasswordChanged(true);
+        toast.success("Password changed successfully.");
       })
       .catch((err) => {
-        setPasswordError(err);
+        setPasswordError(err.message || "Failed to reset password.");
         toast.error(passwordError);
       });
 
-    setPasswordError("");
-    setPasswordChanged(true);
+    setCurrentPassword("");
     setNewPassword("");
+    setConfirmNewPassword("");
   };
 
   const handleEdit = () => {
@@ -173,7 +181,7 @@ export default function UserProfile() {
   const navigationLocation = "/CarOwnerView"; // Set your navigation location
 
   return (
-    <div className="min-h-screen w-4/5 border-2 border-red-500 ">
+    <div className=" min-h-screen w-4/5 border-2 border-red-500 ">
       <div className="w-full flex container mx-auto px-4 py-8 ">
         <div className="w-1/2">
           {/* Display user profile image */}
@@ -306,6 +314,34 @@ export default function UserProfile() {
             </div>
           </div>
         </div>
+        
+        
+          {/* Reset password section - show only in edit mode */}
+          {editing && (
+            <div className="flex flex-col items-center justify-center w-full">
+              <h2>Change password</h2>
+              <label>Old Password : </label>
+              <input
+                name="oldpassword"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              <label>New Password : </label>
+              <input
+                name="newpassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <label>Confirm Password : </label>
+              <input
+                name="confirmnewpassword"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+              />
+              <button onClick={handleChangePassword}>Change Password</button>
+            </div>
+          )}
+        <p className="m-2 text-red-700 text-center font-bold">{passwordError}</p>
       </div>
       {/* Renter's Cars Section */}
       <div className="flex flex-col items-center min-h-screen w-1/2 p-4 bg-[#f5f5f5] rounded-md">

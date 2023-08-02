@@ -244,8 +244,7 @@ async function addCar(db, carData) {
 
     return { message: "Car added successfully", car: addedCar };
   } catch (error) {
-    console.error("Error adding car:", error);
-    throw new Error("Failed to add car");
+    throw new Error(`Failed to add car}`);
   }
 }
 
@@ -495,6 +494,7 @@ async function loginUser(db, email, password) {
   try {
     // Check if the user exists in the database
     const results = await getUserByEmail(db, email);
+    console.log(results);
     if (results.length === 0) {
       throw new Error("User not found");
     }
@@ -518,8 +518,7 @@ async function loginUser(db, email, password) {
       userId: user.Id,
     };
   } catch (error) {
-    console.error("Error during login:", error);
-    throw new Error("Failed to login");
+    throw new Error(`error is :${error}`);
   }
 }
 

@@ -15,7 +15,7 @@ const navigation = [
   { name: "Share your car", href: "/AddCar", current: false },
   { name: "Orders", href: "/Orders", current: false },
   { name: "Chat", href: "/chatapp", current: false },
-  { name: "Contact Us", href: "/ContactUs", current: false },
+  // { name: "Contact Us", href: "/ContactUs", current: false },
 ];
 
 function classNames(...classes) {
