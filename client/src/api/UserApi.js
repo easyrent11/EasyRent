@@ -44,3 +44,7 @@ export const changeOrderStatus = (newOrderStatus) => {
   return axios.put(`${BASE_URL_USER}/changeorderstatus`,newOrderStatus);
 }
 
+export const checkUserDetailsExist = (userDetails) => {
+  return axios.post(`${BASE_URL_USER}/userdetailsexist`, userDetails);
+}
+

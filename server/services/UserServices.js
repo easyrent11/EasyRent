@@ -322,6 +322,7 @@ async function registerUser(db, userData) {
     last_name,
   } = userData;
 
+
   try {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -363,6 +364,98 @@ async function registerUser(db, userData) {
 #                      END USER REGISTER SERVICE                    #
 #####################################################################
 */
+
+/*
+#####################################################################
+#                      CHECK USER  DETAILS EXIST SERVICE            #
+#####################################################################
+*/
+
+// Function to retrieve user by email
+async function checkUserDetailsExist(db, userDetails) {
+  const {email,Id,phoneNumber, drivingLicense} = userDetails;
+  function checkIfEmailExists(){
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE email = ?";
+      db.query(query, [email], (error, results) => {
+        if (error) {
+          console.error(error);
+          reject("Internal server error");
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+  function checkIfUserIdExists() {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE id = ?";
+      db.query(query, [Id], (error, results) => {
+        if (error) {
+          console.error(error);
+          reject("Internal server error");
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+  function checkPhoneNumberExists() {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE phone_number = ?";
+      db.query(query, [phoneNumber], (error, results) => {
+        if (error) {
+          console.error(error);
+          reject("Internal server error");
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+  function checkIfDrivingLicenseExists() {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE driving_license = ?";
+      db.query(query, [drivingLicense], (error, results) => {
+        if (error) {
+          console.error(error);
+          reject("Internal server error");
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  }
+
+   // Call the helper functions and return a combined result
+   return Promise.all([checkIfEmailExists(), checkIfUserIdExists(), checkPhoneNumberExists(), checkIfDrivingLicenseExists()])
+   .then(([emailResults, userIdResults, phoneNumberResults,drivingLicenseResults]) => {
+    const result = {};
+
+    if (emailResults.length > 0) {
+      result.email = true;
+    }
+
+    if (userIdResults.length > 0) {
+      result.Id = true;
+    }
+
+    if (phoneNumberResults.length > 0) {
+      result.phoneNumber = true;
+    }
+
+    if (drivingLicenseResults.length > 0) {
+      result.drivingLicense = true;
+    }
+
+    return result;
+  })
+   .catch(error => {
+     console.error(error);
+     throw new Error("An error occurred while checking user details");
+   });
+  
+}
 
 /*
 #####################################################################
@@ -712,4 +805,5 @@ module.exports = {
   updateOrderStatus,
   getOrderById,
   startChat,
+  checkUserDetailsExist,
 };

@@ -10,6 +10,7 @@ const UserServices = require("../services/UserServices");
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
+  console.log(userData);
   try {
     const result = await UserServices.registerUser(db, userData);
     res.status(200).json(result);
@@ -17,6 +18,18 @@ router.post("/register", async (req, res) => {
     console.error("Error registering user:", error);
     res.status(500).json({ error: "Failed to register user" });
   }
+});
+
+router.post("/userdetailsexist", (req, res) => {
+  const userDetails = req.body;
+  UserServices.checkUserDetailsExist(db, userDetails)
+    .then(results => {
+      res.status(200).json({results:results});
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      res.status(500).json({ error: "An error occurred" });
+    });
 });
 // login route.
 router.post("/login", async (req, res) => {
@@ -212,8 +225,6 @@ router.post("/changepassword", (req, res) => {
 router.post("/uploadProfileImage", (req, res) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      // A Multer error occurred during file upload
-      console.error(err);
       return res.status(500).json({ message: "File upload error" });
     } else if (err) {
       // An unknown error occurred during file upload
@@ -222,8 +233,9 @@ router.post("/uploadProfileImage", (req, res) => {
     }
     // Check if a file was uploaded
     const file = req.file;
+
     if (!file) {
-      return res.status(400).json({ message: "No file provided" });
+      return res.status(200).json({ message: "No file provided", fileUrl:null});
     }
 
     //  If no errors occured , Process the uploaded file and construct a url.
@@ -236,7 +248,7 @@ router.post("/uploadProfileImage", (req, res) => {
       "host"
     )}/images/${newFileName}`;
     // return the status message and the url of the image.
-    return res.json({ message: "Success", fileUrl });
+    return res.json({ message: "Success",fileUrl});
   });
 });
 

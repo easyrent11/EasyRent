@@ -1,11 +1,12 @@
 import React, {useState } from "react";
 import Login from "./Login";
-import { register } from "../api/UserApi";
+import { register,checkUserDetailsExist } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+
 
 export default function Register({ onClose, openLogin }) {
   const [firstName, setFirstName] = useState("");
@@ -22,7 +23,8 @@ export default function Register({ onClose, openLogin }) {
   const [governmentId, setGovernmentId] = useState("");
   const [drivingLicense, setDrivingLicense] = useState("");
   const [showLogin, setShowLogin] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const[profileUrl, setProfileUrl] = useState(null);
 
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
@@ -33,53 +35,85 @@ export default function Register({ onClose, openLogin }) {
   const handleImageUpload = (event) => {
     setProfilePicture(event.target.files[0]);
   };
-
   const notify = (message) => toast(message);
 
   const handleRegister = (e) => {
     e.preventDefault();
-
-    // Validate the password match
+     
+    // building the important user details to be checked if they exist or not.
+    const userDetails = {
+      email: email,
+      Id: governmentId,
+      phoneNumber: phoneNumber,
+      drivingLicense: drivingLicense,
+    };
+    checkUserDetailsExist(userDetails)
+    .then((res) => {
+      const existingFields=res.data.results;
+      if(Object.keys(existingFields).length > 0){
+        console.log(Object.keys(existingFields))
+        if(Object.keys(existingFields)[0] === ""){
+          setErrorMessage("The user already exists try logging in or resetting your password");
+        }
+        else{
+          setErrorMessage(`${Object.keys(existingFields)[0]} Already Exists`);
+        }
+        return;
+      }
+      // no details exist continue with the register.
+      // Validate the password match
     if (password !== verifyPassword) {
-      toast.error(
+      setErrorMessage(
         "you entered different passwords please verify the password correctly"
       );
       return;
     }
 
-
-    // Create a new FormData instance
+    
     const formData = new FormData();
     formData.append("profileImage", profilePicture);
-    // Send the form data with the image to the server for registration
+
     axios
-      .post("http://localhost:3001/user/uploadProfileImage", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
+    .post("http://localhost:3001/user/uploadProfileImage", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((response) => {
+      if (response.data.fileUrl == null) {
+        setProfileUrl("default.png");
+        console.log("i added the default picture = ", profileUrl);
+      } else {
         const { fileUrl } = response.data;
         const pathname = new URL(fileUrl).pathname;
         const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
+        setProfileUrl(filename);
+        console.log("got hereeee");
+      }
+      
+      // Use the updated profileUrl value within this scope
+      console.log("profileUrl inside .then:", profileUrl);
+
+      if (profileUrl == null) {
+        return;
+      }
         const registerInfo = {
           id: governmentId,
           phone_number: phoneNumber,
           driving_license: drivingLicense,
-          picture: filename,
+          picture:profileUrl,
           email: email,
           password: password,
           city_code: city,
-          city_name: city_name, // Add the city name to the registerInfo object
+          city_name: city_name,
           street_name: streetName,
           first_name: firstName,
           last_name: lastName,
         };
-
         // After successful image upload, proceed with registration
         register(registerInfo)
           .then((res) => {
-            notify(res.data.message);
+            notify("success",res.data.message);
             onClose();
           })
           .catch((err) => notify(err.data.message));
@@ -87,6 +121,10 @@ export default function Register({ onClose, openLogin }) {
       .catch((error) => {
         console.error(error);
       });
+    })
+    .catch((error) => {
+      console.log(error);
+    })
   };
 
   const toggleLogin = () => {
@@ -237,6 +275,7 @@ export default function Register({ onClose, openLogin }) {
         >
           Register
         </button>
+        <p className="text-center text-red-700 font-bold">{errorMessage}</p>
       </form>
       {showLogin && <Login onClose={toggleLogin} />}
     </div>
