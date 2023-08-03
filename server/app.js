@@ -9,7 +9,7 @@ const db = require('./models/db');
 // defining the server port.
 const port = process.env.PORT || 3001;
 
-// middleware.
+// middleware. 
 app.use(cors());
 app.use(express.json());
 
@@ -28,7 +28,7 @@ const io = new Server(server, {
 // the socket.io server for chat app.
 
 io.on("connection", (socket) => {
-  console.log(`User Connected : ${socket.id}`);
+  console.log(`⚡: ${socket.id} user just connected`);
 
   socket.on("join_room", (data) => {
       socket.join(data);

@@ -55,7 +55,7 @@ function App() {
   const [notFound, setNotFound] = useState(false); // useState for when a page is not found.
   const [userDetails, setUserDetails] = useState(""); // useState to save all of the retrieved User Details.
   const [carList, setCarList] = useState([]); // useState to save all of the retrieved cars from the *USER SEARCH*.
-  const [allCars, setAllCars] = useState([]); // useState to save all of the cars in the database to display them
+  const [allCars, setAllCars] = useState([]); // useState to save all of the cars in the database to display them 
 
   // ########################################################################################
   // #                             OnClick Functions.                                       #

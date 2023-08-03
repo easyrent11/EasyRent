@@ -6,7 +6,7 @@ const verifyToken = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
 const UserServices = require("../services/UserServices");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
@@ -16,17 +16,17 @@ router.post("/register", async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ error: "Failed to register user"});
+    res.status(500).json({ error: "Failed to register user" });
   }
 });
 
 router.post("/userdetailsexist", (req, res) => {
   const userDetails = req.body;
   UserServices.checkUserDetailsExist(db, userDetails)
-    .then(results => {
-      res.status(200).json({results:results});
+    .then((results) => {
+      res.status(200).json({ results: results });
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("Error:", error);
       res.status(500).json({ error: "An error occurred" });
     });
@@ -38,10 +38,13 @@ router.post("/login", async (req, res) => {
   try {
     const result = await UserServices.loginUser(db, email, password);
     res.status(200).json(result);
-  }catch (error) {
+  } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const colonIndex = errorMessage.indexOf(':');
-    const formattedErrorMessage = colonIndex !== -1 ? errorMessage.slice(colonIndex + 1).trim() : errorMessage;
+    const colonIndex = errorMessage.indexOf(":");
+    const formattedErrorMessage =
+      colonIndex !== -1
+        ? errorMessage.slice(colonIndex + 1).trim()
+        : errorMessage;
     res.status(401).json({ message: formattedErrorMessage });
   }
 });
@@ -110,60 +113,19 @@ router.get("/getuser/:id", (req, res) => {
   });
 });
 
-// route to update user infomation.
-router.put("/updateuserdetails", (req, res) => {
-  // Retrieve the updated user details from the request body
+router.put("/updateuserdetails",async (req, res) => {
   const updatedUserDetails = req.body;
+  console.log("In backend",updatedUserDetails);
 
-  // Get the previous picture filename from the database
-  const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
-
-  db.query(findPreviousPictureQuery, (error, results) => {
-    if (error) {
-      console.error("Error updating user profile:", error);
-      res.status(500).json({ message: "Could not find user old picture" });
-    } else {
-      if (results.length > 0) {
-        const previousPictureFilename = results[0].picture;
-        const filePath = path.join(
-          __dirname,
-          "../images/",
-          previousPictureFilename
-        );
-        if (fs.existsSync(filePath)) {
-          fs.unlink(filePath, (error) => {
-            if (error) console.error("Error deleting previous picture:", error);
-            else console.log("Previous picture deleted successfully");
-          });
-        }
-      } else {
-        console.log("No previous picture found in the user database.");
-      }
-    }
-  });
-  // updating all fields of the user.
-  const query = `
-    UPDATE users
-    SET
-      first_name = '${updatedUserDetails.first_name}',
-      last_name = '${updatedUserDetails.last_name}',
-      email = '${updatedUserDetails.email}',
-      phone_number = '${updatedUserDetails.phone_number}',
-      driving_license = '${updatedUserDetails.driving_license}',
-      street_name = '${updatedUserDetails.street_name}',
-      picture = '${updatedUserDetails.picture}'
-      WHERE id = ${updatedUserDetails.Id}
-  `;
-  // Execute the SQL query
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error("Error updating user profile:", error);
-      res.status(500).json({ message: "Failed to update user profile" });
-    } else {
-      res.json({ message: "User profile updated successfully" });
-    }
-  });
+  try {
+    const result = await UserServices.updateUserDetails(db, updatedUserDetails);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Failed to update user details :", error);
+    res.status(500).json({ error: "Failed to update user details" });
+  }
 });
+
 
 router.post("/changepassword", (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
@@ -214,7 +176,7 @@ router.post("/changepassword", (req, res) => {
             res.status(500).json({ error: "Internal Server Error" });
             return;
           }
-        
+
           // Password update successful
           res.json({ message: "Password updated successfully" });
         });
@@ -237,7 +199,9 @@ router.post("/uploadProfileImage", (req, res) => {
     const file = req.file;
 
     if (!file) {
-      return res.status(200).json({ message: "No file provided", fileUrl:null});
+      return res
+        .status(200)
+        .json({ message: "No file provided", fileUrl: null });
     }
 
     //  If no errors occured , Process the uploaded file and construct a url.
@@ -250,7 +214,7 @@ router.post("/uploadProfileImage", (req, res) => {
       "host"
     )}/images/${newFileName}`;
     // return the status message and the url of the image.
-    return res.json({ message: "Success",fileUrl});
+    return res.json({ message: "Success", fileUrl });
   });
 });
 
@@ -391,7 +355,7 @@ router.get("/getAllUsers", (req, res) => {
   });
 });
 
-router.post("/startChat",async(req,res) => {
+router.post("/startChat", async (req, res) => {
   let { user1Id, user2Id } = req.body;
   user1Id = parseInt(user1Id);
   try {
@@ -401,9 +365,7 @@ router.post("/startChat",async(req,res) => {
     console.error("Error during chatroom start chat:", error);
     res.status(401).json({ message: "Something went wrong" });
   }
-})
-
-
+});
 
 // multer function for uploading a single profile image.
 const upload = multer({

@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-
+const path = require('path');
+const fs = require('fs');
 // ########################################################################################
 // #                                ADD CAR SERVICE FUNCTIONS                             #
 // ########################################################################################
@@ -793,6 +794,125 @@ const startChat = (db, user1Id, user2Id) => {
   });
 };
 
+/*
+##################################################################################
+#                       Services to update user details                           #                            
+##################################################################################
+*/
+
+function deletePreviousPicture(filename) {
+  const filePath = path.join(__dirname, "../images/", filename);
+
+  if (fs.existsSync(filePath)) {
+    fs.unlink(filePath, (error) => {
+      if (error) {
+        console.error("Error deleting previous picture:", error);
+      } else {
+        console.log("Previous picture deleted successfully");
+      }
+    });
+  }
+}
+
+async function updateUserProfile(db,updatedUserDetails) {
+  return new Promise((resolve, reject) => {
+    const updateUserQuery = `
+      UPDATE users
+      SET
+        first_name = '${updatedUserDetails.first_name}',
+        last_name = '${updatedUserDetails.last_name}',
+        email = '${updatedUserDetails.email}',
+        phone_number = '${updatedUserDetails.phone_number}',
+        driving_license = '${updatedUserDetails.driving_license}',
+        street_name = '${updatedUserDetails.street_name}',
+        picture = '${updatedUserDetails.picture}',
+        city_code = '${updatedUserDetails.city_code}'
+      WHERE id = ${updatedUserDetails.Id}
+    `;
+
+    db.query(updateUserQuery, (error, results) => {
+      if (error) {
+        console.error("Error updating user profile:", error);
+        reject("Failed to update user profile");
+      } else {
+        resolve("User profile updated successfully");
+      }
+    });
+  });
+}
+
+async function insertCityAndThenUpdateUser(db,updatedUserDetails) {
+  return new Promise((resolve, reject) => {
+    const insertCityQuery = `
+      INSERT INTO cities (city_code, city_name)
+      VALUES (${updatedUserDetails.city_code}, '${updatedUserDetails.City_Name}')
+    `;
+
+    db.query(insertCityQuery, (error, results) => {
+      if (error) {
+        console.error("Error inserting city:", error);
+        reject("Failed to insert city");
+      } else {
+        updateUserProfile(updatedUserDetails)
+          .then((message) => {
+            resolve(message);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      }
+    });
+  });
+}
+
+async function updateUserDetails(db,updatedUserDetails) {
+  return new Promise(async (resolve, reject) => {
+    const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
+
+    db.query(findPreviousPictureQuery, async (error, results) => {
+      if (error) {
+        console.error("Error updating user profile:", error);
+        reject("Could not find user old picture");
+      } else {
+        if (results.length > 0 && results[0].picture !== updatedUserDetails.picture) {
+          const previousPictureFilename = results[0].picture;
+          deletePreviousPicture(previousPictureFilename);
+        } else {
+          console.log("No previous picture found in the user database.");
+        }
+
+        const checkCityQuery = `SELECT COUNT(*) AS count FROM cities WHERE city_code = ${updatedUserDetails.city_code}`;
+        db.query(checkCityQuery, async (error, results) => {
+          if (error) {
+            console.error("Error checking city:", error);
+            reject("Error checking city");
+          } else {
+            const cityExists = results[0].count > 0;
+
+            if (cityExists) {
+              try {
+                const message = await updateUserProfile(db,updatedUserDetails);
+                resolve(message);
+              } catch (error) {
+                reject(error);
+              }
+            } else {
+              try {
+                const message = await insertCityAndThenUpdateUser(db,updatedUserDetails);
+                resolve(message);
+              } catch (error) {
+                reject(error);
+              }
+            }
+          }
+        });
+      }
+    });
+  });
+}
+
+
+
 module.exports = {
   registerUser,
   loginUser,
@@ -805,4 +925,5 @@ module.exports = {
   getOrderById,
   startChat,
   checkUserDetailsExist,
+  updateUserDetails,
 };

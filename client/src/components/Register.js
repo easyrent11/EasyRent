@@ -30,6 +30,7 @@ export default function Register({ onClose, openLogin }) {
     setCity(selectedOption.value);
     setCityName(selectedOption.label);
     setSelectedCityLabel(selectedOption.label);
+    console.log(city);
   };
 
   const handleImageUpload = (event) => {
