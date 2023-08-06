@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
 const path = require('path');
 const fs = require('fs');
 // ########################################################################################
@@ -142,6 +141,7 @@ function insertCar(
 
 // Function to insert car images
 function insertCarImages(db, platesNumber, imageUrls) {
+  console.log("In User services = ", platesNumber, imageUrls);
   const insertPromises = imageUrls.map((url) => {
     return new Promise((resolve, reject) => {
       db.query(
@@ -152,7 +152,7 @@ function insertCarImages(db, platesNumber, imageUrls) {
             console.error("Error adding image URL:", error);
             reject(error);
           } else {
-            resolve();
+            resolve("Car Images successfully inserted");
           }
         }
       );
@@ -237,7 +237,7 @@ async function addCar(db, carData) {
       Renter_Id,
       car_urls: image_url,
     };
-
+    console.log("Image url = ",image_url);
     // Insert the image URLs into the car_images table
     if (image_url && image_url.length > 0) {
       await insertCarImages(db, Plates_Number, image_url);

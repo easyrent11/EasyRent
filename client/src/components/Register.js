@@ -3,9 +3,8 @@ import Login from "./Login";
 import { register, checkUserDetailsExist } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 import Select from "react-select";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { notify } from "../HelperFunctions/Notify";
 
 
 export default function Register({ onClose, openLogin }) {
@@ -36,7 +35,6 @@ export default function Register({ onClose, openLogin }) {
   const handleImageUpload = (event) => {
     setProfilePicture(event.target.files[0]);
   };
-  const notify = (message) => toast(message);
 
   function userDetailsEmpty() {
     if (
@@ -65,14 +63,14 @@ export default function Register({ onClose, openLogin }) {
       setErrorMessage("Please fill out all fields (picture is optional)")
       return;
     }
-    // Validation Functions
+    // Validation functions for register fields.
     const validateName = (name) => /^[a-zA-Z]{2,}$/.test(name);
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const validatePhoneNumber = (phoneNumber) => /^05\d{1}-?\d{7}$/.test(phoneNumber);
     const validatePassword = (password) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(password);
     const validateGovernmentId = (governmentId) => /^\d{9}$/.test(governmentId);
     const validateDrivingLicense = (drivingLicense) => /^\d{9}$/.test(drivingLicense);
-    const validateStreetName = (streetName) => /^[a-zA-Z\s\d]+$/.test(streetName);
+    const validateStreetName = (streetName) => /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
     
     const validateForm = () => {
       let errors = {};
@@ -131,7 +129,6 @@ export default function Register({ onClose, openLogin }) {
       .then((res) => {
         const existingFields = res.data.results;
         if (Object.keys(existingFields).length > 0) {
-          console.log(Object.keys(existingFields))
           if (Object.keys(existingFields)[0] === "Id") {
             setErrorMessage("The user already exists try logging in or resetting your password");
           }
@@ -179,7 +176,7 @@ export default function Register({ onClose, openLogin }) {
                 notify("success", res.data.message);
                 onClose();
               })
-              .catch((err) => notify(err.data.message));
+              .catch((err) => notify("error",err.data.message));
           })
           .catch((error) => {
             console.error(error);

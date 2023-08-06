@@ -9,7 +9,6 @@ export default function ContactUs({ isLoggedIn }) {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     // You can implement the logic to handle the form submission here, such as sending the message to the admin
-    console.log("Message:", message);
     // Reset the form input
     setMessage("");
   };

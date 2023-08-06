@@ -8,8 +8,10 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { getCar } from "../api/CarApi";
-export default function AddCar() {
+import {selectStyle} from "../res/SelectStyle";
+import { notify } from "../HelperFunctions/Notify";
 
+export default function AddCar() {
   // get the userId from the local storage. so we can send it with the car object
   const userId = localStorage.getItem("userId");
 
@@ -17,7 +19,6 @@ export default function AddCar() {
   const navigate = useNavigate();
 
   const { allCars, setAllCars } = useContext(AllCarsContext);
-
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
@@ -38,8 +39,6 @@ export default function AddCar() {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const notify = (status, message) =>
-    status === "success" ? toast.success(message) : toast.error(message);
 
   const handleManufacturerChange = (selectedOption) => {
     setSelectedManufacturer(selectedOption);
@@ -86,7 +85,6 @@ export default function AddCar() {
   };
 
   const uploadImages = (files) => {
-
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append("carpics", files[i]);
@@ -105,10 +103,9 @@ export default function AddCar() {
     setUploadedImages(files); // Store the selected files temporarily
   };
 
-
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     if (
       !selectedManufacturer ||
       !selectedModel ||
@@ -121,10 +118,12 @@ export default function AddCar() {
       description === "" ||
       rentalPricePerDay === ""
     ) {
-      setErrorMessage("Please fill in all the car details(pictures are optional)");
+      setErrorMessage(
+        "Please fill in all the car details(pictures are optional)"
+      );
       return;
     }
-  
+
     getCar(platesNumber)
       .then((res) => {
         if (res.data.length > 0) {
@@ -133,7 +132,6 @@ export default function AddCar() {
           );
           return;
         } else {
-          console.log("we got here");
           uploadImages(uploadedImages)
             .then((response) => {
               const { files } = response.data;
@@ -141,6 +139,7 @@ export default function AddCar() {
                 const pathname = new URL(url).pathname;
                 return pathname.substring(pathname.lastIndexOf("/") + 1);
               });
+              const defaultImageUrl = "default-car.jpg"; // Replace with your actual default image URL
               const carData = {
                 Manufacturer_Name: selectedManufacturer.value,
                 Manufacturer_Code: selectedManufacturer.value.toLowerCase(),
@@ -155,12 +154,10 @@ export default function AddCar() {
                 Description: description,
                 Rental_Price_Per_Day: rentalPricePerDay,
                 Renter_Id: userId,
-                image_url: filenames,
+                image_url: uploadedImages.length > 0 ? filenames : [defaultImageUrl],
               };
-              console.log(carData);
               addCar(carData)
                 .then((res) => {
-                  console.log("add car res ", res);
                   // update the allCars state
                   setAllCars((prevCars) => [...prevCars, res.data.car]);
                   notify("success", res.data.message);
@@ -199,6 +196,8 @@ export default function AddCar() {
             onChange={handleManufacturerChange}
             options={manufacturers}
             placeholder="Select Manufacturer"
+            styles={selectStyle}
+
           />
         </div>
 
@@ -222,6 +221,7 @@ export default function AddCar() {
             } // Update the line here
             onChange={handleModelChange}
             isDisabled={!selectedManufacturer}
+            styles={selectStyle}
           />
         </div>
 
@@ -256,6 +256,7 @@ export default function AddCar() {
               label: (1990 + index).toString(),
             }))}
             placeholder="Select Year"
+            styles={selectStyle}
           />
         </div>
         <div className="mb-4">
@@ -269,22 +270,63 @@ export default function AddCar() {
             value={color}
             onChange={handleColorChange}
             options={[
-              "red",
-              "black",
-              "blue",
-              "green",
-              "yellow",
-              "orange",
-              "purple",
-              "pink",
-              "gray",
-              "brown",
-              "white",
+              "Red",
+              "Black",
+              "Blue",
+              "Green",
+              "Yellow",
+              "Orange",
+              "Purple",
+              "Pink",
+              "Gray",
+              "Brown",
+              "White",
+              "Silver",
+              "Gold",
+              "Bronze",
+              "Beige",
+              "Champagne",
+              "Maroon",
+              "Navy",
+              "Teal",
+              "Charcoal",
+              "Gunmetal",
+              "Turquoise",
+              "Burgundy",
+              "Ivory",
+              "Cream",
+              "Mocha",
+              "Indigo",
+              "Lavender",
+              "Ruby",
+              "Emerald",
+              "Sapphire",
+              "Amber",
+              "Copper",
+              "Pearl",
+              "Platinum",
+              "Rust",
+              "Steel",
+              "Midnight Blue",
+              "Sunset Orange",
+              "Electric Blue",
+              "Lime Green",
+              "Deep Ocean",
+              "Crimson",
+              "Mahogany",
+              "Tangerine",
+              "Olive",
+              "Graphite",
+              "Cobalt",
+              "Mint Green",
+              "Chocolate",
+              "Frost White",
             ].map((colorOption) => ({
               value: colorOption,
               label: colorOption,
             }))}
             placeholder="Select Color"
+            styles={selectStyle}
           />
         </div>
         <div className="mb-4">
@@ -297,11 +339,18 @@ export default function AddCar() {
           <Select
             value={seatsAmount}
             onChange={handleSeatsAmountChange}
-            options={Array.from({ length: 15 - 2 + 1 }, (_, index) => ({
-              value: 2 + index,
-              label: (2 + index).toString(),
-            }))}
+            options={[
+              { value: 2, label: "2" },
+              { value: 4, label: "4" },
+              { value: 5, label: "5" },
+              { value: 7, label: "7" },
+              { value: 8, label: "8" },
+              { value: 9, label: "9" },
+              { value: 12, label: "12" },
+              { value: 15, label: "15" },
+            ]}
             placeholder="Select Seats Amount"
+            styles={selectStyle}
           />
         </div>
         <div className="mb-4">
@@ -321,6 +370,7 @@ export default function AddCar() {
               })
             )}
             placeholder="Select Engine Type"
+            styles={selectStyle}
           />
         </div>
         <div className="mb-4">
@@ -338,6 +388,7 @@ export default function AddCar() {
               label: transmissionOption,
             }))}
             placeholder="Select Transmission Type"
+            styles={selectStyle}
           />
         </div>
         <div className="mb-4">

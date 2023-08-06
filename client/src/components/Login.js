@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 import { login } from "../api/UserApi";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { getAllUserDetails } from "../api/UserApi";
+import { notify } from "../HelperFunctions/Notify";
+
 
 export default function Login({ onClose, handleLogin }) {
   const { setUserDetails } = useContext(UserProfileDetails);
@@ -14,9 +14,7 @@ export default function Login({ onClose, handleLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // function that takes a message and displays it as an alert popout.
-  const notify = (error,message) => error === "success" ? toast.success(message) : toast.error(message);
-
+ 
   // handle the login submit.
   const handleFormLogin = (e) => {
     e.preventDefault();

@@ -2,15 +2,22 @@ import React, { useState, useContext } from "react";
 import { Carousel } from "@material-tailwind/react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import PersonIcon from "@mui/icons-material/Person";
-import { TbManualGearbox } from "react-icons/tb";
-import { FaCogs } from "react-icons/fa";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCloudUploadAlt,
+  faPencilAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 import { updateCarDetails } from "../api/CarApi";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AllCarsContext } from "../contexts/AllCarsContext";
+import { FaTimes } from 'react-icons/fa';
+import { deleteOldImages, updateCarImages, getCarImages } from "../api/CarApi";
+import {decryptData} from "../HelperFunctions/Encrypt";
+
 export default function CarOwnerView() {
   const notify = (status, message) =>
     status === "success" ? toast.success(message) : toast.error(message);
@@ -18,10 +25,12 @@ export default function CarOwnerView() {
 
   const navigate = useNavigate();
 
-  const { allCars } = useContext(AllCarsContext);
+  const { allCars, setAllCars } = useContext(AllCarsContext);
 
-  //getting the plates number out of the paramaters that are passed in the car component.
-  let { platesNumber } = useParams();
+  //getting encrypted the plates number out of the paramaters that are passed in the car component.
+  let { encryptedPlatesNumber } = useParams();
+  // decryping the encrypted plates number from the parameters.
+  let platesNumber = decryptData(encryptedPlatesNumber);
   // extracting the car from the car list using the plates Number to match it to the one we click on.
   const car = allCars.find(
     (car) => Number(car.Plates_Number) === Number(platesNumber)
@@ -44,8 +53,9 @@ export default function CarOwnerView() {
   const [updatedRentalPrice, setUpdatedRentalPrice] = useState(
     car.Rental_Price_Per_Day
   );
+  const [uploadedImages, setUploadedImages] = useState(null);
 
-  const handleSaveClick = () => {
+  const updateCarDetailsInDB = (images) => {
     const updatedCarDetails = {
       Manufacturer_Code: updatedManufacturerCode.toLowerCase(),
       model_name: updatedModelCode,
@@ -62,8 +72,8 @@ export default function CarOwnerView() {
     };
     // checking if we made any changes to any car field.
     const equal =
-      updatedCarDetails.Manufacturer_Code === car.Manufacturer_Code&&
-      updatedCarDetails.model_code === car.model_code&&
+      updatedCarDetails.Manufacturer_Code === car.Manufacturer_Code &&
+      updatedCarDetails.model_code === car.model_code &&
       updatedCarDetails.Year === car.Year &&
       updatedCarDetails.Color === car.Color &&
       updatedCarDetails.Seats_Amount === car.Seats_Amount &&
@@ -72,20 +82,54 @@ export default function CarOwnerView() {
       updatedCarDetails.Description === car.Description &&
       updatedCarDetails.Rental_Price_Per_Day === car.Rental_Price_Per_Day &&
       updatedCarDetails.Plates_Number === car.Plates_Number;
-      // if the user didnt make any changes exit edit mode and make no changes.
-      if(equal){
+    // if the user didnt make any changes exit edit mode and make no changes.
+    if (equal) {
+      // update car images
+      console.log("Images=", images);
+      if (images !== null) {
+        const carDetails = {
+          images: images,
+          PlatesNumber: car.Plates_Number,
+        };
+        updateCarImages(carDetails)
+          .then((res) => {
+            console.log("Images updated successfully");
+          })
+          .catch((error) => {
+            console.log(
+              `Failed to update car images we got the following error ${error}.`
+            );
+          });
+      } else {
         setEditMode(false);
         return;
       }
-    updateCarDetails(updatedCarDetails)
-      .then(() => {
-        console.log("Car details updated successfully");
-        setEditMode(false);
-        window.location.href = "/";
-      })
-      .catch((error) => {
-        console.error("Failed to update car details:", error);
-      });
+    } else {
+      // update car images.
+      if (images !== null) {
+        const carDetails = {
+          images: images,
+          PlatesNumber: car.Plates_Number,
+        };
+        updateCarImages(carDetails)
+          .then((res) => {
+            console.log("Images updated successfully");
+          })
+          .catch((error) => {
+            console.log(
+              `Failed to update car images we got the following error ${error}.`
+            );
+          });
+      }
+      updateCarDetails(updatedCarDetails)
+        .then(() => {
+          setEditMode(false);
+          navigate("/UserProfile");
+        })
+        .catch((error) => {
+          console.error("Failed to update car details:", error);
+        });
+    }
   };
 
   const getModelOptions = () => {
@@ -114,40 +158,131 @@ export default function CarOwnerView() {
     setEditMode(false);
   };
 
+  const handleSaveClick = () => {
+    let filenames = null;
+    if (uploadedImages !== null) {
+      // Delete old images first
+      const platesNumber = car.Plates_Number;
+      getCarImages(platesNumber)
+        .then((res) => {
+          // if we found previous car images delete them then insert the new ones.
+          if (res.data.length > 0) {
+            deleteOldImages({ platesNumber: car.Plates_Number })
+              .then((res) => {
+                // Upload new images after old images are deleted
+                handleUploadImages(uploadedImages)
+                  .then((response) => {
+                    const { files } = response.data;
+                    const filenames = files.map((url) => {
+                      const pathname = new URL(url).pathname;
+                      return pathname.substring(pathname.lastIndexOf("/") + 1);
+                    });
+                    updateCarDetailsInDB(filenames);
+                  })
+                  .catch((error) => {
+                    console.error("Failed to upload new images:", error);
+                  });
+              })
+              .catch((error) => {
+                console.error("Failed to delete old images:", error);
+              });
+          }
+          // if no pictures found upload the images to db and local folder.
+          else {
+            handleUploadImages(uploadedImages)
+              .then((response) => {
+                const { files } = response.data;
+                filenames = files.map((url) => {
+                  const pathname = new URL(url).pathname;
+                  return pathname.substring(pathname.lastIndexOf("/") + 1);
+                });
+                updateCarDetailsInDB(filenames);
+              })
+              .catch((error) => {
+                console.error("Failed to upload new images:", error);
+              });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      // If no new images are selected, update only other details
+      updateCarDetailsInDB(filenames);
+    }
+  };
+
+  const handleImageUpload = (event) => {
+    const fileList = event.target.files;
+    const files = Array.from(fileList);
+    setUploadedImages(files); // Store the selected files temporarily
+  };
+
+  const handleUploadImages = (files) => {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("carpics", files[i]);
+    }
+
+    return axios.post("http://localhost:3001/cars/uploadImages", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
   return (
-    <div className="w-full flex-1 border-2 border-red-500">
+    <div className="w-full flex flex-1 border-2 border-red-500">
       <button
-        className="absolute top-4 right-4 text-white font-bold py-2 px-4 rounded bg-red-500"
+        className="absolute  hover:bg-[#CC6200] text-white font-bold top-20 right-0 w-20 m-4 p-3 rounded bg-black"
         onClick={() => navigate("/UserProfile")}
       >
-        X
+        <FaTimes className="mx-auto" />
       </button>
-      <div className="w-full flex justify-center">
-        <Carousel className="max-w-lg">
+      <div className="w-full flex-col flex items-center m-2 border-2 border-blue-500 justify-centerm-2">
+        <Carousel className="w-4/5">
           {car.car_urls.map((image, index) => (
-            <div key={index}>
+            <div className="w-full" key={index}>
               <img
                 src={`http://localhost:3001/images/${image}`}
                 alt={`Car Pic ${index + 1}`}
-                className="h-96 object-cover w-full rounded-lg"
+                className="h-full object-cover w-full rounded-lg"
               />
             </div>
           ))}
         </Carousel>
+        {editMode && (
+          <div className="w-1/4 m-6">
+            <label
+              htmlFor="file-input"
+              className="bg-black hover:bg-[#CC6200] text-white font-semibold py-2 px-4 rounded-lg cursor-pointer flex justify-center items-center"
+            >
+              <FontAwesomeIcon icon={faCloudUploadAlt} className="mr-2" />
+              Upload Picture
+            </label>
+            <input
+              type="file"
+              id="file-input"
+              name="picture"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </div>
+        )}
       </div>
 
-      <div className="w-full p-4">
+      <div className="w-full p-4 m-2 border-2 border-black">
         <div className="flex flex-col md:flex-row justify-between">
-          <div className="md:w-1/2">
+          <div className="md:w-1/2  p-2">
             <h2 className="text-2xl font-bold mb-2">
               {editMode ? (
                 <>
                   <div className="mb-2">
                     <label
-                      className="text-sm font-semibold"
+                      className="text-lg font-semibold"
                       htmlFor="manufacturer"
                     >
-                      Manufacturer:
+                      Manufacturer :
                     </label>
                     <Select
                       value={{
@@ -164,10 +299,10 @@ export default function CarOwnerView() {
                       className="w-full p-2 border rounded-md"
                     />
                   </div>
+                  <label className="text-lg font-semibold" htmlFor="model">
+                    Model :
+                  </label>
                   <div className="mb-2">
-                    <label className="text-sm font-semibold" htmlFor="model">
-                      Model:
-                    </label>
                     <Select
                       value={{
                         value: updatedModelCode,
@@ -183,14 +318,17 @@ export default function CarOwnerView() {
                   </div>
                 </>
               ) : (
-                `${car.Manufacturer_Code} ${car.model_code}`
+                <div>
+                  <p className="m-2">{`Manufacturer : ${car.Manufacturer_Code}`} </p>
+                  <p className="m-2">{`Model :  ${car.model_code}`} </p>
+                </div>
               )}
             </h2>
-            <p className="text-gray-500 text-sm mb-4">
+            <p className="text-lg">
               {editMode ? (
                 <>
-                  <label className="text-sm font-semibold" htmlFor="year">
-                    Year:
+                  <label className="text-lg font-semibold" htmlFor="year">
+                    Year :
                   </label>
                   <Select
                     value={{
@@ -211,51 +349,38 @@ export default function CarOwnerView() {
                   />
                 </>
               ) : (
-                `Year: ${car.Year}`
+                <div>
+                  <p className="m-2 text-2xl font-bold">{`Year: ${car.Year}`}</p>
+                </div>
               )}
             </p>
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <h3 className="text-xl font-semibold mb-2">
-                Rental Price (per day)
-              </h3>
-              <div className="flex items-center">
+            <div className="flex flex-col  items-start justify-between">
+            <h3 className=" text-lg font-semibold mb-2">
+              Rental Price (Per Day) : 
+            </h3>
+              <div className="flex items-center w-full justify-center ">
                 {editMode ? (
                   <input
                     type="number"
                     value={updatedRentalPrice}
                     onChange={(e) => setUpdatedRentalPrice(e.target.value)}
-                    className="w-24 p-2 border rounded-md mr-4"
+                    className="w-full p-2 border rounded-md m-2"
                   />
                 ) : (
-                  <p>{car.Rental_Price_Per_Day} USD</p>
-                )}
-                {editMode && (
-                  <button
-                    className="bg-green-500 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleSaveClick}
-                  >
-                    Save
-                  </button>
-                )}
-                {editMode && (
-                  <button
-                    className="bg-red-500 text-white font-bold py-2 px-4 rounded ml-4"
-                    onClick={handleCancelClick}
-                  >
-                    Cancel
-                  </button>
+                  <div>
+                    <p className="text-2xl font-bold m-2">{car.Rental_Price_Per_Day} USD</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-          <div className="md:w-1/2">
-            <ul className="flex flex-wrap mt-4 mb-2">
-              <li className="flex items-center mr-8">
-                <PersonIcon className="text-blue-500 mr-2" />
+          <div className="md:w-1/2 p-2">
+            <ul className="flex flex-col flex-wrap mt-4 mb-2">
+              <li className="flex flex-col w-full items-start ">
                 {editMode ? (
                   <>
                     <label
-                      className="text-sm font-semibold"
+                      className="text-lg font-semibold"
                       htmlFor="seatsAmount"
                     >
                       Seats Amount:
@@ -275,19 +400,20 @@ export default function CarOwnerView() {
                           label: (2 + index).toString(),
                         })
                       )}
-                      className="w-full p-2 border rounded-md ml-2"
+                      className="w-full p-2 border rounded-md"
                     />
                   </>
                 ) : (
-                  `Seats Amount: ${car.Seats_Amount}`
+                  <div>
+                    <p className="font-bold text-2xl">{`Seats Amount: ${car.Seats_Amount}`}</p>
+                  </div>
                 )}
               </li>
-              <li className="flex items-center mr-8">
-                <TbManualGearbox className="text-blue-500 mr-2" />
+              <li className="flex flex-col w-full items-start">
                 {editMode ? (
                   <>
                     <label
-                      className="text-sm font-semibold"
+                      className="text-lg font-semibold"
                       htmlFor="transmissionType"
                     >
                       Transmission Type:
@@ -304,19 +430,18 @@ export default function CarOwnerView() {
                         value: transmissionOption,
                         label: transmissionOption,
                       }))}
-                      className="w-full p-2 border rounded-md ml-2"
+                      className="w-full p-2 border rounded-md "
                     />
                   </>
                 ) : (
                   `Transmission Type: ${car.Transmission_type}`
                 )}
               </li>
-              <li className="flex items-center">
-                <FaCogs className="text-blue-500 mr-2" />
+              <li className="flex flex-col w-full items-start">
                 {editMode ? (
                   <>
                     <label
-                      className="text-sm font-semibold"
+                      className="text-lg font-semibold"
                       htmlFor="engineType"
                     >
                       Engine Type:
@@ -335,17 +460,15 @@ export default function CarOwnerView() {
                           label: engineOption,
                         })
                       )}
-                      className="w-full p-2 border rounded-md ml-2"
+                      className="w-full p-2 border rounded-md"
                     />
                   </>
                 ) : (
                   `Engine Type: ${car.Engine_Type}`
                 )}
               </li>
-            </ul>
-            <ul className="flex mt-4">
-              <li className="mr-8">
-                <h3 className="text-sm font-semibold mb-2">Color:</h3>
+              <li className="flex flex-col items-start">
+                <h3 className="text-lg font-semibold mb-2">Color:</h3>
                 {editMode ? (
                   <Select
                     value={{ value: updatedColor, label: updatedColor }}
@@ -368,19 +491,21 @@ export default function CarOwnerView() {
                       value: colorOption,
                       label: colorOption,
                     }))}
-                    className="w-36 p-2 border rounded-md"
+                    className=" p-2 border w-full rounded-md"
                   />
                 ) : (
                   `${car.Color}`
                 )}
               </li>
+            </ul>
+            <ul className="flex flex-col w-full">
               <li>
-                <h3 className="text-sm font-semibold mb-2">Description:</h3>
+                <h3 className="text-lg font-semibold mb-2">Description:</h3>
                 {editMode ? (
                   <textarea
                     value={updatedDescription}
                     onChange={(e) => setUpdatedDescription(e.target.value)}
-                    className="w-64 h-24 p-2 border rounded-md"
+                    className="w-full  border p-2 border-black rounded-md"
                   />
                 ) : (
                   <p className="text-sm">{car.Description}</p>
@@ -389,14 +514,32 @@ export default function CarOwnerView() {
             </ul>
           </div>
         </div>
-        {!editMode && (
-          <button
-            onClick={() => setEditMode(true)}
-            className="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          >
-            Edit
-          </button>
-        )}
+        <div className=" flex items-center justify-center m-6 max-w-full">
+          {!editMode && (
+            <button
+              onClick={() => setEditMode(true)}
+              className="mt-4 bg-blue-500 m-2 text-white font-bold py-2 px-4 rounded"
+            >
+              Edit
+            </button>
+          )}
+          {editMode && (
+            <button
+              className="bg-green-500 m-2 text-black font-bold py-2 px-4 rounded"
+              onClick={handleSaveClick}
+            >
+              Save
+            </button>
+          )}
+          {editMode && (
+            <button
+              className="bg-red-500 m-2 text-black font-bold py-2 px-4 rounded ml-4"
+              onClick={handleCancelClick}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

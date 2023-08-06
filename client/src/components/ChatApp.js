@@ -3,7 +3,6 @@ import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { FiSend } from "react-icons/fi";
 import io from "socket.io-client";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 
 
 const socket = io.connect("http://localhost:3001");

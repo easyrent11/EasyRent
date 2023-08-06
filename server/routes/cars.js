@@ -4,14 +4,13 @@ const router = express.Router();
 const fs = require("fs");
 const db = require("../models/db");
 const multer = require("multer");
-const carServices  = require('../services/CarServices');
+const carServices = require("../services/CarServices");
 //call multer and  define  the images folder.
 const upload = multer({
   dest: path.join(__dirname, "../images"),
 }).array("carpics", 20);
 
-
-
+// car that will get all of the cars in the website.
 router.get("/getallcars", async (req, res) => {
   try {
     const carsWithImages = await carServices.getAllCarsWithImages();
@@ -20,22 +19,22 @@ router.get("/getallcars", async (req, res) => {
     res.status(500).json({ error: "Error retrieving cars" });
   }
 });
-
-router.get("/getcar/:PlatesNumber",async(req,res) => {
+// route that will take a plate number and retrieve all car details.
+router.get("/getcar/:PlatesNumber", async (req, res) => {
   const PlatesNumber = req.params.PlatesNumber;
-  try{
+  try {
     const car = await carServices.getCarWithPlatesNumber(db, PlatesNumber);
     res.status(200).json(car);
-  }catch (error) {
+  } catch (error) {
     res.status(500).json({ error: "Error retrieving car" });
   }
 });
-router.get("/getcarwithuserid/:userId",async(req,res) => {
+router.get("/getcarwithuserid/:userId", async (req, res) => {
   const userId = req.params.userId;
-  try{
+  try {
     const car = await carServices.getCarsWithUserId(db, userId);
     res.status(200).json(car);
-  }catch (error) {
+  } catch (error) {
     res.status(500).json({ error: "Error retrieving car" });
   }
 });
@@ -44,7 +43,7 @@ router.get("/getcarwithuserid/:userId",async(req,res) => {
 router.put("/updatecardetails", async (req, res) => {
   // Retrieve the updated car details from the request body
   const updatedCarDetails = req.body;
-  console.log("Updated Details =",updatedCarDetails);
+  console.log("details to update in db=", updatedCarDetails);
 
   try {
     await carServices.updateCarDetails(db, updatedCarDetails);
@@ -55,8 +54,45 @@ router.put("/updatecardetails", async (req, res) => {
   }
 });
 
+// route for deleting old images of a car.
+router.post("/deleteoldimages", async (req, res) => {
+  const {platesNumber} = req.body;
+  try {
+    const result = await carServices.deleteCarPictures(
+      db,
+      platesNumber
+    );
+    res.json({ message: `${result}` });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete previous car images." });
+  }
+});
+// route for updating car images in the database.
+router.post("/insertimages", async (req, res) => {
+  const carDetails = req.body;
+  try {
+    await carServices.insertCarImages(
+      db,
+      carDetails.PlatesNumber,
+      carDetails.images
+    );
+    res.json({ message: "Images inserted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to insert car images." });
+  }
+});
 
+router.get("/getallcarimages/:PlatesNumber", async (req, res) => {
+  const PlatesNumber = req.params.PlatesNumber;
+  try {
+    const carImages = await carServices.fetchAllCarImages(db, PlatesNumber);
+    res.status(200).json(carImages);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving car" });
+  }
+});
 
+// route for uploading images of a car to local folder.
 router.post("/uploadImages", (req, res) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {

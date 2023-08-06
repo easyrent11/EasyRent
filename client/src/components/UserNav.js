@@ -3,12 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import NotificationDropdown from "./NotificationDropdown";
-
+import { notify } from "../HelperFunctions/Notify";
 
 const navigation = [
   { name: "Dashboard", href: "/homepage", current: true },
@@ -28,9 +26,11 @@ export default function UserNav({ handleLogout }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userDetails } = useContext(UserProfileDetails);
   const userProfileImage = userDetails.picture;
-
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+
+
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -48,7 +48,7 @@ export default function UserNav({ handleLogout }) {
   }, []);
 
   const logout = () => {
-    toast.success("Successfully logged out");
+    notify("success","Successfully logged out");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     handleLogout();

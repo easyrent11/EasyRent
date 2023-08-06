@@ -12,6 +12,7 @@ import { sendOrderRequest } from "../api/UserApi";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import { FaTimes } from 'react-icons/fa';
 import { Link } from "react-router-dom";
+import {decryptData} from "../HelperFunctions/Encrypt";
 
 export default function CarView() {
   const navigate = useNavigate();
@@ -31,8 +32,10 @@ export default function CarView() {
   const { allCars } = useContext(AllCarsContext);
   const { setUserRenteeOrders } = useUserOrders();
 
-  //getting the plates number out of the paramaters that are passed in the car component.
-  let { platesNumber } = useParams();
+    //getting encrypted the plates number out of the paramaters that are passed in the car component.
+    let { encryptedPlatesNumber } = useParams();
+    // decryping the encrypted plates number from the parameters.
+    let platesNumber = decryptData(encryptedPlatesNumber);
   // extracting the car from the car list using the plates Number to match it to the one we click on.
   const car = allCars.find(
     (car) => Number(car.Plates_Number) === Number(platesNumber)

@@ -1,7 +1,7 @@
 // ########################################################################################
 // #                             IMPORTS OF REACT/OTHER LIBRARIES.                        #
 // ########################################################################################
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
@@ -86,7 +86,7 @@ function App() {
   // ########################################################################################
   // #                                     USE-EFFECTS                                      #
   // ########################################################################################
-  useEffect(() => {
+  useMemo(() => {
     // Fetch all cars from backend API using Axios
     getAllCars()
       .then((response) => {

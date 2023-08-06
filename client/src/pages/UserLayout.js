@@ -8,7 +8,6 @@ import { useUserOrders } from '../contexts/UserOrdersContext';
 
 export default function UserLayout() {
   const { userOrders, userRenteeOrders } = useUserOrders();
-  console.log(userOrders,userRenteeOrders);
   const userDetails = useContext(UserProfileDetails);
   return (
     <>
