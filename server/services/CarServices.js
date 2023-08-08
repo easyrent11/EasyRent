@@ -91,12 +91,11 @@ async function deleteCar(db, platesNumber) {
 
 
 async function deleteCarPictures(db, Plates_Number) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     db.query(
       "SELECT image_url FROM car_images WHERE Plates_Number = ?",
       [Plates_Number],
-      (error, results) => {
-        console.log(results);
+      async (error, results) => {
         if (error) {
           reject("Failed to check if car images exist.");
         } else {
@@ -104,10 +103,19 @@ async function deleteCarPictures(db, Plates_Number) {
             resolve("No previous images were found.");
             return;
           } else {
-            for (let i = 0; i < results.length; i++) {
-              deletePictureFromFolder(results[i].image_url);
+            const imageUrls = results.map(result => result.image_url);
+            
+            // Check if there's only one image and its the default one.
+            if (imageUrls.length === 1 && imageUrls[0] === 'default-car.jpg') {
+              resolve("Car has no image only the default one Skipping deletion.");
+              return;
             }
-            const result = deletePictureFromDataBase(db, Plates_Number);
+            
+            // Delete images from folder and database
+            for (let i = 0; i < imageUrls.length; i++) {
+               deletePictureFromFolder(imageUrls[i]);
+            }
+            const result = await deletePictureFromDataBase(db, Plates_Number);
             console.log(
               result
                 ? "Images deleted successfully"
@@ -120,6 +128,7 @@ async function deleteCarPictures(db, Plates_Number) {
     );
   });
 }
+
 // helper function that takes the plates number of a car and deletes all of its images.
 function deletePictureFromDataBase(db, Plates_Number) {
   return new Promise((resolve, reject) => {

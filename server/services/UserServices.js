@@ -141,7 +141,6 @@ function insertCar(
 
 // Function to insert car images
 function insertCarImages(db, platesNumber, imageUrls) {
-  console.log("In User services = ", platesNumber, imageUrls);
   const insertPromises = imageUrls.map((url) => {
     return new Promise((resolve, reject) => {
       db.query(
@@ -237,7 +236,6 @@ async function addCar(db, carData) {
       Renter_Id,
       car_urls: image_url,
     };
-    console.log("Image url = ",image_url);
     // Insert the image URLs into the car_images table
     if (image_url && image_url.length > 0) {
       await insertCarImages(db, Plates_Number, image_url);
@@ -802,7 +800,6 @@ const startChat = (db, user1Id, user2Id) => {
 
 function deletePreviousPicture(filename) {
   const filePath = path.join(__dirname, "../images/", filename);
-
   if (fs.existsSync(filePath)) {
     fs.unlink(filePath, (error) => {
       if (error) {
@@ -876,7 +873,9 @@ async function updateUserDetails(db,updatedUserDetails) {
       } else {
         if (results.length > 0 && results[0].picture !== updatedUserDetails.picture) {
           const previousPictureFilename = results[0].picture;
-          deletePreviousPicture(previousPictureFilename);
+          if(!previousPictureFilename === 'default.jpg'){
+            deletePreviousPicture(previousPictureFilename);
+          }
         } else {
           console.log("No previous picture found in the user database.");
         }

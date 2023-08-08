@@ -149,7 +149,7 @@ export default function Register({ onClose, openLogin }) {
           })
           .then((response) => {
             if (response.data.fileUrl == null) {
-              setProfileUrl("default.png");
+              setProfileUrl("default.jpg");
             } else {
               const { fileUrl } = response.data;
               const pathname = new URL(fileUrl).pathname;

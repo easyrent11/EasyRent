@@ -18,7 +18,7 @@ export default function AddCar() {
   // create user navigate object.
   const navigate = useNavigate();
 
-  const { allCars, setAllCars } = useContext(AllCarsContext);
+  const {setAllCars } = useContext(AllCarsContext);
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
