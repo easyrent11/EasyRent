@@ -140,8 +140,8 @@ function App() {
                 )}
                 <Routes>
                   <Route path="/" element={<HomeLayout />} />
-                  <Route path="/CarView/:platesNumber" element={<CarView />} />
-                  <Route path="/CarOwnerView/:platesNumber" element={<CarOwnerView setAllCars={setAllCars} />} />
+                  <Route path="/CarView/:encryptedPlatesNumber" element={<CarView />} />
+                  <Route path="/CarOwnerView/:encryptedPlatesNumber" element={<CarOwnerView setAllCars={setAllCars} />} />
                   <Route path="/FAQ" element={<FAQ />} />
                   <Route path="/ContactUs" element={<ContactUs />} />
                   <Route path="/AddCar" element={<AddCar />} />

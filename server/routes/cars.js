@@ -56,15 +56,32 @@ router.put("/updatecardetails", async (req, res) => {
 
 // route for deleting old images of a car.
 router.post("/deleteoldimages", async (req, res) => {
-  const {platesNumber} = req.body;
+  const { platesNumber } = req.body;
   try {
-    const result = await carServices.deleteCarPictures(
-      db,
-      platesNumber
-    );
+    const result = await carServices.deleteCarPictures(db, platesNumber);
     res.json({ message: `${result}` });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete previous car images." });
+  }
+});
+
+// Route for deleting a car along with its images
+router.delete("/deletecar/:platesNumber", async (req, res) => {
+  const { platesNumber } = req.params;
+  try {
+    // Delete car images first
+    const result = await carServices.deleteCarPictures(db, platesNumber);
+
+    // Now delete the car from the cars table
+    const deleteCarResult = await carServices.deleteCar(db, platesNumber);
+
+    if (deleteCarResult) {
+      res.json({ message: "Car and images deleted successfully" });
+    } else {
+      res.status(500).json({ message: "Failed to delete car" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete car and images" });
   }
 });
 // route for updating car images in the database.

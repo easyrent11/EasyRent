@@ -51,29 +51,6 @@ function getAllCarsWithImages() {
     });
   });
 }
-
-function getAllCarsWithImages() {
-  return new Promise((resolve, reject) => {
-    const query = `
-      SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
-      FROM cars AS c
-      LEFT JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
-      GROUP BY c.Plates_Number
-    `;
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Error retrieving cars:", error);
-        reject("Error retrieving cars");
-      } else {
-        const carsWithImages = results.map((car) => ({
-          ...car,
-          car_urls: car.car_urls ? car.car_urls.split(",") : [],
-        }));
-        resolve(carsWithImages);
-      }
-    });
-  });
-}
 /*
 #####################################################################
 #                      END OF SERVICE                               #
@@ -81,8 +58,38 @@ function getAllCarsWithImages() {
 */
 
 //#####################################################################
-//#                    DELETE CAR IMAGES SERVICE                      #
+//#                    DELETE CAR IMAGES AND CAR SERVICE              #
 //#####################################################################
+async function deleteCar(db, platesNumber) {
+  return new Promise((resolve, reject) => {
+    // We delete car pictures first
+    deleteCarPictures(db, platesNumber)
+      .then((deletePicturesResult) => {
+        // Now we delete the car from the cars table
+        db.query(
+          "DELETE FROM cars WHERE Plates_Number = ?",
+          [platesNumber],
+          (error, results) => {
+            if (error) {
+              reject("Failed to delete the car from the cars table.");
+            } else {
+              console.log(
+                results.affectedRows > 0
+                  ? "Car deleted successfully"
+                  : "Car not found or already deleted"
+              );
+              resolve(results.affectedRows > 0);
+            }
+          }
+        );
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
+
+
 async function deleteCarPictures(db, Plates_Number) {
   return new Promise((resolve, reject) => {
     db.query(
@@ -91,22 +98,19 @@ async function deleteCarPictures(db, Plates_Number) {
       (error, results) => {
         if (error) {
           reject("Failed to check if car images exist.");
-        } 
-        else 
-        {
-          if(results.length === 0){
+        } else {
+          if (results.length === 0) {
             resolve("No previous images were found.");
             return;
-          }
-          else{
+          } else {
             for (let i = 0; i < results.length; i++) {
-               deletePictureFromFolder(results[i].image_url);
+              deletePictureFromFolder(results[i].image_url);
             }
             const result = deletePictureFromDataBase(db, Plates_Number);
             console.log(
-            result
-              ? "Images deleted successfully"
-              : "Failed to delete the car images"
+              result
+                ? "Images deleted successfully"
+                : "Failed to delete the car images"
             );
             resolve(result);
           }
@@ -127,7 +131,9 @@ function deletePictureFromDataBase(db, Plates_Number) {
           reject(error);
         } else {
           if (results.length === 0) {
-            console.log("No images found in the database for the given Plates Number.");
+            console.log(
+              "No images found in the database for the given Plates Number."
+            );
             resolve(0);
           } else {
             db.query(
@@ -149,6 +155,7 @@ function deletePictureFromDataBase(db, Plates_Number) {
     );
   });
 }
+
 
 
 // helper function that takes a filename of a picture and deletes it from the images folder.
@@ -174,7 +181,7 @@ function deletePictureFromFolder(filename) {
 // Function to update car details
 function updateCarDetails(db, updatedCarDetails) {
   return new Promise((resolve, reject) => {
-    const { Manufacturer_Code, model_code, Plates_Number} = updatedCarDetails;
+    const { Manufacturer_Code, model_code, Plates_Number } = updatedCarDetails;
 
     // Check if the Manufacturer_Code exists in the car_manufacturer table
     const findManufacturerQuery = `SELECT * FROM car_manufacturer WHERE Manufacturer_Code = '${Manufacturer_Code}'`;
@@ -292,11 +299,16 @@ function updateCarDetails(db, updatedCarDetails) {
   });
 }
 
-
 async function getCarWithPlatesNumber(db, PlatesNumber) {
-  const query = `SELECT Manufacturer_Code, model_code, Plates_Number, Year, Color, Seats_Amount, Engine_Type, Transmission_type, Description, Rental_Price_Per_Day FROM cars WHERE Plates_Number = ${PlatesNumber}`;
+  const query = `
+  SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
+  FROM cars AS c
+  LEFT JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
+  WHERE c.Plates_Number = ?
+  GROUP BY c.Plates_Number;
+`  
   return new Promise((resolve, reject) => {
-    db.query(query, (error, results) => {
+    db.query(query,[PlatesNumber], (error, results) => {
       if (error) {
         reject(error);
       } else {
@@ -319,29 +331,31 @@ async function getCarsWithUserId(db, userId) {
   });
 }
 
-
 /*
 #####################################################################
 #             INSERT CAR IMAGES SERVICE                             #
 #####################################################################
 */
 
-function fetchAllCarImages(db,PlatesNumber){
-  return new Promise((resolve,reject) => {
-    if(!PlatesNumber){
+function fetchAllCarImages(db, PlatesNumber) {
+  return new Promise((resolve, reject) => {
+    if (!PlatesNumber) {
       reject("No plates number provided");
       return;
     }
-    db.query("SELECT image_url FROM car_images WHERE Plates_Number = ? ", [PlatesNumber], (error,results) => {
-      if(error){
-        reject("Failed to fetch car images");
+    db.query(
+      "SELECT image_url FROM car_images WHERE Plates_Number = ? ",
+      [PlatesNumber],
+      (error, results) => {
+        if (error) {
+          reject("Failed to fetch car images");
+        } else {
+          console.log(results);
+          resolve(results);
+        }
       }
-      else{
-        console.log(results);
-        resolve(results);
-      }
-    })
-  })
+    );
+  });
 }
 // Function to insert car images
 function insertCarImages(db, platesNumber, imageUrls) {
@@ -366,7 +380,6 @@ function insertCarImages(db, platesNumber, imageUrls) {
   return Promise.all(insertPromises);
 }
 
-
 module.exports = {
   getAllCarsWithImages,
   updateCarDetails,
@@ -376,4 +389,5 @@ module.exports = {
   deleteCarPictures,
   fetchAllCarImages,
   insertCarImages,
+  deleteCar,
 };

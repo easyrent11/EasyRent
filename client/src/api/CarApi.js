@@ -1,7 +1,6 @@
 import axios from 'axios';
 const BASE_URL = "http://localhost:3001/cars";
 
-
 //#######################################################################
 //                                Cars apis.                            #
 //#######################################################################
@@ -37,3 +36,7 @@ export const updateCarImages = (carDetails) => {
 export const deleteOldImages = (platesNumber) => {
   return axios.post(`${BASE_URL}/deleteoldimages`, platesNumber);
 }
+
+export const deleteCar = (platesNumber) => {
+  return axios.delete(`${BASE_URL}/deletecar/${platesNumber}`);
+};

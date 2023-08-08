@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useMemo } from "react";
 import { Carousel } from "@material-tailwind/react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -11,49 +11,67 @@ import axios from "axios";
 import { updateCarDetails } from "../api/CarApi";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
 import Select from "react-select";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { AllCarsContext } from "../contexts/AllCarsContext";
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes } from "react-icons/fa";
 import { deleteOldImages, updateCarImages, getCarImages } from "../api/CarApi";
-import {decryptData} from "../HelperFunctions/Encrypt";
+import { xorDecrypt } from "../HelperFunctions/Encrypt";
+import {getCar} from "../api/CarApi";
+import {notify} from "../HelperFunctions/Notify";
 
 export default function CarOwnerView() {
-  const notify = (status, message) =>
-    status === "success" ? toast.success(message) : toast.error(message);
+  const [editMode, setEditMode] = useState(false);
+  const [updatedManufacturerCode, setUpdatedManufacturerCode] = useState("");
+  const [updatedModelCode, setUpdatedModelCode] = useState("");
+  const [updatedYear, setUpdatedYear] = useState("");
+  const [updatedColor, setUpdatedColor] = useState("");
+  const [updatedSeatsAmount, setUpdatedSeatsAmount] = useState("");
+  const [updatedEngineType, setUpdatedEngineType] = useState("");
+  const [updatedTransmissionType, setUpdatedTransmissionType] = useState("");
+  const [updatedDescription, setUpdatedDescription] = useState("");
+  const [updatedRentalPrice, setUpdatedRentalPrice] = useState("");
+  const [uploadedImages, setUploadedImages] = useState(null);
+  const [car, setCar] = useState([]);
+
   let flag = false;
 
   const navigate = useNavigate();
 
-  const { allCars, setAllCars } = useContext(AllCarsContext);
-
+  const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
   //getting encrypted the plates number out of the paramaters that are passed in the car component.
   let { encryptedPlatesNumber } = useParams();
   // decryping the encrypted plates number from the parameters.
-  let platesNumber = decryptData(encryptedPlatesNumber);
-  // extracting the car from the car list using the plates Number to match it to the one we click on.
-  const car = allCars.find(
-    (car) => Number(car.Plates_Number) === Number(platesNumber)
-  );
-  const [editMode, setEditMode] = useState(false);
-  const [updatedManufacturerCode, setUpdatedManufacturerCode] = useState(
-    car.Manufacturer_Code
-  );
-  const [updatedModelCode, setUpdatedModelCode] = useState(car.model_code);
-  const [updatedYear, setUpdatedYear] = useState(car.Year);
-  const [updatedColor, setUpdatedColor] = useState(car.Color);
-  const [updatedSeatsAmount, setUpdatedSeatsAmount] = useState(
-    car.Seats_Amount
-  );
-  const [updatedEngineType, setUpdatedEngineType] = useState(car.Engine_Type);
-  const [updatedTransmissionType, setUpdatedTransmissionType] = useState(
-    car.Transmission_type
-  );
-  const [updatedDescription, setUpdatedDescription] = useState(car.Description);
-  const [updatedRentalPrice, setUpdatedRentalPrice] = useState(
-    car.Rental_Price_Per_Day
-  );
-  const [uploadedImages, setUploadedImages] = useState(null);
+  let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
+   // api call to fetch all car info based on plates number
+   useMemo(() => {
+    getCar(platesNumber)
+    .then((res) => {
+      setCar(res.data[0]);
+    })
+    .catch((error) => {
+      notify('error', error);
+    })
+  },[]);
+
+  const carImageUrls = useMemo(() => {
+    if (car && car.car_urls) {
+      return car.car_urls.split(",");
+    }
+    return [];
+  }, [car]);
+
+  useMemo(() => {
+    if (car) {
+      setUpdatedManufacturerCode(car.Manufacturer_Code || "");
+      setUpdatedModelCode(car.model_code || "");
+      setUpdatedYear(car.Year || "");
+      setUpdatedColor(car.Color || "");
+      setUpdatedSeatsAmount(car.Seats_Amount || "");
+      setUpdatedEngineType(car.Engine_Type || "");
+      setUpdatedTransmissionType(car.Transmission_type || "");
+      setUpdatedDescription(car.Description || "");
+      setUpdatedRentalPrice(car.Rental_Price_Per_Day || "");
+    }
+  }, [car]);
+
 
   const updateCarDetailsInDB = (images) => {
     const updatedCarDetails = {
@@ -84,8 +102,6 @@ export default function CarOwnerView() {
       updatedCarDetails.Plates_Number === car.Plates_Number;
     // if the user didnt make any changes exit edit mode and make no changes.
     if (equal) {
-      // update car images
-      console.log("Images=", images);
       if (images !== null) {
         const carDetails = {
           images: images,
@@ -240,16 +256,22 @@ export default function CarOwnerView() {
         <FaTimes className="mx-auto" />
       </button>
       <div className="w-full flex-col flex items-center m-2 border-2 border-blue-500 justify-centerm-2">
-        <Carousel className="w-4/5">
-          {car.car_urls.map((image, index) => (
-            <div className="w-full" key={index}>
-              <img
-                src={`http://localhost:3001/images/${image}`}
-                alt={`Car Pic ${index + 1}`}
-                className="h-full object-cover w-full rounded-lg"
-              />
-            </div>
-          ))}
+     <Carousel className="rounded-md">
+          {carImageUrls.length > 0 ? (
+            carImageUrls.map((imageUrl, index) => (
+              <figure key={index} className="rounded-xl">
+                <img
+                  src={`http://localhost:3001/images/${imageUrl}`}
+                  alt={`Car Pic ${index + 1}`}
+                  className="object-cover w-full h-80"
+                />
+              </figure>
+            ))
+          ) : (
+            <figure>
+              <img src="/images/noImages.png" alt="No Images" />
+            </figure>
+          )}
         </Carousel>
         {editMode && (
           <div className="w-1/4 m-6">
@@ -319,7 +341,9 @@ export default function CarOwnerView() {
                 </>
               ) : (
                 <div>
-                  <p className="m-2">{`Manufacturer : ${car.Manufacturer_Code}`} </p>
+                  <p className="m-2">
+                    {`Manufacturer : ${car.Manufacturer_Code}`}{" "}
+                  </p>
                   <p className="m-2">{`Model :  ${car.model_code}`} </p>
                 </div>
               )}
@@ -355,9 +379,9 @@ export default function CarOwnerView() {
               )}
             </p>
             <div className="flex flex-col  items-start justify-between">
-            <h3 className=" text-lg font-semibold mb-2">
-              Rental Price (Per Day) : 
-            </h3>
+              <h3 className=" text-lg font-semibold mb-2">
+                Rental Price (Per Day) :
+              </h3>
               <div className="flex items-center w-full justify-center ">
                 {editMode ? (
                   <input
@@ -368,7 +392,9 @@ export default function CarOwnerView() {
                   />
                 ) : (
                   <div>
-                    <p className="text-2xl font-bold m-2">{car.Rental_Price_Per_Day} USD</p>
+                    <p className="text-2xl font-bold m-2">
+                      {car.Rental_Price_Per_Day} USD
+                    </p>
                   </div>
                 )}
               </div>

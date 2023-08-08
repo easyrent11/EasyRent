@@ -1,20 +1,20 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Carousel } from "@material-tailwind/react";
-import { AllCarsContext } from "../contexts/AllCarsContext";
 import PersonIcon from "@mui/icons-material/Person";
 import { TbManualGearbox } from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
 import { getAllUserDetails } from "../api/UserApi";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { sendOrderRequest } from "../api/UserApi";
 import { useUserOrders } from "../contexts/UserOrdersContext";
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import {decryptData} from "../HelperFunctions/Encrypt";
-
+import { xorDecrypt } from "../HelperFunctions/Encrypt";
+import { notify } from "../HelperFunctions/Notify";
+import { getCar } from "../api/CarApi";
 export default function CarView() {
+  let flag = false;
+
   const navigate = useNavigate();
   const [startTime, setStartTime] = useState("10:00");
   const [endTime, setEndTime] = useState("10:00");
@@ -25,22 +25,34 @@ export default function CarView() {
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
   const [ownerId, setOwnerId] = useState("");
-  const notify = (status, message) =>
-    status === "success" ? toast.success(message) : toast.error(message);
-  let flag = false;
+  const [car, setCar] = useState([]);
 
-  const { allCars } = useContext(AllCarsContext);
   const { setUserRenteeOrders } = useUserOrders();
+  const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
-    //getting encrypted the plates number out of the paramaters that are passed in the car component.
-    let { encryptedPlatesNumber } = useParams();
-    // decryping the encrypted plates number from the parameters.
-    let platesNumber = decryptData(encryptedPlatesNumber);
+  //getting encrypted the plates number out of the paramaters that are passed in the car component.
+  let { encryptedPlatesNumber } = useParams();
+  // decryping the encrypted plates number from the parameters.
+  let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
   // extracting the car from the car list using the plates Number to match it to the one we click on.
-  const car = allCars.find(
-    (car) => Number(car.Plates_Number) === Number(platesNumber)
-  );
+  useMemo(() => {
+    getCar(platesNumber)
+      .then((res) => {
+        setCar(res.data[0]);
+      })
+      .catch((error) => {
+        notify("error", error);
+      });
+  }, []);
 
+  const carImageUrls = useMemo(() => {
+    if (car && car.car_urls) {
+      return car.car_urls.split(",");
+    }
+    return [];
+  }, [car]);
+
+  console.log(car.car_urls);
   useEffect(() => {
     getAllUserDetails(car.Renter_Id)
       .then((result) => {
@@ -149,11 +161,11 @@ export default function CarView() {
       <section className="w-full max-w-3xl mt-10">
         {/* A Photo slider that has all the car images where we can select and view them */}
         <Carousel className="rounded-md">
-          {!flag ? (
-            car.car_urls.map((image, index) => (
+          {carImageUrls.length > 0 ? (
+            carImageUrls.map((imageUrl, index) => (
               <figure key={index} className="rounded-xl">
                 <img
-                  src={`http://localhost:3001/images/${image}`}
+                  src={`http://localhost:3001/images/${imageUrl}`}
                   alt={`Car Pic ${index + 1}`}
                   className="object-cover w-full h-80"
                 />
@@ -161,7 +173,7 @@ export default function CarView() {
             ))
           ) : (
             <figure>
-              <img src="/images/noImages.png" />
+              <img src="/images/noImages.png" alt="No Images" />
             </figure>
           )}
         </Carousel>
