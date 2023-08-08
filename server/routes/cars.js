@@ -70,12 +70,12 @@ router.delete("/deletecar/:platesNumber", async (req, res) => {
   const { platesNumber } = req.params;
   try {
     // Delete car images first
-    const result = await carServices.deleteCarPictures(db, platesNumber);
+    const result =  await carServices.deleteCarPictures(db, platesNumber);
 
     // Now delete the car from the cars table
     const deleteCarResult = await carServices.deleteCar(db, platesNumber);
 
-    if (deleteCarResult) {
+    if (deleteCarResult && result) {
       res.json({ message: "Car and images deleted successfully" });
     } else {
       res.status(500).json({ message: "Failed to delete car" });

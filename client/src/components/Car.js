@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PersonIcon from '@mui/icons-material/Person';
 import  {TbManualGearbox} from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
@@ -6,22 +6,24 @@ import {xorEncrypt} from "../HelperFunctions/Encrypt";
 import {deleteCar} from "../api/CarApi";
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { AllCarsContext } from '../contexts/AllCarsContext';
+import {notify} from "../HelperFunctions/Notify";
 
 export default function Car({car,btnText,navigationLocation}) {
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
- 
+  const {setAllCars} = useContext(AllCarsContext);
   const navigate = useNavigate();
   const handleDeleteClick = () => {
     const platesNumber = car.Plates_Number;
     if (window.confirm("Are you sure you want to delete this car?")) {
       deleteCar(platesNumber)
         .then(() => {
-          console.log("Car deleted successfully");
-          navigate("/UserProfile");
+        // Remove the deleted car from the AllCarsContext
+          setAllCars((prevCars) => prevCars.filter((c) => c.Plates_Number !== platesNumber));
+          notify("success", "Car Deleted Successfully");
         })
         .catch((error) => {
-          console.error("Failed to delete car:", error);
+          notify("error",`Failed To Delete Car ${error}`);
         });
     }
   };

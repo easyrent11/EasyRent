@@ -70,7 +70,7 @@ export default function Register({ onClose, openLogin }) {
     const validatePassword = (password) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(password);
     const validateGovernmentId = (governmentId) => /^\d{9}$/.test(governmentId);
     const validateDrivingLicense = (drivingLicense) => /^\d{9}$/.test(drivingLicense);
-    const validateStreetName = (streetName) => /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
+    // const validateStreetName = (streetName) => /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
     
     const validateForm = () => {
       let errors = {};
@@ -105,9 +105,9 @@ export default function Register({ onClose, openLogin }) {
       if (!validateDrivingLicense(drivingLicense)) {
         errors.drivingLicense = "Invalid driving license, it must be 9 digits";
       }
-      if(!validateStreetName(streetName)){
-        errors.streetName = "Invalid Street Name, must be only letters and spaces and digits"
-      }
+      // if(!validateStreetName(streetName)){
+      //   errors.streetName = "Invalid Street Name, must be only letters and spaces and digits"
+      // }
       return errors;
     };
 

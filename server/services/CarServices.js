@@ -96,6 +96,7 @@ async function deleteCarPictures(db, Plates_Number) {
       "SELECT image_url FROM car_images WHERE Plates_Number = ?",
       [Plates_Number],
       (error, results) => {
+        console.log(results);
         if (error) {
           reject("Failed to check if car images exist.");
         } else {
