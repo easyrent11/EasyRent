@@ -30,18 +30,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected`);
 
-  socket.on("join_notifications_room", (notificationsRoomId) => {
-    socket.join(notificationsRoomId);
-  });
-
-  socket.on("send_notification", (data) => {
-    saveNotificationToDB(data);
-    io.to(data.room).emit(
-      "receive_notification",
-      data
-    );
-  });
-
+ 
   socket.on("join_room", (data) => {
     socket.join(data);
   });

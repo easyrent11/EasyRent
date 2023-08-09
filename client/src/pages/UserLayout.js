@@ -1,4 +1,4 @@
-import React, { useContext, useState,useEffect } from 'react'
+import React, { useContext } from 'react'
 import AllCarsSection from '../components/AllCarsSection';
 import CarSortSection from "../components/CarSortSection";
 import CarFilterSection from '../components/CarFilterSection';
@@ -12,34 +12,7 @@ import { useUserOrders } from '../contexts/UserOrdersContext';
 export default function UserLayout() {
   const { userOrders, userRenteeOrders } = useUserOrders();
   const userDetails = useContext(UserProfileDetails);
-  const [notificationsRoomId,setNotificationsRoomId] = useState(null);
 
-  function joinNotificationsRoom(){
-    axios
-    .post("http://localhost:3001/user/joinnotificationsroom", userId)
-    .then((response) => {
-      console.log(response);
-      setNotificationsRoomId(response.data.room);
-      socket.emit("join_notifications_room", response.data.room);
-    })
-    .catch((error) => {
-      console.error("Error creating/retrieving chat room:", error);
-    });
-  }
-  if(localStorage.get('userId')){
-    joinNotificationsRoom();
-  }
-  
-  useEffect(() => {
-    // Add an event listener to receive notifications
-    socket.on("send_notification", (notification) => {
-      console.log(notification);
-    });
-
-    return () => {
-      socket.off("send_notification");
-    };
-  }, []);
   return (
     <>
         <h1 className="font-lobster text-6xl">Welcome {userDetails.userDetails.first_name} </h1>

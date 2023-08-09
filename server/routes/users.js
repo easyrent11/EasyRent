@@ -368,19 +368,7 @@ router.post("/startChat", async (req, res) => {
   }
 });
 
-router.post('/joinnotificationsroom', async(req,res) => {
-  let {userId} = req.body;
-  // convert userId from string to int.
-  userId = parseInt(userId);
-  try{
-    const result = await UserServices.joinNotificationsRoom(db, userId);
-    res.status(200).json(result);
-  }
-  catch (error) {
-    console.error("Error during chatroom start chat:", error);
-    res.status(401).json({ message: "Something went wrong" });
-  }
-})
+
 // multer function for uploading a single profile image.
 const upload = multer({
   dest: path.join(__dirname, "../images"),
