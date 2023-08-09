@@ -1,28 +1,28 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const carRoutes = require('./routes/cars');
-const userRoutes = require('./routes/users');
-const http = require('http');
-const{Server} = require('socket.io');
-const db = require('./models/db');
+const carRoutes = require("./routes/cars");
+const userRoutes = require("./routes/users");
+const http = require("http");
+const { Server } = require("socket.io");
+const db = require("./models/db");
 // defining the server port.
 const port = process.env.PORT || 3001;
 
-// middleware. 
+// middleware.
 app.use(cors());
 app.use(express.json());
 
-app.use('/images', express.static('images'));
-app.use('/cars', carRoutes);
-app.use('/user', userRoutes);
+app.use("/images", express.static("images"));
+app.use("/cars", carRoutes);
+app.use("/user", userRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors:{
-        origin:"http://localhost:3000",
-        methods:["GET","POST"],
-    },
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
 // the socket.io server for chat app.
@@ -30,13 +30,25 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected`);
 
+  socket.on("join_notifications_room", (notificationsRoomId) => {
+    socket.join(notificationsRoomId);
+  });
+
+  socket.on("send_notification", (data) => {
+    saveNotificationToDB(data);
+    io.to(data.room).emit(
+      "receive_notification",
+      data
+    );
+  });
+
   socket.on("join_room", (data) => {
-      socket.join(data);
-  })
+    socket.join(data);
+  });
   socket.on("send_message", (data) => {
     // Save the message in the database
     saveMessageToDB(data);
-    console.log("data we got",data);
+    console.log("data we got", data);
 
     // Emit the received message to all users in the chat room
     io.to(data.room).emit("receive_message", data);

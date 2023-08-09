@@ -791,6 +791,41 @@ const startChat = (db, user1Id, user2Id) => {
     });
   });
 };
+// function to join notifications room.
+const joinNotificationsRoom = (db, userId) => {
+  return new Promise((resolve, reject) => {
+    // Check if a chat room already exists between user1 and user2
+    const query = `SELECT notification_id  FROM notifications WHERE Id = ?`;
+    db.query(query, [userId], (error, results) => {
+      if (error) {
+        console.error("Error checking chat room:", error);
+        reject("Internal Server Error");
+      }
+
+      if (results.length > 0) {
+        // If a chat room exists, return its ID
+        resolve({ room: results[0].id });
+        console.log("res=",results);
+      } else {
+        // If a chat room doesn't exist, create a new one
+        const createQuery = `INSERT INTO notifications (Id) VALUES (?)`;
+        db.query(
+          createQuery,
+          [userId],
+          (createError, createResults) => {
+            if (createError) {
+              console.error("Error creating chat room:", createError);
+              reject("Internal Server Error");
+            }
+            console.log(createResults);
+            resolve({ room: createResults.insertId });
+          }
+        );
+      }
+    });
+  });
+};
+
 
 /*
 ##################################################################################
@@ -925,4 +960,5 @@ module.exports = {
   startChat,
   checkUserDetailsExist,
   updateUserDetails,
+  joinNotificationsRoom,
 };

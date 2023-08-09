@@ -127,7 +127,6 @@ export default function UserProfile() {
 
       };
       // Update user details
-      console.log(updatedDetailsWithoutPicture);
       updateUserDetails(updatedDetailsWithoutPicture);
     }
   };
