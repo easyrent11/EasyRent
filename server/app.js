@@ -30,17 +30,23 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected`);
 
- 
   socket.on("join_room", (data) => {
     socket.join(data);
   });
   socket.on("send_message", (data) => {
     // Save the message in the database
     saveMessageToDB(data);
-    console.log("data we got", data);
 
     // Emit the received message to all users in the chat room
     io.to(data.room).emit("receive_message", data);
+    // Listen for new message notifications and broadcast them to all clients
+    socket.on("new_message_notification", (notification) => {
+      // Broadcast the notification to all connected clients
+      io.to(notification.room).emit(
+        "receive_message_notification",
+        notification
+      );
+    });
   });
 });
 

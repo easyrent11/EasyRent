@@ -3,10 +3,7 @@ import { Carousel } from "@material-tailwind/react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCloudUploadAlt,
-  faPencilAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import {faCloudUploadAlt} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { updateCarDetails } from "../api/CarApi";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";

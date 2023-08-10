@@ -4,7 +4,6 @@ import { useNavigate,Link } from 'react-router-dom';
 const Orders = () => {
   const navigate = useNavigate();
   const { userOrders, userRenteeOrders } = useUserOrders();
-  console.log("orders made on your car",userOrders,"orders you made", userRenteeOrders);
   return (
     <div className="flex-1 p-4">
       <div className="mb-8">

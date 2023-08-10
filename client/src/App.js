@@ -33,6 +33,8 @@ import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
 import { UserOrdersProvider } from "./contexts/UserOrdersContext";
+import { MessageNotificationProvider } from "./contexts/MessageNotificationContext";
+
 
 // ########################################################################################
 // #                             Imports Of pages.                                        #
@@ -130,6 +132,7 @@ function App() {
         <AllCarsContext.Provider value={{ allCars, setAllCars }}>
           <UserProfileDetails.Provider value={{ userDetails, setUserDetails }}>
             <UserOrdersProvider>
+            <MessageNotificationProvider>
               <Router>
                 {notFound ? (
                   <PageNotFound handleNotFound={handleNotFound} />
@@ -187,6 +190,7 @@ function App() {
                 )}
                 <Footer />
               </Router>
+              </MessageNotificationProvider>
             </UserOrdersProvider>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>

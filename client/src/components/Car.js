@@ -4,7 +4,6 @@ import  {TbManualGearbox} from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
 import {xorEncrypt} from "../HelperFunctions/Encrypt";
 import {deleteCar} from "../api/CarApi";
-import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { AllCarsContext } from '../contexts/AllCarsContext';
 import {notify} from "../HelperFunctions/Notify";
@@ -12,7 +11,14 @@ import {notify} from "../HelperFunctions/Notify";
 export default function Car({car,btnText,navigationLocation}) {
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
   const {setAllCars} = useContext(AllCarsContext);
-  const navigate = useNavigate();
+  
+  // getting the ownerId of the car and checking if its the logged in user so we know if to display the Rent Now or not.
+  const loggedInUser = localStorage.getItem('userId');
+  const ownerIsLoggedUser = loggedInUser == car.Renter_Id;
+  // if the rentee is the same as the logged in user then we want to change the navigation location to the car owner section.
+  if(ownerIsLoggedUser){
+    navigationLocation = "/CarOwnerView";
+  }
   const handleDeleteClick = () => {
     const platesNumber = car.Plates_Number;
     if (window.confirm("Are you sure you want to delete this car?")) {
@@ -71,11 +77,12 @@ export default function Car({car,btnText,navigationLocation}) {
           <div className="flex items-center justify-between p-2">
             <p className="text-[#00215e]">₪{car.Rental_Price_Per_Day}/day</p>
             <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
-              <button className="bg-black text-white p-2 rounded-md">
-                {btnText}
-              </button>
+              {!ownerIsLoggedUser &&  <button className="bg-black text-white p-2 rounded-md">{btnText}</button>} 
             </Link>
+            {navigationLocation === '/CarOwnerView' && 
             <button onClick={handleDeleteClick} className='bg-red-500 m-2 text-white p-2 rounded-md'>Delete</button>
+            || ownerIsLoggedUser && <button onClick={handleDeleteClick} className='bg-red-500 m-2 text-white p-2 rounded-md'>Delete</button>
+            }
           </div>
         </div>
       </div>

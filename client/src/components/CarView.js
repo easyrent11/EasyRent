@@ -52,7 +52,6 @@ export default function CarView() {
     return [];
   }, [car]);
 
-  console.log(car.car_urls);
   useEffect(() => {
     getAllUserDetails(car.Renter_Id)
       .then((result) => {
