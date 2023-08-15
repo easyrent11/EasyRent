@@ -51,6 +51,7 @@ export default function UserNav({ handleLogout }) {
     notify("success","Successfully logged out");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem('isAdmin');
     handleLogout();
     navigate("/");
   };

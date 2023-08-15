@@ -1,5 +1,5 @@
 import {useNavigate } from 'react-router-dom';
-import useAuthentication from '../components/userAuthentication';
+import useAuthentication from './userAuthentication';
 
 export default function PrivateRoute({ component: Component,openLogin, ...rest }) {
   const { token } = useAuthentication();

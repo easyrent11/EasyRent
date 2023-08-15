@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const carRoutes = require("./routes/cars");
 const userRoutes = require("./routes/users");
+const adminRoutes = require("./routes/admin");
 const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./models/db");
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/images", express.static("images"));
 app.use("/cars", carRoutes);
 app.use("/user", userRoutes);
+app.use("/admin",adminRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {

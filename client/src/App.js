@@ -26,6 +26,10 @@ import Notifications from "./components/Notifications";
 import Reports from "./components/Reports";
 import CarOwnerView from "./components/CarOwnerView";
 import ChatApp from "./components/ChatApp";
+import PrivateAdminRoute from "./components/PrivateAdminRoute";
+import AdminDashboard from "./components/AdminDashBoard";
+import AdminProfile from "./components/AdminProfile";
+import AdminNav from "./components/AdminNavBar";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -39,11 +43,14 @@ import { UserOrdersProvider } from "./contexts/UserOrdersContext";
 // ########################################################################################
 import UserLayout from "./pages/UserLayout";
 import HomeLayout from "./pages/HomeLayout";
+import AdminPage from "./pages/AdminPage";
 // ########################################################################################
 // #                             IMPORTS OF API CALLS/HELPER FUNCTIONS.                   #
 // ########################################################################################
 import { getAllCars } from "./api/CarApi";
 import { getAllUserDetails } from "./api/UserApi";
+import AdminUsersList from "./components/AdminUsersList";
+import AdminOrders from "./components/AdminOrders";
 
 function App() {
   // ########################################################################################
@@ -131,10 +138,15 @@ function App() {
                 {notFound ? (
                   <PageNotFound handleNotFound={handleNotFound} />
                 ) : isLoggedIn ? (
-                  <UserNav handleLogout={handleLogout} />
+                  localStorage.getItem('isAdmin') === "true" ? (
+                    <AdminNav handleLogout={handleLogout} />
+                  ) : (
+                    <UserNav handleLogout={handleLogout} />
+                  )
                 ) : (
                   <NavBar openLogin={openLogin} openRegister={openRegister} />
                 )}
+
                 <Routes>
                   <Route path="/" element={<HomeLayout />} />
                   <Route
@@ -147,16 +159,48 @@ function App() {
                   />
                   <Route path="/FAQ" element={<FAQ />} />
                   <Route path="/ContactUs" element={<ContactUs />} />
-                  <Route path="/AddCar" element={<AddCar />} />
-                  <Route path="/UserProfile" element={<UserProfile />} />
-                  <Route path="/Orders" element={<Orders />} />
-                  <Route path="/ChatApp" element={<ChatApp />} />
+                  <Route
+                    path="/AddCar"
+                    element={
+                      <PrivateRoute openLogin={openLogin} component={AddCar} />
+                    }
+                  />
+                  <Route
+                    path="/UserProfile"
+                    element={
+                      <PrivateRoute
+                        openLogin={openLogin}
+                        component={UserProfile}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/Orders"
+                    element={
+                      <PrivateRoute openLogin={openLogin} component={Orders} />
+                    }
+                  />
+                  <Route
+                    path="/ChatApp"
+                    element={
+                      <PrivateRoute openLogin={openLogin} component={ChatApp} />
+                    }
+                  />
                   <Route
                     path="/Notifications/:orderId/:typeOfNotification"
-                    element={<Notifications />}
+                    element={
+                      <PrivateRoute
+                        openLogin={openLogin}
+                        component={Notifications}
+                      />
+                    }
                   />
-                  <Route path="/Reports/:orderId" element={<Reports />} />
-
+                  <Route
+                    path="/Reports/:orderId"
+                    element={
+                      <PrivateRoute openLogin={openLogin} component={Reports} />
+                    }
+                  />
                   <Route
                     path="/DisplaySearchResults"
                     element={<DisplaySearchResults />}
@@ -171,6 +215,54 @@ function App() {
                       />
                     }
                   />
+                  {/* Private route for the admin */}
+                  <Route
+                    path="/adminpage"
+                    element={
+                      <PrivateAdminRoute
+                        handleLogout={handleLogout}
+                        component={AdminPage}
+                      />
+                    }
+                  />
+                  <Route
+                    path="profile"
+                    element={
+                      <PrivateAdminRoute
+                        openLogin={openLogin}
+                        component={AdminProfile}
+                      />
+                    }
+                  />
+                  <Route
+                    path="dashboard"
+                    element={
+                      <PrivateAdminRoute
+                        openLogin={openLogin}
+                        component={AdminDashboard}
+                      />
+                    }
+                  />
+                  <Route
+                    path="users"
+                    element={
+                      <PrivateAdminRoute
+                        openLogin={openLogin}
+                        component={AdminUsersList}
+                      />
+                    }
+                  />
+                   <Route
+                    path="adminorders"
+                    element={
+                      <PrivateAdminRoute
+                        openLogin={openLogin}
+                        component={AdminOrders}
+                      />
+                    }
+                  />
+                  {/* End of private routes for admin */}
+
                   {/* catch all */}
                   <Route
                     path="*"

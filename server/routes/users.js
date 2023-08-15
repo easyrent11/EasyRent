@@ -127,6 +127,8 @@ router.put("/updateuserdetails",async (req, res) => {
 });
 
 
+
+
 router.post("/changepassword", (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
   console.log(userId, currentPassword, newPassword);
@@ -321,6 +323,19 @@ router.put("/changeorderstatus", async (req, res) => {
   }
 });
 
+router.put("/changeuserstatus",async(req,res) => {
+  const {userId,newStatus} = req.body;
+  console.log(userId,newStatus);
+  try{
+    const result = await UserServices.changeUserStatus(db,userId,newStatus);
+    console.log(result);
+    return res.json({message:"User status changed"});
+  }
+  catch{
+    return res.status(500).json({ error: "Internal server error" });
+  }
+})
+
 // Route to get all users.
 
 // Route to get messages for a specific chat room
@@ -353,6 +368,19 @@ router.get("/getAllUsers", (req, res) => {
       res.json(results);
     }
   });
+});
+
+router.get("/getlatestorders", (req, res) => {
+  const query = "SELECT * FROM orders ORDER BY Order_Date DESC LIMIT 5";
+  db.query(query, (error,results) => {
+    if(error){
+      console.error("Failed to retrieve latest orders.", error);
+      res.status(500).json({error:"Internal server error"});
+    }
+    else{
+      res.json(results);
+    }
+  })
 });
 
 router.post("/startChat", async (req, res) => {

@@ -20,9 +20,15 @@ export const addCar = (carInfo) => {
   return axios.post(`${BASE_URL_USER}/addcar`, carInfo);
 };
 
+export const getAllUsers = () => {
+  return axios.get(`${BASE_URL_USER}/getAllUsers`)
+}    
 export const searchCars = (requestData) => {
   return axios.post(`${BASE_URL_USER}/searchcar`, requestData);
 };
+export const getLatestOrders = () => {
+  return axios.get(`${BASE_URL_USER}/getlatestorders`);
+}
 
 export const sendOrderRequest = (orderInfo) => {
   return axios.post(`${BASE_URL_USER}/ordercar`, orderInfo);
@@ -40,6 +46,8 @@ export const getOrderById = (orderId) => {
   return axios.get(`${BASE_URL_USER}/orders/${orderId}`)
 }
 
+
+
 export const changeOrderStatus = (newOrderStatus) => {
   return axios.put(`${BASE_URL_USER}/changeorderstatus`,newOrderStatus);
 }
@@ -48,3 +56,6 @@ export const checkUserDetailsExist = (userDetails) => {
   return axios.post(`${BASE_URL_USER}/userdetailsexist`, userDetails);
 }
 
+export const changeUserStatus = (userDetails) => {
+  return axios.put(`${BASE_URL_USER}/changeuserstatus`, userDetails)
+}

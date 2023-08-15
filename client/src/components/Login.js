@@ -33,13 +33,25 @@ export default function Login({ onClose, handleLogin }) {
     // sending the login object to the backend and displaying the result .
     login(loginInfo)
       .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.userId);
+        const { token, userFirstName, userId, isAdmin } = res.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("userId", userId);
+        if(isAdmin){
+          localStorage.setItem('isAdmin', "true");
+        }
+        else{
+          localStorage.setItem('isAdmin', "false");
+        }
         notify("success", res.data.message);
         handleLogin(true);
         // get the user details after obtaining the userId.
         fetchUserDetails(res.data.userId);
-        navigate("/homepage");
+        if(isAdmin){
+          navigate("/adminpage");
+        }
+        else{
+          navigate("/homepage");
+        }
       })
       .catch((err) => {
         notify("error",err.response.data.message);

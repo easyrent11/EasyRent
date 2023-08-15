@@ -4,10 +4,10 @@ import axios from 'axios';
 
 const useAuthentication = () => {
   const navigate = useNavigate();
+  const isAdmin = localStorage.getItem('isAdmin') === "true";
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
     if (!token) {
       // User is not authenticated, redirect to login page or handle accordingly
       navigate('/');
@@ -18,12 +18,11 @@ const useAuthentication = () => {
   }, [navigate]);
 
 
-  const token = localStorage.getItem('token');
 
 
   return {
     token,
-    // user
+    isAdmin
   };
 };
 

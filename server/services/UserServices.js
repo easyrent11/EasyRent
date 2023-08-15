@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require('path');
-const fs = require('fs');
+const path = require("path");
+const fs = require("fs");
 // ########################################################################################
 // #                                ADD CAR SERVICE FUNCTIONS                             #
 // ########################################################################################
@@ -320,7 +320,6 @@ async function registerUser(db, userData) {
     last_name,
   } = userData;
 
-
   try {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -371,8 +370,8 @@ async function registerUser(db, userData) {
 
 // Function to retrieve user by email
 async function checkUserDetailsExist(db, userDetails) {
-  const {email,Id,phoneNumber, drivingLicense} = userDetails;
-  function checkIfEmailExists(){
+  const { email, Id, phoneNumber, drivingLicense } = userDetails;
+  function checkIfEmailExists() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM users WHERE email = ?";
       db.query(query, [email], (error, results) => {
@@ -425,34 +424,45 @@ async function checkUserDetailsExist(db, userDetails) {
     });
   }
 
-   // Call the helper functions and return a combined result
-   return Promise.all([checkIfEmailExists(), checkIfUserIdExists(), checkPhoneNumberExists(), checkIfDrivingLicenseExists()])
-   .then(([emailResults, userIdResults, phoneNumberResults,drivingLicenseResults]) => {
-    const result = {};
+  // Call the helper functions and return a combined result
+  return Promise.all([
+    checkIfEmailExists(),
+    checkIfUserIdExists(),
+    checkPhoneNumberExists(),
+    checkIfDrivingLicenseExists(),
+  ])
+    .then(
+      ([
+        emailResults,
+        userIdResults,
+        phoneNumberResults,
+        drivingLicenseResults,
+      ]) => {
+        const result = {};
 
-    if (emailResults.length > 0) {
-      result.email = true;
-    }
+        if (emailResults.length > 0) {
+          result.email = true;
+        }
 
-    if (userIdResults.length > 0) {
-      result.Id = true;
-    }
+        if (userIdResults.length > 0) {
+          result.Id = true;
+        }
 
-    if (phoneNumberResults.length > 0) {
-      result.phoneNumber = true;
-    }
+        if (phoneNumberResults.length > 0) {
+          result.phoneNumber = true;
+        }
 
-    if (drivingLicenseResults.length > 0) {
-      result.drivingLicense = true;
-    }
+        if (drivingLicenseResults.length > 0) {
+          result.drivingLicense = true;
+        }
 
-    return result;
-  })
-   .catch(error => {
-     console.error(error);
-     throw new Error("An error occurred while checking user details");
-   });
-  
+        return result;
+      }
+    )
+    .catch((error) => {
+      console.error(error);
+      throw new Error("An error occurred while checking user details");
+    });
 }
 
 /*
@@ -499,6 +509,9 @@ async function loginUser(db, email, password) {
     }
 
     const user = results[0];
+    if(user.status === "disabled"){
+      throw new Error("Your account was disabled, please check your email if this was a mistake let us know.");
+    }
 
     // Compare the provided password with the hashed password
     const passwordMatch = await comparePasswords(password, user.password);
@@ -509,12 +522,13 @@ async function loginUser(db, email, password) {
     //If we got here then password is correct, Generate a token with the userId
     const token = generateToken(user.Id, "1h");
 
-    // Return the token and user details
+    // Return the token, user details, and isAdmin status
     return {
       message: "Login successful",
       token,
       userFirstName: user.first_name,
       userId: user.Id,
+      isAdmin: user.isadmin, // Include the isAdmin status
     };
   } catch (error) {
     throw new Error(`error is :${error}`);
@@ -811,7 +825,7 @@ function deletePreviousPicture(filename) {
   }
 }
 
-async function updateUserProfile(db,updatedUserDetails) {
+async function updateUserProfile(db, updatedUserDetails) {
   return new Promise((resolve, reject) => {
     const updateUserQuery = `
       UPDATE users
@@ -838,7 +852,7 @@ async function updateUserProfile(db,updatedUserDetails) {
   });
 }
 
-async function insertCityAndThenUpdateUser(db,updatedUserDetails) {
+async function insertCityAndThenUpdateUser(db, updatedUserDetails) {
   return new Promise((resolve, reject) => {
     const insertCityQuery = `
       INSERT INTO cities (city_code, city_name)
@@ -862,7 +876,7 @@ async function insertCityAndThenUpdateUser(db,updatedUserDetails) {
   });
 }
 
-async function updateUserDetails(db,updatedUserDetails) {
+async function updateUserDetails(db, updatedUserDetails) {
   return new Promise(async (resolve, reject) => {
     const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
 
@@ -871,9 +885,12 @@ async function updateUserDetails(db,updatedUserDetails) {
         console.error("Error updating user profile:", error);
         reject("Could not find user old picture");
       } else {
-        if (results.length > 0 && results[0].picture !== updatedUserDetails.picture) {
+        if (
+          results.length > 0 &&
+          results[0].picture !== updatedUserDetails.picture
+        ) {
           const previousPictureFilename = results[0].picture;
-          if(!previousPictureFilename === 'default.jpg'){
+          if (!previousPictureFilename === "default.jpg") {
             deletePreviousPicture(previousPictureFilename);
           }
         } else {
@@ -890,14 +907,17 @@ async function updateUserDetails(db,updatedUserDetails) {
 
             if (cityExists) {
               try {
-                const message = await updateUserProfile(db,updatedUserDetails);
+                const message = await updateUserProfile(db, updatedUserDetails);
                 resolve(message);
               } catch (error) {
                 reject(error);
               }
             } else {
               try {
-                const message = await insertCityAndThenUpdateUser(db,updatedUserDetails);
+                const message = await insertCityAndThenUpdateUser(
+                  db,
+                  updatedUserDetails
+                );
                 resolve(message);
               } catch (error) {
                 reject(error);
@@ -910,7 +930,30 @@ async function updateUserDetails(db,updatedUserDetails) {
   });
 }
 
+/*
+##################################################################################
+#                       Service function to update change status                 #                            
+##################################################################################
+*/
 
+// Function to update user's status
+
+
+async function changeUserStatus(db, userId,newStatus) {
+  return new Promise((resolve, reject) => {
+    const query = `UPDATE users SET status = ? WHERE Id = ?`;
+
+
+    db.query(query,[newStatus,userId], (error, results) => {
+      if (error) {
+        console.error("Error updating user status:", error);
+        reject("Failed to update user status");
+      } else {
+        resolve("User status updated successfully");
+      }
+    });
+  });
+}
 
 module.exports = {
   registerUser,
@@ -925,4 +968,5 @@ module.exports = {
   startChat,
   checkUserDetailsExist,
   updateUserDetails,
+  changeUserStatus,
 };
