@@ -60,35 +60,49 @@ function getAllCarsWithImages() {
 //#####################################################################
 //#                    DELETE CAR IMAGES AND CAR SERVICE              #
 //#####################################################################
-async function deleteCar(db, platesNumber) {
+async function carExistsInOrders(db, platesNumber) {
+  platesNumber = Number(platesNumber);
   return new Promise((resolve, reject) => {
-    // We delete car pictures first
-    deleteCarPictures(db, platesNumber)
-      .then((deletePicturesResult) => {
-        // Now we delete the car from the cars table
-        db.query(
-          "DELETE FROM cars WHERE Plates_Number = ?",
-          [platesNumber],
-          (error, results) => {
-            if (error) {
-              reject("Failed to delete the car from the cars table.");
-            } else {
-              console.log(
-                results.affectedRows > 0
-                  ? "Car deleted successfully"
-                  : "Car not found or already deleted"
-              );
-              resolve(results.affectedRows > 0);
-            }
-          }
-        );
-      })
-      .catch((error) => {
-        reject(error);
-      });
+    db.query(
+      "SELECT * FROM orders WHERE Car_Plates_Number = ? AND `status` = 'accepted' ",
+      [platesNumber],
+      (error, results) => {
+        if (error) {
+          console.error("Error checking car plates number:", error);
+          reject("Failed to add car");
+        } else {
+          resolve(results);
+        }
+      }
+    );
   });
 }
 
+async function deleteCar(db, platesNumber) {
+  
+  platesNumber = Number(platesNumber);
+  return new Promise(async (resolve, reject) => {
+    // Now we delete the car from the cars table
+    db.query(
+      "DELETE FROM cars WHERE Plates_Number = ?",
+      [platesNumber],
+      (error, results) => {
+        if (error) {
+          reject("Failed to delete the car from the cars table.");
+        } else {
+          console.log(
+            results.affectedRows > 0
+              ? "Car deleted successfully"
+              : "Car not found or already deleted"
+          );
+          resolve(results.affectedRows > 0);
+        }
+      }
+    );
+  }).catch((error) => {
+    reject(error);
+  });
+}
 
 async function deleteCarPictures(db, Plates_Number) {
   return new Promise(async (resolve, reject) => {
@@ -103,17 +117,32 @@ async function deleteCarPictures(db, Plates_Number) {
             resolve("No previous images were found.");
             return;
           } else {
-            const imageUrls = results.map(result => result.image_url);
-            
+            const imageUrls = results.map((result) => result.image_url);
+
             // Check if there's only one image and its the default one.
-            if (imageUrls.length === 1 && imageUrls[0] === 'default-car.jpg') {
-              resolve("Car has no image only the default one Skipping deletion.");
+            if (imageUrls.length === 1 && imageUrls[0] === "default-car.jpg") {
+              // Delete the default image from the database
+              const deleteResult = await deletePictureFromDataBase(
+                db,
+                Plates_Number
+              );
+              if (deleteResult) {
+                console.log("Default image deleted from the database.");
+              } else {
+                console.log(
+                  "Failed to delete default image from the database."
+                );
+              }
+
+              resolve(
+                "Car has no image other than the default one. Skipping deletion."
+              );
               return;
             }
-            
+
             // Delete images from folder and database
             for (let i = 0; i < imageUrls.length; i++) {
-               deletePictureFromFolder(imageUrls[i]);
+              deletePictureFromFolder(imageUrls[i]);
             }
             const result = await deletePictureFromDataBase(db, Plates_Number);
             console.log(
@@ -165,8 +194,6 @@ function deletePictureFromDataBase(db, Plates_Number) {
     );
   });
 }
-
-
 
 // helper function that takes a filename of a picture and deletes it from the images folder.
 function deletePictureFromFolder(filename) {
@@ -316,9 +343,9 @@ async function getCarWithPlatesNumber(db, PlatesNumber) {
   LEFT JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
   WHERE c.Plates_Number = ?
   GROUP BY c.Plates_Number;
-`  
+`;
   return new Promise((resolve, reject) => {
-    db.query(query,[PlatesNumber], (error, results) => {
+    db.query(query, [PlatesNumber], (error, results) => {
       if (error) {
         reject(error);
       } else {
@@ -400,4 +427,5 @@ module.exports = {
   fetchAllCarImages,
   insertCarImages,
   deleteCar,
+  carExistsInOrders,
 };

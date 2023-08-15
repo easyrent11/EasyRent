@@ -39,14 +39,6 @@ io.on("connection", (socket) => {
 
     // Emit the received message to all users in the chat room
     io.to(data.room).emit("receive_message", data);
-    // Listen for new message notifications and broadcast them to all clients
-    socket.on("new_message_notification", (notification) => {
-      // Broadcast the notification to all connected clients
-      io.to(notification.room).emit(
-        "receive_message_notification",
-        notification
-      );
-    });
   });
 });
 

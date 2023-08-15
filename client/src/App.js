@@ -33,8 +33,6 @@ import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
 import { UserOrdersProvider } from "./contexts/UserOrdersContext";
-import { MessageNotificationProvider } from "./contexts/MessageNotificationContext";
-
 
 // ########################################################################################
 // #                             Imports Of pages.                                        #
@@ -57,7 +55,7 @@ function App() {
   const [notFound, setNotFound] = useState(false); // useState for when a page is not found.
   const [userDetails, setUserDetails] = useState(""); // useState to save all of the retrieved User Details.
   const [carList, setCarList] = useState([]); // useState to save all of the retrieved cars from the *USER SEARCH*.
-  const [allCars, setAllCars] = useState([]); // useState to save all of the cars in the database to display them 
+  const [allCars, setAllCars] = useState([]); // useState to save all of the cars in the database to display them
 
   // ########################################################################################
   // #                             OnClick Functions.                                       #
@@ -112,7 +110,7 @@ function App() {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    if(!userId){
+    if (!userId) {
       return;
     }
     getAllUserDetails(userId)
@@ -123,16 +121,12 @@ function App() {
       .catch((err) => console.log("Couldnt get user details ", err));
   }, []);
 
-
-  
-
   return (
     <>
       <SearchCarListResult.Provider value={{ carList, updateCarList }}>
         <AllCarsContext.Provider value={{ allCars, setAllCars }}>
           <UserProfileDetails.Provider value={{ userDetails, setUserDetails }}>
             <UserOrdersProvider>
-            <MessageNotificationProvider>
               <Router>
                 {notFound ? (
                   <PageNotFound handleNotFound={handleNotFound} />
@@ -143,8 +137,14 @@ function App() {
                 )}
                 <Routes>
                   <Route path="/" element={<HomeLayout />} />
-                  <Route path="/CarView/:encryptedPlatesNumber" element={<CarView />} />
-                  <Route path="/CarOwnerView/:encryptedPlatesNumber" element={<CarOwnerView setAllCars={setAllCars} />} />
+                  <Route
+                    path="/CarView/:encryptedPlatesNumber"
+                    element={<CarView />}
+                  />
+                  <Route
+                    path="/CarOwnerView/:encryptedPlatesNumber"
+                    element={<CarOwnerView setAllCars={setAllCars} />}
+                  />
                   <Route path="/FAQ" element={<FAQ />} />
                   <Route path="/ContactUs" element={<ContactUs />} />
                   <Route path="/AddCar" element={<AddCar />} />
@@ -155,10 +155,7 @@ function App() {
                     path="/Notifications/:orderId/:typeOfNotification"
                     element={<Notifications />}
                   />
-                  <Route
-                    path="/Reports/:orderId"
-                    element={<Reports />}
-                  />
+                  <Route path="/Reports/:orderId" element={<Reports />} />
 
                   <Route
                     path="/DisplaySearchResults"
@@ -183,14 +180,13 @@ function App() {
 
                 {/* conditional rendering login and register components. */}
                 {showLogin && (
-                  <Login handleLogin={handleLogin} onClose={closeLogin}/>
+                  <Login handleLogin={handleLogin} onClose={closeLogin} />
                 )}
                 {showRegister && (
                   <Register onClose={closeRegister} openLogin={openLogin} />
                 )}
                 <Footer />
               </Router>
-              </MessageNotificationProvider>
             </UserOrdersProvider>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>

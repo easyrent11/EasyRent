@@ -3,11 +3,9 @@ import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { FiSend } from "react-icons/fi";
 import io from "socket.io-client";
 import axios from "axios";
-import { useMessageNotification } from "../contexts/MessageNotificationContext";
 
 const socket = io.connect("http://localhost:3001");
 export default function ChatApp() {
-  const { setMessageNotifications } = useMessageNotification();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState(null);
@@ -86,17 +84,6 @@ export default function ChatApp() {
     socket.emit("send_message", { message, room, user_id: user1Id });
     // Clear the input field after sending the message
     setMessage("");
-    // Create a new message notification
-    const newNotification = {
-      room:room,
-      messageToUserId:selectedUser,
-      message: `New message from ${
-        users.find((user) => user.Id == user1Id)?.first_name || ""
-      }`,
-      // You can customize the message notification as needed
-    };
-
-    socket.emit("new_message_notification", newNotification);
   }
 
   useEffect(() => {
@@ -124,22 +111,6 @@ export default function ChatApp() {
       socket.off("receive_message");
     };
   }, [room]);
-
-  useEffect(() => {
-    // Add an event listener to receive message notifications
-    socket.on("receive_message_notification", (notification) => {
-      // Update the message notifications array
-      setMessageNotifications((prevNotifications) => [
-        ...prevNotifications,
-        notification,
-      ]);
-    });
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      socket.off("receive_message_notification");
-    };
-  }, []);
 
   return (
     <main

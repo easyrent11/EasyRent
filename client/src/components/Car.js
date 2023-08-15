@@ -23,10 +23,15 @@ export default function Car({car,btnText,navigationLocation}) {
     const platesNumber = car.Plates_Number;
     if (window.confirm("Are you sure you want to delete this car?")) {
       deleteCar(platesNumber)
-        .then(() => {
-        // Remove the deleted car from the AllCarsContext
+        .then((res) => {
+          if(res.data.exists){
+            notify("error", "The car exists in the orders, please check your orders");
+          }
+          else{
+          // Remove the deleted car from the AllCarsContext
           setAllCars((prevCars) => prevCars.filter((c) => c.Plates_Number !== platesNumber));
-          notify("success", "Car Deleted Successfully");
+            notify("success", res.message);
+          }
         })
         .catch((error) => {
           notify("error",`Failed To Delete Car ${error}`);

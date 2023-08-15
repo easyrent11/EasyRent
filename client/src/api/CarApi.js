@@ -40,3 +40,7 @@ export const deleteOldImages = (platesNumber) => {
 export const deleteCar = (platesNumber) => {
   return axios.delete(`${BASE_URL}/deletecar/${platesNumber}`);
 };
+
+export const carExistsInOrders = (platesNumber) => {
+  return axios.get(`${BASE_URL}/carexistsinorders/${platesNumber}`);
+};

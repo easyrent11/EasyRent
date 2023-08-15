@@ -65,25 +65,42 @@ router.post("/deleteoldimages", async (req, res) => {
   }
 });
 
-// Route for deleting a car along with its images
+
+
 router.delete("/deletecar/:platesNumber", async (req, res) => {
   const { platesNumber } = req.params;
   try {
-    // Delete car images first
-    const result =  await carServices.deleteCarPictures(db, platesNumber);
-
-    // Now delete the car from the cars table
-    const deleteCarResult = await carServices.deleteCar(db, platesNumber);
-
-    if (deleteCarResult && result) {
-      res.json({ message: "Car and images deleted successfully" });
+    const carExistsInOrders = await carServices.carExistsInOrders(db, platesNumber);
+    
+    if (carExistsInOrders.length > 0) {
+      res.status(200).json({exists:true});
     } else {
-      res.status(500).json({ message: "Failed to delete car" });
+      // Delete car images first
+      const result = await carServices.deleteCarPictures(db, platesNumber);
+      // Now delete the car from the cars table
+      const deleteCarResult = await carServices.deleteCar(db, platesNumber);
+      
+      if (deleteCarResult && result) {
+        res.json({ message: "Car and images deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete car" });
+      }
     }
   } catch (error) {
     res.status(500).json({ message: "Failed to delete car and images" });
   }
 });
+
+
+// router.get('/carexistsinorders/:platesNumber', async(req,res) => {
+//   const { platesNumber } = req.params;
+//   try {
+//     const result = await carServices.carExistsInOrders(db, platesNumber);
+//     res.json({ message: `${result}` });
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to check if car exists in orders." });
+//   }
+// })
 // route for updating car images in the database.
 router.post("/insertimages", async (req, res) => {
   const carDetails = req.body;
