@@ -37,22 +37,22 @@ export default function AdminUsersList() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="w-3/4">
-        <h1 className="text-3xl font-bold mb-4">All Users</h1>
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-200">            
-              <th className="border p-2 font-bold">Id </th>
-              <th className="border p-2 font-bold">First Name</th>
-              <th className="border p-2 font-bold">Last Name </th>
-              <th className="border p-2 font-bold">Email </th>
-              <th className="border p-2 font-bold">Driving License</th>
-              <th className="border p-2 font-bold">Phone Number</th>
-              <th className="border p-2 font-bold">Street Name</th>
-              <th className="border p-2 font-bold">Is Admin </th>
-              <th className="border p-2 font-bold">Status</th>
-              <th className="border p-2 font-bold">Change User Status</th>
+    <div className="flex-1 flex text-center items-center flex-col mt-8 border-2 border-red-500 justify-start">
+      <h1 className="text-3xl border-2 w-4/5 border-red-500 mt-8 font-bold ">Users List </h1>
+      <div className="w-4/5  rounded-lg mt-40">
+      <table className="w-full rounded-md  shadow-lg ">
+          <thead className="rounded-md">
+            <tr className="bg-black text-white">            
+              <th className="p-2 font-bold">Id </th>
+              <th className="p-2 font-bold">First Name</th>
+              <th className="p-2 font-bold">Last Name </th>
+              <th className="p-2 font-bold">Email </th>
+              <th className="p-2 font-bold">Driving License</th>
+              <th className="p-2 font-bold">Phone Number</th>
+              <th className="p-2 font-bold">Street Name</th>
+              <th className="p-2 font-bold">Is Admin </th>
+              <th className="p-2 font-bold">Status</th>
+              <th className="p-2 font-bold">Change User Status</th>
             </tr>
           </thead>
           <tbody>

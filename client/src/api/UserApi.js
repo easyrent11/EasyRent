@@ -26,9 +26,7 @@ export const getAllUsers = () => {
 export const searchCars = (requestData) => {
   return axios.post(`${BASE_URL_USER}/searchcar`, requestData);
 };
-export const getLatestOrders = () => {
-  return axios.get(`${BASE_URL_USER}/getlatestorders`);
-}
+
 
 export const sendOrderRequest = (orderInfo) => {
   return axios.post(`${BASE_URL_USER}/ordercar`, orderInfo);

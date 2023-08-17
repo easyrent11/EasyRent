@@ -7,7 +7,7 @@ import axios from "axios";
 import { notify } from "../HelperFunctions/Notify";
 
 
-export default function Register({ onClose, openLogin }) {
+export default function Register({ onClose, openLogin,setAllUsers }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -173,6 +173,7 @@ export default function Register({ onClose, openLogin }) {
             // After successful image upload, proceed with registration
             register(registerInfo)
               .then((res) => {
+                setAllUsers((prevUsers) => [...prevUsers, res.data.user]);
                 notify("success", res.data.message);
                 onClose();
               })

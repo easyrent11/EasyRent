@@ -23,6 +23,30 @@ code {
   min-height: 100vh;
 }
 
+
+/* Admin Layout */
+.admin-layout {
+  display: flex;
+  flex-direction: row; /* Align on left and right */
+  font-weight: 500;
+  width: 100%;
+  background-color: #f6f6f6;
+  scroll-behavior: smooth;
+  min-height: 100vh;
+}
+
+/* Default Layout */
+.default-layout {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  align-items: center;
+  width: 100%;
+  background-color: #FFFFFF;
+  scroll-behavior: smooth;
+  min-height: 100vh;
+}
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';

@@ -343,13 +343,13 @@ async function registerUser(db, userData) {
 
     if (cityExists) {
       // City already exists, update the user instead of inserting
-      const userResults = await insertUser(db, user);
-      return { results: userResults, message: "User registered successfully" };
+      await insertUser(db, user);
+      return { user: user, message: "User registered successfully" };
     } else {
       // City does not exist, insert the city and user
       await insertCity(db, city_code, city_name);
-      const userResults = await insertUser(db, user);
-      return { results: userResults, message: "User registered successfully" };
+      await insertUser(db, user);
+      return { user: user, message: "User registered successfully" };
     }
   } catch (error) {
     console.error("Error hashing password:", error);

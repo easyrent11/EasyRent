@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
 // Protected user page route. *****
 router.get("/homepage", verifyToken, (req, res) => {
   // Access user information from req.user
-  const { first_name, userId } = req.user;
+  const { first_name} = req.user;
 
   // Perform actions specific to the authenticated user
   res.json({ message: `Welcome, ${first_name}` });
@@ -125,9 +125,6 @@ router.put("/updateuserdetails",async (req, res) => {
     res.status(500).json({ error: "Failed to update user details" });
   }
 });
-
-
-
 
 router.post("/changepassword", (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
@@ -328,7 +325,6 @@ router.put("/changeuserstatus",async(req,res) => {
   console.log(userId,newStatus);
   try{
     const result = await UserServices.changeUserStatus(db,userId,newStatus);
-    console.log(result);
     return res.json({message:"User status changed"});
   }
   catch{

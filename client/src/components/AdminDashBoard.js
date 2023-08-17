@@ -1,90 +1,121 @@
-import React, { useState, useEffect } from "react";
-import { getAllUsers, getLatestOrders } from "../api/UserApi";
-import { getAllCars } from "../api/CarApi";
-import { format } from "date-fns";
-
-export default function AdminDashBoard() {
-  const [users, setUsers] = useState([]);
-  const [cars, setCars] = useState([]);
-  const [latestOrders, setLatestOrders] = useState([]);
+import React, { useState, useEffect} from "react";
+import {getOrdersStatistics,getBestSellerUserThisMonth} from "../api/AdminApi";
+import { FaUsers, FaCar } from "react-icons/fa";
+import {xorEncrypt} from "../HelperFunctions/Encrypt";
+import { Link } from "react-router-dom";
+export default function AdminDashBoard({users,cars}) {
+  const [orderStats, setOrderStats] = useState({});
+  const [selectedStatistic, setSelectedStatistic] = useState("today");
+  const [bestSeller,setBestSeller] = useState([]);
+  const userFirstName = bestSeller.first_name ? bestSeller.first_name : null;
 
   useEffect(() => {
-    // Fetch data using API functions and update state
     async function fetchData() {
       try {
-        const usersResponse = await getAllUsers();
-        const carsResponse = await getAllCars();
-        const latestOrdersResponse = await getLatestOrders();
-
-        setUsers(usersResponse.data);
-        setCars(carsResponse.data);
-        setLatestOrders(latestOrdersResponse.data);
+        const ordersStatsResponse = await getOrdersStatistics();
+        const bestSellerThisMonth = await getBestSellerUserThisMonth();
+        setOrderStats(ordersStatsResponse.data);
+        setBestSeller(bestSellerThisMonth.data.user);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
+
   }, []);
 
+  const handleStatisticChange = (statistic) => {
+    setSelectedStatistic(statistic);
+  };
+
+    // Wait for bestSeller to be populated before accessing its properties
+    const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+    const encryptedIdToString = bestSeller.Id ? bestSeller.Id.toString() : "";
+    const encryptedId = xorEncrypt(encryptedIdToString, secretKey);
+  
+ 
+ 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center mt-4">
-      <h1 className="text-2xl font-bold mb-4">Welcome Admin</h1>
+    <>
+      <div className="w-full m-2">
+        <h1 className="text-3xl self-start p-2 font-bold mb-4">Dashboard</h1>
+        <main className="min-h-screen w-4/5 mx-auto flex flex-col items-center">
+          <div className="flex items-center border-2 border-red-500 w-full justify-around">
+            {/* Display Total Users */}
+            <div className="bg-[#e8e8e8] m-4 h-40 w-60 rounded-lg p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Total Users</h2>
+                <p className="text-4xl">{users.length}</p>
+              </div>
+              <div >
+                <FaUsers color="#cc6200" size={40} />
+              </div>
+            </div>
+            {/*End of display Total Users */}
 
-      <div className="flex items-center justify-center">
-        {/* Display Total Users */}
-        <div className="bg-blue-200 m-4 rounded-md p-4">
-          <h2 className="text-lg font-semibold mb-2">Total Users</h2>
-          <p className="text-xl">{users.length}</p>
-        </div>
+             {/* Display Order Statistics */}
+             <div className="bg-[#e8e8e8] m-4  h-40  w-60 rounded-lg p-4 flex flex-col items-center justify-center">
+              <h2 className="text-lg font-semibold mb-2">Orders Made</h2>
+              <div className="flex items-center justify-between w-full">
+                <div
+                  className={`cursor-pointer ${
+                    selectedStatistic === "today" && "font-bold"
+                  }`}
+                  onClick={() => handleStatisticChange("today")}
+                >
+                  Today
+                </div>
+                <div
+                  className={`cursor-pointer ${
+                    selectedStatistic === "thisMonth" && "font-bold"
+                  }`}
+                  onClick={() => handleStatisticChange("thisMonth")}
+                >
+                  This Month
+                </div>
+                <div
+                  className={`cursor-pointer ${
+                    selectedStatistic === "thisYear" && "font-bold"
+                  }`}
+                  onClick={() => handleStatisticChange("thisYear")}
+                >
+                  This Year
+                </div>
+              </div>
+              <p className="text-4xl">{orderStats[`${selectedStatistic}`]}</p>
+            </div>
 
-        {/* Display Total Cars */}
-        <div className="bg-red-200 m-4 rounded-md p-4">
-          <h2 className="text-lg font-semibold mb-2">Total Cars</h2>
-          <p className="text-xl">{cars.length}</p>
-        </div>
-      </div>
 
-      {/* Display Latest Orders */}
-      <div className="w-full">
-        {latestOrders.length === 0 ? (
-          <p className="text-center text-2xl m-6">No orders available</p>
-        ) : (
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Latest Orders</h2>
-            <table className="w-full border">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="p-2 border">Order ID</th>
-                  <th className="p-2 border">Car Plates Number</th>
-                  <th className="p-2 border">Rentee ID</th>
-                  <th className="p-2 border">Start Time</th>
-                  <th className="p-2 border">End Time</th>
-                  <th className="p-2 border">Status</th>
-                  <th className="p-2 border">Renter ID</th>
-                  <th className="p-2 border">Order Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {latestOrders.map((order) => (
-                  <tr key={order.Order_Id}>
-                    <td className="p-2 border">{order.Order_Id}</td>
-                    <td className="p-2 border">{order.Car_Plates_Number}</td>
-                    <td className="p-2 border">{order.Rentee_id}</td>
-                    <td className="p-2 border">{order.Start_Time}</td>
-                    <td className="p-2 border">{order.End_Time}</td>
-                    <td className="p-2 border">{order.status}</td>
-                    <td className="p-2 border">{order.Renter_Id}</td>
-                    <td className="p-2 border">
-                      {format(new Date(order.Order_Date), "yyyy-MM-dd HH:mm:ss")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="bg-[#e8e8e8] h-40  m-4 w-60 rounded-lg p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Total Cars</h2>
+                <p className="text-4xl">{cars.length}</p>
+              </div>
+              <div >
+                <FaCar color="#cc6200" size={40} />
+              </div>
+            </div>
+       
+
+            
+          
+            <div className="bg-[#e8e8e8] h-40  m-4 w-60 rounded-lg p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Best seller of the month</h2>
+                <Link to={`/ViewUserProfile/${encryptedId}`}>
+                  <p className="text-4xl">{userFirstName} </p>
+                </Link>
+              </div>
+              <div >
+                <FaCar color="#cc6200" size={40} />
+              </div>
+            </div>
+
           </div>
-        )}
+
+        </main>
       </div>
-    </main>
+    </>
   );
 }
