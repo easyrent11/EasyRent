@@ -104,7 +104,7 @@ export default function AdminDashBoard({users,cars}) {
               <div>
                 <h2 className="text-lg font-semibold mb-1">Best seller of the month</h2>
                 <Link to={`/ViewUserProfile/${encryptedId}`}>
-                  <p className="text-4xl">{userFirstName} </p>
+                  <p className="text-4xl hover:text-[#cc6200]">{userFirstName} </p>
                 </Link>
               </div>
               <div >

@@ -64,36 +64,60 @@ async function carExistsInOrders(db, platesNumber) {
   platesNumber = Number(platesNumber);
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT * FROM orders WHERE Car_Plates_Number = ? AND `status` = 'accepted' ",
+      "SELECT * FROM orders WHERE Car_Plates_Number = ?",
       [platesNumber],
       (error, results) => {
         if (error) {
           console.error("Error checking car plates number:", error);
-          reject("Failed to add car");
+          reject("Failed to check car's status");
         } else {
-          resolve(results);
+          // Check if any orders were found for the car
+          if (results.length === 0) {
+            resolve(false);
+          } else {
+            // Get the current date and time
+            const currentDate = new Date();
+
+            // Check if there are any active orders for the car
+            const hasActiveOrders = results.some((order) => {
+              const orderStatus = order.status;
+              const orderEndDate = new Date(
+                order.End_Date + "T" + order.End_Time
+              );
+              console.log(orderEndDate);
+              return (
+                (orderStatus === "accepted" &&
+                  orderEndDate > currentDate) ||
+                orderStatus === "pending"
+              );
+            });
+
+            resolve(hasActiveOrders);
+          }
         }
       }
     );
   });
 }
 
+
+
+
 async function deleteCar(db, platesNumber) {
-  
   platesNumber = Number(platesNumber);
   return new Promise(async (resolve, reject) => {
-    // Now we delete the car from the cars table
+    // Now we update the status of the car in the cars table
     db.query(
-      "DELETE FROM cars WHERE Plates_Number = ?",
+      "UPDATE cars SET status = false WHERE Plates_Number = ?",
       [platesNumber],
       (error, results) => {
         if (error) {
-          reject("Failed to delete the car from the cars table.");
+          reject("Failed to update car status in the cars table.");
         } else {
           console.log(
             results.affectedRows > 0
-              ? "Car deleted successfully"
-              : "Car not found or already deleted"
+              ? "Car status updated successfully"
+              : "Car not found"
           );
           resolve(results.affectedRows > 0);
         }
@@ -103,6 +127,7 @@ async function deleteCar(db, platesNumber) {
     reject(error);
   });
 }
+
 
 async function deleteCarPictures(db, Plates_Number) {
   return new Promise(async (resolve, reject) => {

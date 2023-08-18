@@ -93,6 +93,76 @@ router.post("/searchcar", async (req, res) => {
   }
 });
 
+router.post("/reportuser",async (req,res) => {
+  const reportDetails = req.body;
+
+  try{
+    const result = await UserServices.handleReportUser(db,reportDetails);
+    console.log(result);
+    res.send(result);
+  }
+  catch(error){
+    res.status(500).send("Internal server error");
+  }
+})
+
+router.get('/reports', (req, res) => {
+  const getReportsQuery = `
+    SELECT 
+      reports.*, 
+      reported_users.first_name AS reported_first_name, 
+      reported_users.last_name AS reported_last_name,
+      reporting_users.first_name AS reporting_first_name,
+      reporting_users.last_name AS reporting_last_name
+    FROM 
+      reports 
+    JOIN 
+      users AS reported_users ON reports.Reported_User_Id = reported_users.Id 
+    JOIN
+      users AS reporting_users ON reports.Reporting_User_Id = reporting_users.Id 
+    WHERE 
+      Reported_User_Id IN (SELECT Id FROM users WHERE Report_Counter >= 3)
+  `;
+
+  db.query(getReportsQuery, (error, results) => {
+    if (error) {
+      res.status(500).json({ error: "Error fetching reports" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Route to get all reports for a specific user
+router.get('/reports/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const getReportsQuery = `
+    SELECT 
+      reports.*, 
+      reported_users.first_name AS reported_first_name, 
+      reported_users.last_name AS reported_last_name,
+      reporting_users.first_name AS reporting_first_name,
+      reporting_users.last_name AS reporting_last_name
+    FROM 
+      reports 
+    JOIN 
+      users AS reported_users ON reports.Reported_User_Id = reported_users.Id 
+    JOIN
+      users AS reporting_users ON reports.Reporting_User_Id = reporting_users.Id 
+    WHERE 
+      Reported_User_Id = ?
+  `;
+
+  db.query(getReportsQuery, [userId], (error, results) => {
+    if (error) {
+      res.status(500).json({ error: "Error fetching user reports" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 // Route for getting all user details of a user based on the provided user id.
 router.get("/getuser/:id", (req, res) => {
   const userId = req.params.id;

@@ -26,6 +26,16 @@ export const getAllUsers = () => {
 export const searchCars = (requestData) => {
   return axios.post(`${BASE_URL_USER}/searchcar`, requestData);
 };
+export const getAllReports = () => {
+  return axios.get(`${BASE_URL_USER}/reports`);
+}
+export const getUserReports = (userId) => {
+  return axios.get(`${BASE_URL_USER}/reports/${userId}`)
+}
+
+export const reportUser = (reportDetails) => {
+  return axios.post(`${BASE_URL_USER}/reportuser`)
+}
 
 
 export const sendOrderRequest = (orderInfo) => {

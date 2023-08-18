@@ -1,0 +1,93 @@
+import React, { useState, useEffect } from "react";
+import { getAllReports } from "../api/UserApi";
+import { xorEncrypt } from "../HelperFunctions/Encrypt";
+
+export default function AdminUserReports() {
+    const [reports, setReports] = useState([]);
+
+    const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+  
+    const handleSelectUser = (userId) => {
+        const encryptedIdToString = userId ? userId.toString() : "";
+        const encryptedId = xorEncrypt(encryptedIdToString, secretKey);
+
+        if (encryptedId) {
+          const url = `/UserReportsView/${encryptedId}`;
+          window.location.href = url;
+        }
+      };
+  
+    useEffect(() => {
+      fetchReports();
+    }, []);
+  
+    const fetchReports = async () => {
+      try {
+        const response = await getAllReports();
+        setReports(response.data);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      }
+    };
+
+    const userReports = {}; // To store user IDs and their report counts
+
+    reports.forEach((report) => {
+        if (!userReports[report.Reported_User_Id]) {
+          userReports[report.Reported_User_Id] = {
+            count: 1,
+            firstName: report.reported_first_name,
+            lastName: report.reported_last_name,
+          };
+        } else {
+          userReports[report.Reported_User_Id].count++;
+        }
+      });
+
+
+  
+    return (
+      <div className="flex border-2 border-red-500 w-full flex-col items-center ">
+        <h2 className="text-3xl font-bold m-20">Admin User Reports</h2>
+        <div className="w-1/2 flex flex-col border-2 mb-4 border-red-500 p-4 items-center justify-center">
+          <h3 className="text-lg font-bold mb-2">
+            Search User Reports via User Id
+          </h3>
+     
+        </div>
+        <div className="flex w-4/5  flex-wrap border-2 flex-1 border-blue-500 p-8 justify-around">
+          <div className="max-h-60 overflow-y-auto">
+            <table className="w-full text-center rounded-md shadow-lg">
+              <thead className="rounded-md bg-black text-white">
+                <tr>
+                  <th className="p-2 font-bold">Reported Person</th>
+                  <th className="p-2 font-bold">First Name</th>
+                  <th className="p-2 font-bold">Last Name</th>
+                  <th className="p-2 font-bold">Amount of Reports</th>
+                  <th className="p-2 font-bold">View All Reports</th>
+                </tr>
+              </thead>
+              <tbody>
+              {Object.keys(userReports).map((userId) => (
+                <tr key={userId}>
+                  <td>{userId}</td>
+                  <td>{userReports[userId].firstName}</td>
+                  <td>{userReports[userId].lastName}</td>
+                  <td>{userReports[userId].count}</td>
+                  <td>
+                    <button
+                      onClick={() => handleSelectUser(userId)}
+                      className="p-2 m-2 font-bold  bg rounded-md bg-black text-white hover:text-[#cc6200]"
+                    >
+                      View All Reports
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }

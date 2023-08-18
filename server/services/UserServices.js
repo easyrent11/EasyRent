@@ -954,6 +954,46 @@ async function changeUserStatus(db, userId,newStatus) {
     });
   });
 }
+async function handleReportUser(db, reportDetails) {
+  return new Promise((resolve, reject) => {
+    const insertQuery = "INSERT INTO reports (Reported_User_Id, Reporting_User_Id, Report_Cause, Message) VALUES (?, ?, ?, ?)";
+    const incrementCounterQuery = "UPDATE users SET Report_Counter = Report_Counter + 1 WHERE Id = ?";
+    
+    db.query(insertQuery, [reportDetails.reportedUserId, reportDetails.reportingUserId, reportDetails.reportCause, reportDetails.message], (insertError, insertResults) => {
+      if (insertError) {
+        reject("Error adding report");
+      } else {
+        db.query(incrementCounterQuery, [reportDetails.reportedUserId], (counterError, counterResults) => {
+          if (counterError) {
+            reject("Error incrementing user's report counter");
+          } else {
+            const checkCounterQuery = "SELECT Report_Counter FROM users WHERE Id = ?";
+            db.query(checkCounterQuery, [reportDetails.reportedUserId], (checkCounterError, checkCounterResults) => {
+              if (checkCounterError) {
+                reject("Error fetching user's report counter");
+              } else {
+                if (checkCounterResults[0].Report_Counter >= 3) {
+                  // Report counter reached 3 or more, return all reports for the reported user
+                  const allReportsQuery = "SELECT * FROM reports WHERE Reported_User_Id = ?";
+                  db.query(allReportsQuery, [reportDetails.reportedUserId], (reportsError, reportsResults) => {
+                    if (reportsError) {
+                      reject("Error fetching all reports");
+                    } else {
+                      resolve(reportsResults);
+                    }
+                  });
+                } else {
+                  resolve("Report added and user's counter updated");
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+}
+
 
 module.exports = {
   registerUser,
@@ -969,4 +1009,5 @@ module.exports = {
   checkUserDetailsExist,
   updateUserDetails,
   changeUserStatus,
+  handleReportUser,
 };

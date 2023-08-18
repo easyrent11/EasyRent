@@ -38,7 +38,7 @@ export const deleteOldImages = (platesNumber) => {
 }
 
 export const deleteCar = (platesNumber) => {
-  return axios.delete(`${BASE_URL}/deletecar/${platesNumber}`);
+  return axios.put(`${BASE_URL}/deletecar/${platesNumber}`);
 };
 
 export const carExistsInOrders = (platesNumber) => {

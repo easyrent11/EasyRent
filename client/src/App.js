@@ -30,6 +30,7 @@ import PrivateAdminRoute from "./components/PrivateAdminRoute";
 import AdminDashboard from "./components/AdminDashBoard";
 import AdminProfile from "./components/AdminProfile";
 import ViewUserProfile from "./components/ViewUserProfile";
+import AdminUserReports from "./components/AdminUserReports";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -50,6 +51,7 @@ import { getAllCars } from "./api/CarApi";
 import { getAllUserDetails,getAllUsers } from "./api/UserApi";
 import AdminUsersList from "./components/AdminUsersList";
 import AdminSideBar from "./components/AdminSideBar";
+import AdminUserReportsView from "./components/AdminUserReportsView";
 
 function App() {
   // ########################################################################################
@@ -269,6 +271,15 @@ function App() {
                         />
                       }
                     />
+                     <Route
+                      path="reports"
+                      element={
+                        <PrivateAdminRoute
+                          openLogin={openLogin}
+                          component={AdminUserReports}
+                        />
+                      }
+                    />
                    
                     <Route
                       path="users"
@@ -276,6 +287,15 @@ function App() {
                         <PrivateAdminRoute
                           openLogin={openLogin}
                           component={AdminUsersList}
+                        />
+                      }
+                    />
+                     <Route
+                      path="/UserReportsView/:encryptedId"
+                      element={
+                        <PrivateAdminRoute
+                          openLogin={openLogin}
+                          component={AdminUserReportsView}
                         />
                       }
                     />
