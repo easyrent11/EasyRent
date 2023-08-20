@@ -11,7 +11,7 @@ const adminNavigation = [
   { name: "Users", href: "/users" },
   { name: "Profile", href: "/profile" },
   { name: "Reports", href: "/reports" },
-  { name: "User Activity", href: "/useractivity" },
+  { name: "Chat History", href: "/chathistory"},
   { name: "Chat App", href: "/ChatApp" },
 ];
 

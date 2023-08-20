@@ -37,6 +37,13 @@ export const reportUser = (reportDetails) => {
   return axios.post(`${BASE_URL_USER}/reportuser`)
 }
 
+export const getMessagesForRoom = (room) => {
+  return axios.get(`${BASE_URL_USER}/messages/${room}`)
+}
+export const getRoomForUser = (userId) => {
+  return axios.get(`${BASE_URL_USER}/chatroom/${userId}`);
+}
+
 
 export const sendOrderRequest = (orderInfo) => {
   return axios.post(`${BASE_URL_USER}/ordercar`, orderInfo);

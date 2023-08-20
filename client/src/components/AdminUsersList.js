@@ -8,8 +8,8 @@ export default function AdminUsersList() {
     // Fetch all users from the database
     getAllUsers()
       .then((response) => {
-        setUsers(response.data);
-        console.log(response.data);
+        const filteredUsers = response.data.filter((user) => user.Id !== 121121121);
+        setUsers(filteredUsers);
       })
       .catch((error) => {
         console.error("Error fetching users:", error);

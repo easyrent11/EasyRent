@@ -26,11 +26,14 @@ import Notifications from "./components/Notifications";
 import Reports from "./components/Reports";
 import CarOwnerView from "./components/CarOwnerView";
 import ChatApp from "./components/ChatApp";
+// admin components.
 import PrivateAdminRoute from "./components/PrivateAdminRoute";
 import AdminDashboard from "./components/AdminDashBoard";
 import AdminProfile from "./components/AdminProfile";
 import ViewUserProfile from "./components/ViewUserProfile";
 import AdminUserReports from "./components/AdminUserReports";
+import AdminUserChatHistory from "./components/AdminUserChatHistory";
+import AdminChatHistory from "./components/AdminChatHistory";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -299,6 +302,25 @@ function App() {
                         />
                       }
                     />
+                     <Route
+                      path="/chathistory/:encryptedId" 
+                      element={
+                        <PrivateAdminRoute
+                          openLogin={openLogin}
+                          component={AdminUserChatHistory}
+                        />
+                      }
+                    />
+                      <Route
+                      path="/chathistory" 
+                      element={
+                        <PrivateAdminRoute
+                          openLogin={openLogin}
+                          component={AdminChatHistory}
+                        />
+                      }
+                    />
+
                     {/* End of private routes for admin */}
 
                     {/* catch all */}

@@ -409,7 +409,7 @@ router.get("/messages/:room", (req, res) => {
   const room = req.params.room;
 
   // Use your database query method to retrieve messages for the specified chat room
-  const query = `SELECT text AS message,chat_room_id as room, user_id FROM messages WHERE chat_room_id = ?`;
+  const query = `SELECT text AS message,chat_room_id as room, user_id,timestamp FROM messages WHERE chat_room_id = ?`;
   db.query(query, [room], (error, results) => {
     if (error) {
       console.error("Error retrieving messages:", error);
@@ -420,6 +420,20 @@ router.get("/messages/:room", (req, res) => {
     }
   });
 });
+
+router.get("/chatroom/:userId", (req,res) => {
+  const userId = req.params.userId;
+  const query = ("SELECT * FROM chat_rooms WHERE user1_id = ? or user2_id = ?");
+  db.query(query, [userId,userId], (error,results) => {
+    if(error){
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+   else {
+    // send the chat rooms of the user.
+    res.json(results);
+  }
+  })
+})
 
 router.get("/getAllUsers", (req, res) => {
   const query = "SELECT * from users";

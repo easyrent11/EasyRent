@@ -28,6 +28,9 @@ export default function AdminUserReportsView() {
       <Link to="/users">
         <h2 className='m-4 font-bold text-2xl'>User Reports for User ID: <span className="hover:text-[#cc6200]">{userId}</span></h2>
       </Link>
+      <Link to="/users" className='font-bold p-2 font-lg hover:text-[#cc6200]'>
+        View Chat History
+      </Link>
     
       <div className="max-h-60  overflow-y-auto">
         <table className="w-full text-center rounded-md shadow-lg">
@@ -42,8 +45,8 @@ export default function AdminUserReportsView() {
           <tbody>
             {userReports.map((report) => (
               <tr key={report.Id}>
-                <td className="border p-2">{report.reporting_first_name} {report.reporting_last_name}</td>
                 <td className="border p-2">{report.Reporting_User_Id}</td>
+                <td className="border p-2">{report.reporting_first_name} {report.reporting_last_name}</td>
                 <td className="border p-2">{report.Report_Cause}</td>
                 <td className="border p-2">{report.Message}</td>
               </tr>
