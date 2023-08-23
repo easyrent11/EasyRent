@@ -97,9 +97,91 @@ function getUserWithMostAcceptedOrdersThisMonth(db) {
   });
 }
 
+
+
+async function getGraphData(db) {
+  return new Promise((resolve, reject) => {
+    const ordersQuery = "SELECT * FROM orders";
+    const usersQuery = "SELECT * FROM users";
+    const carsQuery = "SELECT * FROM cars";
+
+    const graphData = {};
+
+    db.query(ordersQuery, (error, ordersResults) => {
+      if (error) {
+        console.error(error);
+        reject("Internal server error");
+        return;
+      }
+
+      const orderCreationDates = ordersResults.map(row => row.Order_Date);
+      graphData.orderCreationDates = orderCreationDates;
+
+      db.query(usersQuery, (error, usersResults) => {
+        if (error) {
+          console.error(error);
+          reject("Internal server error");
+          return;
+        }
+
+        const userRegistrationDates = usersResults.map(row => row.register_date);
+        graphData.userRegistrationDates = userRegistrationDates;
+
+        db.query(carsQuery, (error, carsResults) => {
+          if (error) {
+            console.error(error);
+            reject("Internal server error");
+            return;
+          }
+
+          const carRegistrationDates = carsResults.map(row => row.upload_date);
+          graphData.carRegistrationDates = carRegistrationDates;
+
+          resolve(graphData);
+        });
+      });
+    });
+  });
+}
+
+// Function to insert a user
+async function insertActivity(db, user_id, activity_type, details) {
+  const query = `
+  INSERT INTO activities (user_id, activity_type, details)
+  VALUES (?, ?, ?)
+`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [user_id, activity_type, details], (error, results) => {
+      if (error) {
+        reject("Failed to insert activity");
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
+async function getLatestActivities(db){
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM activities ORDER BY activity_time DESC LIMIT 10";
+    db.query(query,(error, results) => {
+      if (error) {
+        console.error(error);
+        reject("Internal server error");
+      } else {
+        console.log(resolve);
+        resolve(results);
+      }
+    });
+  });
+}
+
 module.exports = {
   getOrdersToday,
   getOrdersThisMonth,
   getOrdersThisYear,
   getUserWithMostAcceptedOrdersThisMonth,
+  getGraphData,
+  insertActivity,
+  getLatestActivities,
 };

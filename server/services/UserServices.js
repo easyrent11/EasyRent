@@ -220,7 +220,7 @@ async function addCar(db, carData) {
       Transmission_type,
       Description,
       Rental_Price_Per_Day,
-      Renter_Id
+      Renter_Id,
     );
     const addedCar = {
       Manufacturer_Code,
@@ -306,6 +306,8 @@ function insertUser(db, user) {
 
 // Function to register a user
 async function registerUser(db, userData) {
+  console.log(userData);
+
   const {
     id,
     phone_number,
@@ -993,6 +995,7 @@ async function handleReportUser(db, reportDetails) {
     });
   });
 }
+
 
 
 module.exports = {

@@ -14,10 +14,23 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// app.use("/",(req, res, next) => {
+//   console.log("Hello.... ");
+//   const ipAddress = req.ip; 
+
+
+//   console.log(ipAddress);
+
+//   next();
+// });
+
+
+
 app.use("/images", express.static("images"));
 app.use("/cars", carRoutes);
 app.use("/user", userRoutes);
 app.use("/admin",adminRoutes);
+
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -63,5 +76,7 @@ function saveMessageToDB(data) {
 
 // Listen for incoming connections on the same port for both Express app and Socket.IO
 server.listen(port, () => {
+ 
+  
   console.log(`Server listening on port ${port}`);
 });

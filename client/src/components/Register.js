@@ -5,9 +5,9 @@ import { Cities } from "../res/Cities";
 import Select from "react-select";
 import axios from "axios";
 import { notify } from "../HelperFunctions/Notify";
+import {insertActivity} from "../api/AdminApi";
 
-
-export default function Register({ onClose, openLogin,setAllUsers }) {
+export default function Register({ onClose, openLogin, setAllUsers }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,24 +54,31 @@ export default function Register({ onClose, openLogin,setAllUsers }) {
     return false;
   }
 
-
   const handleRegister = (e) => {
+    
+
     e.preventDefault();
 
     // Check if user details arent null
     if (userDetailsEmpty()) {
-      setErrorMessage("Please fill out all fields (picture is optional)")
+      setErrorMessage("Please fill out all fields (picture is optional)");
       return;
     }
     // Validation functions for register fields.
     const validateName = (name) => /^[a-zA-Z]{2,}$/.test(name);
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const validatePhoneNumber = (phoneNumber) => /^05\d{1}-?\d{7}$/.test(phoneNumber);
-    const validatePassword = (password) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(password);
+    const validatePhoneNumber = (phoneNumber) =>
+      /^05\d{1}-?\d{7}$/.test(phoneNumber);
+    const validatePassword = (password) =>
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(
+        password
+      );
     const validateGovernmentId = (governmentId) => /^\d{9}$/.test(governmentId);
-    const validateDrivingLicense = (drivingLicense) => /^\d{9}$/.test(drivingLicense);
-    // const validateStreetName = (streetName) => /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
-    
+    const validateDrivingLicense = (drivingLicense) =>
+      /^\d{9}$/.test(drivingLicense);
+    const validateStreetName = (streetName) =>
+      /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
+
     const validateForm = () => {
       let errors = {};
 
@@ -88,11 +95,13 @@ export default function Register({ onClose, openLogin,setAllUsers }) {
       }
 
       if (!validatePhoneNumber(phoneNumber)) {
-        errors.phoneNumber = "Invalid phone number,it must be an israeli phone number format";
+        errors.phoneNumber =
+          "Invalid phone number,it must be an israeli phone number format";
       }
 
       if (!validatePassword(password)) {
-        errors.password = "Invalid password, it must have both uppercase/lowercase letters, numbers and symbols";
+        errors.password =
+          "Invalid password, it must have both uppercase/lowercase letters, numbers and symbols";
       }
 
       if (password !== verifyPassword) {
@@ -105,19 +114,20 @@ export default function Register({ onClose, openLogin,setAllUsers }) {
       if (!validateDrivingLicense(drivingLicense)) {
         errors.drivingLicense = "Invalid driving license, it must be 9 digits";
       }
-      // if(!validateStreetName(streetName)){
-      //   errors.streetName = "Invalid Street Name, must be only letters and spaces and digits"
-      // }
+      if (!validateStreetName(streetName)) {
+        errors.streetName =
+          "Invalid Street Name, must be only letters and spaces and digits";
+      }
       return errors;
     };
 
     const errors = validateForm();
-    if(Object.keys(errors).length > 0){
+    if (Object.keys(errors).length > 0) {
       const errMsg = errors[Object.keys(errors)[0]];
       setErrorMessage(errMsg);
       return;
     }
- 
+
     // building the important user details to be checked if they exist or not.
     const userDetails = {
       email: email,
@@ -130,62 +140,73 @@ export default function Register({ onClose, openLogin,setAllUsers }) {
         const existingFields = res.data.results;
         if (Object.keys(existingFields).length > 0) {
           if (Object.keys(existingFields)[0] === "Id") {
-            setErrorMessage("The user already exists try logging in or resetting your password");
-          }
-          else {
+            setErrorMessage(
+              "The user already exists try logging in or resetting your password"
+            );
+          } else {
             setErrorMessage(`${Object.keys(existingFields)[0]} Already Exists`);
           }
           return;
         }
 
         const formData = new FormData();
+
         formData.append("profileImage", profilePicture);
-
         axios
-          .post("http://localhost:3001/user/uploadProfileImage", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            if (response.data.fileUrl == null) {
-              setProfileUrl("default.jpg");
-            } else {
-              const { fileUrl } = response.data;
-              const pathname = new URL(fileUrl).pathname;
-              const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
-              setProfileUrl(filename);
-            }
-
-            const registerInfo = {
-              id: governmentId,
-              phone_number: phoneNumber,
-              driving_license: drivingLicense,
-              picture: profileUrl,
-              email: email,
-              password: password,
-              city_code: city,
-              city_name: city_name,
-              street_name: streetName,
-              first_name: firstName,
-              last_name: lastName,
-            };
-            // After successful image upload, proceed with registration
-            register(registerInfo)
+        .post("http://localhost:3001/user/uploadProfileImage", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          if (response.data.fileUrl == null) {
+            setProfileUrl("default.jpg");
+          } else {
+            const { fileUrl } = response.data;
+            const pathname = new URL(fileUrl).pathname;
+            const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
+            setProfileUrl(filename);
+          }
+      
+          const registerInfo = {
+            id: governmentId,
+            phone_number: phoneNumber,
+            driving_license: drivingLicense,
+            picture: profileUrl === null ? "default.jpg" : profileUrl, 
+            email: email,
+            password: password,
+            city_code: city,
+            city_name: city_name,
+            street_name: streetName,
+            first_name: firstName,
+            last_name: lastName,
+          };
+      
+          // Move the register API call inside this block
+          register(registerInfo)
+            .then((res) => {
+              console.log(res.data);
+              setAllUsers((prevUsers) => [...prevUsers, res.data.user]);
+              const activityDetails = {
+                userId:registerInfo.id,
+                activity_type:"New User Registered",
+                details: `User ${registerInfo.id} registered to the website`
+              }
+              insertActivity(activityDetails)
               .then((res) => {
-                setAllUsers((prevUsers) => [...prevUsers, res.data.user]);
+                console.log(res.data);
                 notify("success", res.data.message);
-                onClose();
               })
-              .catch((err) => notify("error",err.data.message));
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+              .catch((error) => notify("error", error));
+              notify("success", res.data.message);
+              onClose();
+            })
+            .catch((err) => notify("error", err.data.message));
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      });
   };
 
   const toggleLogin = () => {

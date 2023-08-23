@@ -34,7 +34,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
   return (
     <>
       <nav className="flex flex-col w-2/12 items-center m-4 bg-white shadow-md rounded-md justify-start  p-4">
-        <div className="flex flex-col border-2 items-start justify-center border-red-500 ">
+        <div className="flex flex-col items-start justify-center  ">
           <div className="m-2 p-2 w-full flex items-center justify-start">
             <img
               src={`http://localhost:3001/images/${

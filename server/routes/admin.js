@@ -35,4 +35,39 @@ router.get("/bestmonthlyseller",async (req,res) => {
   }
 })
 
+router.get("/getgraphdata", async(req,res) => {
+  try{
+    const graphData = await AdminServices.getGraphData(db);
+    res.status(200).json({graphData:graphData});
+  }
+  catch(error){
+    res.status(500).json({error:"Internal Server Error"});
+  }
+})
+
+
+router.post('/logActivity',async (req, res) => {
+  const { user_id, activity_type, details } = req.body;
+  try{
+    await AdminServices.insertActivity(db,user_id, activity_type, details);
+    res.status(200).json({ message: 'Activity logged successfully.' });
+  }
+  catch(error){
+    res.status(500).json({error:"Internal Server Error"});
+  }
+});
+
+router.get("/getlatestactivities", async(req,res) => {
+  try{
+    const results = await AdminServices.getLatestActivities(db);
+    res.status(200).json({results});
+  }
+  catch(error){
+    res.status(500).json({error:"Internal Server Error"});
+  }
+})
+
+
+
+
 module.exports = router; 

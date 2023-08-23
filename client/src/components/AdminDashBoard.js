@@ -1,8 +1,11 @@
 import React, { useState, useEffect} from "react";
 import {getOrdersStatistics,getBestSellerUserThisMonth} from "../api/AdminApi";
 import { FaUsers, FaCar } from "react-icons/fa";
+import StatisticsGraph from "../components/StatisticsGraph";
 import {xorEncrypt} from "../HelperFunctions/Encrypt";
 import { Link } from "react-router-dom";
+import AdminOrdersStatisticsCircle from "../components/AdminOrdersStatisticsCircle";
+import AdminUserActivities from "./AdminUserActivities";
 export default function AdminDashBoard({users,cars}) {
   const [orderStats, setOrderStats] = useState({});
   const [selectedStatistic, setSelectedStatistic] = useState("today");
@@ -41,9 +44,9 @@ export default function AdminDashBoard({users,cars}) {
       <div className="w-full m-2">
         <h1 className="text-3xl self-start p-2 font-bold mb-4">Dashboard</h1>
         <main className="min-h-screen w-4/5 mx-auto flex flex-col items-center">
-          <div className="flex items-center border-2 border-red-500 w-full justify-around">
+          <div className="flex items-center  w-full justify-between">
             {/* Display Total Users */}
-            <div className="bg-[#e8e8e8] m-4 h-40 w-60 rounded-lg p-4 flex items-center justify-between">
+            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">Total Users</h2>
                 <p className="text-4xl">{users.length}</p>
@@ -55,7 +58,7 @@ export default function AdminDashBoard({users,cars}) {
             {/*End of display Total Users */}
 
              {/* Display Order Statistics */}
-             <div className="bg-[#e8e8e8] m-4  h-40  w-60 rounded-lg p-4 flex flex-col items-center justify-center">
+             <div className="bg-white  h-40 w-80 rounded-lg p-4 flex flex-col items-center justify-center">
               <h2 className="text-lg font-semibold mb-2">Orders Made</h2>
               <div className="flex items-center justify-between w-full">
                 <div
@@ -87,7 +90,7 @@ export default function AdminDashBoard({users,cars}) {
             </div>
 
 
-            <div className="bg-[#e8e8e8] h-40  m-4 w-60 rounded-lg p-4 flex items-center justify-between">
+            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">Total Cars</h2>
                 <p className="text-4xl">{cars.length}</p>
@@ -100,7 +103,7 @@ export default function AdminDashBoard({users,cars}) {
 
             
           
-            <div className="bg-[#e8e8e8] h-40  m-4 w-60 rounded-lg p-4 flex items-center justify-between">
+            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">Best seller of the month</h2>
                 <Link to={`/ViewUserProfile/${encryptedId}`}>
@@ -113,8 +116,21 @@ export default function AdminDashBoard({users,cars}) {
             </div>
 
           </div>
+          <div className="w-full ">
 
+            {/* Statistics graph for orders,users,cars amount each month. */}
+            <StatisticsGraph/>
+            <div className="flex items-center justify-between">
+              <div className="flex w-full ">
+                <AdminUserActivities/>
+                <AdminOrdersStatisticsCircle/>
+              </div>
+         
+            </div>
+
+          </div>
         </main>
+  
       </div>
     </>
   );

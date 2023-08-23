@@ -4,7 +4,7 @@ import { notify } from '../HelperFunctions/Notify';
 import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
 
 
-export default function AdminUserChatHistory({ userId }) {
+export default function AdminUserChatHistory({ userId,setShowChatHistory }) {
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -67,6 +67,10 @@ export default function AdminUserChatHistory({ userId }) {
 
   return (
     <div className='p-4 w-4/5 flex flex-col items-center'>
+      {setShowChatHistory  && 
+      <button className='p-2 bg-black text-white text-lg hover:bg-[#cc6200] rounded-md shadow-lg' onClick={() => setShowChatHistory(false)}>
+        Return To Reports</button>
+      }
       <h2 className='mt-8 mb-8 text-2xl font-bold'>Chat History for User {userId}</h2>
       <div className='flex items-center p-4 w-1/2 border border-black shadow-lg rounded-md bg-white justify-center flex-col'>
         <h3 className='mb-8 font-bold text-xl text-[#cc6200]'>Select a Chat Room to View Chat History</h3>

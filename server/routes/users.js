@@ -476,6 +476,18 @@ router.post("/startChat", async (req, res) => {
   }
 });
 
+router.get("/orders", async(req,res) => {
+  const query = "SELECT * FROM orders";
+  db.query(query, (error,results) => {
+    if(error){
+      console.error("Failed to retrieve  orders.", error);
+      res.status(500).json({error:"Internal server error"});
+    }
+    else{
+      res.json(results);
+    }
+  })
+})
 
 // multer function for uploading a single profile image.
 const upload = multer({

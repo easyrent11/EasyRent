@@ -8,17 +8,19 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { getCar } from "../api/CarApi";
-import {selectStyle} from "../res/SelectStyle";
+import { selectStyle } from "../res/SelectStyle";
 import { notify } from "../HelperFunctions/Notify";
+import {insertActivity} from "../api/AdminApi";
 
 export default function AddCar() {
+ 
   // get the userId from the local storage. so we can send it with the car object
   const userId = localStorage.getItem("userId");
 
   // create user navigate object.
   const navigate = useNavigate();
 
-  const {setAllCars } = useContext(AllCarsContext);
+  const { setAllCars } = useContext(AllCarsContext);
 
   const sortedManufacturers = CarMakesAndModels.map((make) => ({
     value: make.brand,
@@ -38,7 +40,6 @@ export default function AddCar() {
   const [rentalPricePerDay, setRentalPricePerDay] = useState(0);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-
 
   const handleManufacturerChange = (selectedOption) => {
     setSelectedManufacturer(selectedOption);
@@ -161,6 +162,17 @@ export default function AddCar() {
                   // update the allCars state
                   setAllCars((prevCars) => [...prevCars, res.data.car]);
                   notify("success", res.data.message);
+                  const activityDetails = {
+                    userId:userId,
+                    activity_type:"New Car Inserted",
+                    details: `User ${userId} Added a new car to the website of type : ${carData.Manufacturer_Name}${carData.model_name}`
+                  }
+                  insertActivity(activityDetails)
+                  .then((res) => {
+                    console.log(res.data);
+                    notify("success", res.data.message);
+                  })
+                  .catch((error) => notify("error", error));
                   // navigate to the homepage after adding a car.
                   navigate("/homepage");
                 })
@@ -197,7 +209,6 @@ export default function AddCar() {
             options={manufacturers}
             placeholder="Select Manufacturer"
             styles={selectStyle}
-
           />
         </div>
 

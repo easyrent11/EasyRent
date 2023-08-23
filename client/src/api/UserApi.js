@@ -61,6 +61,9 @@ export const getOrderById = (orderId) => {
   return axios.get(`${BASE_URL_USER}/orders/${orderId}`)
 }
 
+export const getAllOrders = () => {
+  return axios.get(`${BASE_URL_USER}/orders`);
+}
 
 
 export const changeOrderStatus = (newOrderStatus) => {
