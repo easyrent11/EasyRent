@@ -135,7 +135,7 @@ export default function UserProfile() {
     axios
       .put("http://localhost:3001/user/updateuserdetails", updatedDetails)
       .then((response) => {
-        notify.success("success",`User details saved successfully: ${response.data}`);
+        notify("success",`${response.data}`);
         setEditing(false);
 
         // Update userDetails with the new updatedDetails

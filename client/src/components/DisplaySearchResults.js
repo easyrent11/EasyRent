@@ -9,7 +9,7 @@ export default function AllCarsSection() {
   const { allCars } = useContext(AllCarsContext);
   const [currentPage, setCurrentPage] = useState(1);
 
-  console.log("All cars", allCars);
+
 
   if (!allCars || allCars.length === 0) {
     return (

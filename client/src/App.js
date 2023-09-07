@@ -68,7 +68,6 @@ function App() {
   const [carList, setCarList] = useState([]); // useState to save all of the retrieved cars from the *USER SEARCH*.
   const [allCars, setAllCars] = useState([]); // useState to save all of the cars from the database to display them whenever needed.
   const [allUsers,setAllUsers] = useState([]); // useState to save all of the users fron the database to display them whenever needed.
-  // admin use states.
  
   // ########################################################################################
   // #                             OnClick Functions.                                       #

@@ -32,11 +32,13 @@ function checkIfCarExists(db, platesNumber) {
 function getAllCarsWithImages() {
   return new Promise((resolve, reject) => {
     const query = `
-      SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
-      FROM cars AS c
-      LEFT JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
-      GROUP BY c.Plates_Number
-    `;
+  SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
+  FROM cars AS c
+  LEFT JOIN car_images AS i ON c.Plates_Number = i.Plates_Number
+  WHERE c.status = 1
+  GROUP BY c.Plates_Number
+`;
+
     db.query(query, (error, results) => {
       if (error) {
         console.error("Error retrieving cars:", error);
@@ -86,8 +88,7 @@ async function carExistsInOrders(db, platesNumber) {
               );
               console.log(orderEndDate);
               return (
-                (orderStatus === "accepted" &&
-                  orderEndDate > currentDate) ||
+                (orderStatus === "accepted" && orderEndDate > currentDate) ||
                 orderStatus === "pending"
               );
             });
@@ -99,10 +100,7 @@ async function carExistsInOrders(db, platesNumber) {
     );
   });
 }
-
-
-
-
+// function that takes a car plates number and updates its status to false so it doesnt show in the user ui.
 async function deleteCar(db, platesNumber) {
   platesNumber = Number(platesNumber);
   return new Promise(async (resolve, reject) => {
@@ -127,7 +125,6 @@ async function deleteCar(db, platesNumber) {
     reject(error);
   });
 }
-
 
 async function deleteCarPictures(db, Plates_Number) {
   return new Promise(async (resolve, reject) => {

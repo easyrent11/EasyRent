@@ -103,6 +103,7 @@ router.put("/deletecar/:platesNumber", async (req, res) => {
 //     res.status(500).json({ message: "Failed to check if car exists in orders." });
 //   }
 // })
+
 // route for updating car images in the database.
 router.post("/insertimages", async (req, res) => {
   const carDetails = req.body;
