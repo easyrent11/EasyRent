@@ -489,6 +489,34 @@ router.get("/orders", async(req,res) => {
   })
 })
 
+router.get("/notifications/:userId", async(req,res) => {
+  const userId = req.params.userId;
+  const query = "SELECT * FROM notifications WHERE userId = ? AND isRead  = 0";
+  db.query(query,[userId], (error,results) => {
+    if(error){
+      console.error("Failed to retrieve  notifications for user.", error);
+      res.status(500).json({error:"Internal server error"});
+    }
+    else{
+      res.json(results);
+    }
+  })
+})
+
+router.put("/notifications/:notificationId", async(req,res) => {
+  const notificationId = req.params.notificationId;
+  try {
+    const result = await UserServices.markNotificationAsRead(db, notificationId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error during marking notification as read", error);
+    res.status(401).json({ message: "Something went wrong" });
+  }
+})
+
+
+
+
 // multer function for uploading a single profile image.
 const upload = multer({
   dest: path.join(__dirname, "../images"),

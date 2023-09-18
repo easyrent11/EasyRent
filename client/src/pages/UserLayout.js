@@ -14,7 +14,8 @@ export default function UserLayout() {
   const userDetails = useContext(UserProfileDetails);
   const [filteredCars, setFilteredCars] = useState([...allCars]); // Copy allCars initially
 
- 
+  
+  
 
   function filterCars(filterOptions) {
     let filteredCars = [... allCars]; //copying the array.
@@ -80,6 +81,8 @@ export default function UserLayout() {
       filterCars(JSON.parse(localStorage.getItem('filterOptions')));
     }
   }, [allCars]);
+
+
 
   return (
     <>

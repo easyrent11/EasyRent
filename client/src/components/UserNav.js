@@ -7,6 +7,9 @@ import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import NotificationDropdown from "./NotificationDropdown";
 import { notify } from "../HelperFunctions/Notify";
+import io from 'socket.io-client';
+import notificationSound from '../Assets/notificationsound.mp3'; // notification audio mp3
+import { getUserNotifications } from "../api/UserApi";
 
 const navigation = [
   { name: "Dashboard", href: "/homepage", current: true },
@@ -21,14 +24,73 @@ function classNames(...classes) {
 }
 
 export default function UserNav({ handleLogout }) {
-  const { readNotifications, markNotificationAsRead } = useUserOrders();
   const { userOrders, userRenteeOrders } = useUserOrders();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userDetails } = useContext(UserProfileDetails);
+  const [notifications, setNotifications] = useState([]);
+  const [socket, setSocket] = useState(null);
+  // Create a hidden audio element
+  const [notificationAudio] = useState(() => {
+    const audio = new Audio(notificationSound);
+    audio.style.display = 'none'; // Hide the audio element
+    document.body.appendChild(audio); // Add the audio element to the DOM
+    return audio;
+  });
+
   const userProfileImage = userDetails.picture;
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
+  const userId = parseInt(localStorage.getItem('userId'));
+
+  useEffect(() => {
+    getUserNotifications(userDetails.Id)
+    .then((res) => {
+      setNotifications(res.data);
+      console.log(res.data);
+    })
+    .catch((error) => {
+      notify('error', error);
+    })
+  },[userDetails]);
+
+
+  useEffect(() => {
+    // Connect to the Socket.IO server and authenticate
+    const socket = io.connect("http://localhost:3001");
+
+    if (userId) {
+      socket.emit('authenticate', userId);
+    }
+
+    // Handle incoming notifications
+    socket.on('notification', (notification) => {
+      console.log(notification);
+      setNotifications((prevNotifications) => [...prevNotifications, notification]);
+      // Play the notification sound when a new notification arrives
+      simulateAudioClick(notificationAudio);
+    });
+
+    setSocket(socket);
+
+    // Clean up when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [userId]);
+
+  // Function to simulate a click event on the audio element
+  const simulateAudioClick = (audioElement) => {
+    if (audioElement) {
+      try {
+        audioElement.play();
+      } catch (error) {
+        console.error('Failed to play audio:', error);
+      }
+    }
+  };
 
 
 
@@ -48,7 +110,7 @@ export default function UserNav({ handleLogout }) {
   }, []);
 
   const logout = () => {
-    notify("success","Successfully logged out");
+    notify("success", "Successfully logged out");
     localStorage.removeItem('token');
     localStorage.removeItem("userId");
     localStorage.removeItem('isAdmin');
@@ -56,11 +118,6 @@ export default function UserNav({ handleLogout }) {
     handleLogout();
     navigate("/");
   };
-
- 
-  
-  // Calculate the total number of notifications
-  const totalNotifications = userOrders.length + userRenteeOrders.length;
 
   return (
     <Disclosure as="nav" className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0">
@@ -110,9 +167,9 @@ export default function UserNav({ handleLogout }) {
                 >
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  {readNotifications.length > 0 && (
+                  {notifications.length > 0 && (
                     <span className="absolute top-0 right-9 p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                      {readNotifications.length}
+                      {notifications.length}
                     </span>
                   )}
                 </button>
@@ -186,8 +243,7 @@ export default function UserNav({ handleLogout }) {
                   className="absolute right-12 mt-10 top-3 w-48 origin-top-right bg-[#f4f4f4] p-4  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
                   <NotificationDropdown
-                    userOrders={userOrders}
-                    userRenteeOrders={userRenteeOrders}
+                    notifications={notifications}
                   />
                 </div>
               )}

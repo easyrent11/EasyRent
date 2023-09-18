@@ -77,3 +77,11 @@ export const checkUserDetailsExist = (userDetails) => {
 export const changeUserStatus = (userDetails) => {
   return axios.put(`${BASE_URL_USER}/changeuserstatus`, userDetails)
 }
+
+export const getUserNotifications = (userId) => {
+  return axios.get(`${BASE_URL_USER}/notifications/${userId}`);
+}
+
+export const markNotificationAsRead = (notificationId) => {
+  return axios.put(`${BASE_URL_USER}/notifications/${notificationId}`);
+}

@@ -12,7 +12,10 @@ import { Link } from "react-router-dom";
 import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { notify } from "../HelperFunctions/Notify";
 import { getCar } from "../api/CarApi";
+import io from 'socket.io-client';
+
 export default function CarView() {
+
   let flag = false;
 
   const navigate = useNavigate();
@@ -26,6 +29,7 @@ export default function CarView() {
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
   const [ownerId, setOwnerId] = useState("");
   const [car, setCar] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   const { setUserRenteeOrders } = useUserOrders();
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
@@ -35,6 +39,19 @@ export default function CarView() {
   // decryping the encrypted plates number from the parameters.
   let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
   // extracting the car from the car list using the plates Number to match it to the one we click on.
+ 
+  useEffect(() => {
+    const socket = io.connect("http://localhost:3001");
+    setSocket(socket);
+  
+    // Clean up when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+ 
   useMemo(() => {
     getCar(platesNumber)
       .then((res) => {
@@ -76,6 +93,8 @@ export default function CarView() {
   renteeId = renteeId ? parseInt(renteeId) : null;
 
   const sendCarOrderRequest = () => {
+    socket.emit('notification', {userId:ownerId, message: 'You have a new order on one of your cars', type:"order-notification"});
+
     // checking if the user provided the order details.
     if (!startDate || !endDate || !startTime || !endTime) {
       notify("error", "Error: Please fill in all required fields.");

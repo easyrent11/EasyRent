@@ -775,6 +775,19 @@ async function updateOrderStatus(db, orderId, status) {
   });
 }
 
+async function markNotificationAsRead(db,notificationId){
+  const query = `UPDATE notifications SET isRead = 1 WHERE id = ${notificationId}`;
+  return new Promise((resolve, reject) => {
+    db.query(query, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
 // function to start chat.
 const startChat = (db, user1Id, user2Id) => {
   return new Promise((resolve, reject) => {
@@ -1013,4 +1026,5 @@ module.exports = {
   updateUserDetails,
   changeUserStatus,
   handleReportUser,
+  markNotificationAsRead,
 };

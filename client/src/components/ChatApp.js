@@ -86,6 +86,8 @@ export default function ChatApp() {
 
   function sendMessage() {
     socket.emit("send_message", { message, room, user_id: user1Id });
+    socket.emit('notification', {userId:selectedUser, message: 'You have a new message', type:"recieve-message-notification"});
+
     setMessage("");
   }
 

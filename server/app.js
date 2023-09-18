@@ -14,17 +14,6 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// app.use("/",(req, res, next) => {
-//   console.log("Hello.... ");
-//   const ipAddress = req.ip; 
-
-
-//   console.log(ipAddress);
-
-//   next();
-// });
-
-
 
 app.use("/images", express.static("images"));
 app.use("/cars", carRoutes);
@@ -40,10 +29,15 @@ const io = new Server(server, {
   },
 });
 
-// the socket.io server for chat app.
+// socket io setup for real time notifications and chat app messages
+const usersToSockets = new Map();
 
 io.on("connection", (socket) => {
-  console.log(`⚡: ${socket.id} user just connected`);
+
+  socket.on('authenticate', (userId) => {
+    // Store user-to-socket mapping
+    usersToSockets.set(userId, socket);
+  });
 
   socket.on("join_room", (data) => {
     socket.join(data);
@@ -55,7 +49,44 @@ io.on("connection", (socket) => {
     // Emit the received message to all users in the chat room
     io.to(data.room).emit("receive_message", data);
   });
+
+  socket.on('notification', (notificationDetails) => {
+    saveNotificationToDataBase(notificationDetails); // saving the notification in db.
+    sendNotificationToUser(notificationDetails.userId, notificationDetails.message, notificationDetails.type); // send the notification to the reciever.
+  });
+
+  socket.on('disconnect', () => {
+    // Remove user-to-socket mapping on disconnect
+    for (const [user, userSocket] of usersToSockets.entries()) {
+      if (userSocket === socket) {
+        usersToSockets.delete(user);
+        break;
+      }
+    }
+  });
 });
+
+// To send a notification to a specific user
+function sendNotificationToUser(userId, message, type) {
+  const userSocket = usersToSockets.get(userId);
+  console.log("dgsdag=", userId,message,type)
+  if (userSocket) {
+    userSocket.emit('notification', {message,type});
+  }
+}
+
+function saveNotificationToDataBase(notificationDetails){
+  const {userId,message,type} = notificationDetails;
+  const query = `INSERT INTO notifications (userId,message,type) VALUES (? ,? ,?)`;
+  db.query(query, [userId,message,type], (error, results) => {
+    if (error) {
+      console.error("Error saving message:", error);
+    } else {
+      console.log("Message saved successfully!");
+    }
+  });
+}
+
 
 // Function to save the message in the database
 function saveMessageToDB(data) {

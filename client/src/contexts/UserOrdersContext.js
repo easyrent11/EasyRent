@@ -5,7 +5,7 @@ import { getOrdersByRenterId, getOrdersByRenteeId } from '../api/UserApi';
 
 const UserOrdersContext = createContext();
 
-export function useUserOrders() {
+export function useUserOrders() { 
   const context = useContext(UserOrdersContext);
   if (!context) {
     throw new Error('useUserOrders must be used within a UserOrdersProvider');
