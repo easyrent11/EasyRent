@@ -1,16 +1,13 @@
 import React, { useContext, useState } from "react";
-import { AllCarsContext } from "../contexts/AllCarsContext";
 import Car from "../components/Car";
 
 const carsPerPage = 4; // Number of cars to show per page
 
-export default function AllCarsSection() {
-  const { allCars } = useContext(AllCarsContext);
+export default function AllCarsSection({filteredCars}) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  console.log("All cars", allCars);
 
-  if (!allCars || allCars.length === 0) {
+  if (!filteredCars || filteredCars.length === 0) {
     return (
       <div className="flex items-center justify-center">
         <h2 className="font-bold text-2xl text-black">No cars Yet...</h2>
@@ -19,12 +16,12 @@ export default function AllCarsSection() {
   }
 
   // Calculate total number of pages
-  const totalPages = Math.ceil(allCars.length / carsPerPage);
+  const totalPages = Math.ceil(filteredCars.length / carsPerPage);
 
   // Get the cars to display for the current page
   const indexOfLastCar = currentPage * carsPerPage;
   const indexOfFirstCar = indexOfLastCar - carsPerPage;
-  const currentCars = allCars.slice(indexOfFirstCar, indexOfLastCar);
+  const currentCars = filteredCars.slice(indexOfFirstCar, indexOfLastCar);
 
   // Handle page navigation
   const handlePageChange = (pageNumber) => {
@@ -55,4 +52,4 @@ export default function AllCarsSection() {
       </div>
     </div>
   );
-}
+} 

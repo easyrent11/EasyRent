@@ -34,7 +34,7 @@ export const getUserReports = (userId) => {
 }
 
 export const reportUser = (reportDetails) => {
-  return axios.post(`${BASE_URL_USER}/reportuser`)
+  return axios.post(`${BASE_URL_USER}/reportuser`, reportDetails)
 }
 
 export const getMessagesForRoom = (room) => {

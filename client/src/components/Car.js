@@ -7,9 +7,14 @@ import {deleteCar} from "../api/CarApi";
 import { Link } from 'react-router-dom';
 import { AllCarsContext } from '../contexts/AllCarsContext';
 import {notify} from "../HelperFunctions/Notify";
+import { useNavigate } from 'react-router-dom';
 
 export default function Car({car,btnText,navigationLocation}) {
+  // creating a use navigate object to be able to navigate to different links.
+  const navigate = useNavigate();
+  // getting the secret key for encryption.
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+  // getting the set all cars function from the context.
   const {setAllCars} = useContext(AllCarsContext);
   
   // getting the ownerId of the car and checking if its the logged in user so we know if to display the Rent Now or not.
@@ -19,6 +24,7 @@ export default function Car({car,btnText,navigationLocation}) {
   if(ownerIsLoggedUser){
     navigationLocation = "/CarOwnerView";
   }
+  // function that handles the delete car click.
   const handleDeleteClick = () => {
     const platesNumber = car.Plates_Number;
     if (window.confirm("Are you sure you want to delete this car?")) {
@@ -38,8 +44,18 @@ export default function Car({car,btnText,navigationLocation}) {
         });
     }
   };
+  // function that handles the click on 'rent now' button or 'view car'
+  const handleBtnClick = () => {
+    if(!loggedInUser){
+      console.log('No user');
+      return;
+    }
+
+  }
 
   const encryptedPlatesNumber = xorEncrypt(car.Plates_Number.toString(), secretKey);
+
+
   return (
     
     <article className='flex border-2 border-red-500 w-1/2 h-1/2'>
@@ -82,7 +98,7 @@ export default function Car({car,btnText,navigationLocation}) {
           <div className="flex items-center justify-between p-2">
             <p className="text-[#00215e]">₪{car.Rental_Price_Per_Day}/day</p>
             <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
-              {!ownerIsLoggedUser &&  <button className="bg-black text-white p-2 rounded-md">{btnText}</button>} 
+              {!ownerIsLoggedUser &&  <button onClick={handleBtnClick} className="bg-black text-white p-2 rounded-md">{btnText}</button>} 
             </Link>
             {navigationLocation === '/CarOwnerView' && 
             <button onClick={handleDeleteClick} className='bg-red-500 m-2 text-white p-2 rounded-md'>Delete</button>

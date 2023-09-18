@@ -961,7 +961,7 @@ async function handleReportUser(db, reportDetails) {
     const insertQuery = "INSERT INTO reports (Reported_User_Id, Reporting_User_Id, Report_Cause, Message) VALUES (?, ?, ?, ?)";
     const incrementCounterQuery = "UPDATE users SET Report_Counter = Report_Counter + 1 WHERE Id = ?";
     
-    db.query(insertQuery, [reportDetails.reportedUserId, reportDetails.reportingUserId, reportDetails.reportCause, reportDetails.message], (insertError, insertResults) => {
+    db.query(insertQuery, [reportDetails.reportedUserId, reportDetails.reportingUserId, reportDetails.selectedReportCause, reportDetails.reportMessage], (insertError, insertResults) => {
       if (insertError) {
         reject("Error adding report");
       } else {

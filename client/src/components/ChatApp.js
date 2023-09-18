@@ -3,8 +3,10 @@ import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { FiSend } from "react-icons/fi";
 import io from "socket.io-client";
 import axios from "axios";
+import ReportUserView from "./ReportUserView";
 
 const socket = io.connect("http://localhost:3001");
+
 export default function ChatApp() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -13,10 +15,12 @@ export default function ChatApp() {
   const [selectedUser, setSelectedUser] = useState(null); // the selected user to chat with
   const { userDetails, setUserDetails } = useContext(UserProfileDetails);
   const user1Id = parseInt(localStorage.getItem("userId"));
+  const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
 
   useEffect(() => {
     displayAllUsers();
   }, [room]);
+
   function displayAllUsers() {
     axios
       .get("http://localhost:3001/user/getAllUsers")
@@ -32,6 +36,7 @@ export default function ChatApp() {
         console.error("Error fetching users:", error);
       });
   }
+
   function getSelectedUserImage(givenUserId) {
     const user = users.find((user) => user.Id == givenUserId);
 
@@ -42,6 +47,7 @@ export default function ChatApp() {
       return `http://localhost:3001/images/${userDetails.picture}`;
     }
   }
+
   function fetchMessagesForRoom() {
     if (room) {
       axios
@@ -57,7 +63,6 @@ export default function ChatApp() {
   }
 
   function startChat(user2Id) {
-    // Data to send to the backend for creating/retrieving the chat room
     const roomInfo = {
       user1Id: user1Id,
       user2Id: user2Id,
@@ -67,33 +72,28 @@ export default function ChatApp() {
       .post("http://localhost:3001/user/startChat", roomInfo)
       .then((response) => {
         setRoom(response.data.room);
-        setSelectedUser(user2Id); // Set the selected user when starting the chat
-        // Join the chat room on the frontend and add the "receive_message" event listener
+        setSelectedUser(user2Id);
         socket.emit("join_room", response.data.room);
       })
       .catch((error) => {
         console.error("Error creating/retrieving chat room:", error);
       });
   }
+
   useMemo(() => {
     fetchMessagesForRoom();
   }, [room]);
 
   function sendMessage() {
-    // Emit an event to the backend to save the message
     socket.emit("send_message", { message, room, user_id: user1Id });
-    // Clear the input field after sending the message
     setMessage("");
   }
 
   useEffect(() => {
-    // Add the event listener to receive messages
     socket.on("receive_message", (data) => {
-      // Update the room state if the received message is for a different room
       if (data.room !== room) {
         setRoom(data.room);
       }
-      // Add the received message to the frontend state (messages) if it's for the current room
       if (data.room === room) {
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -106,7 +106,6 @@ export default function ChatApp() {
       }
     });
 
-    // Clean up the event listener when the component unmounts
     return () => {
       socket.off("receive_message");
     };
@@ -117,8 +116,7 @@ export default function ChatApp() {
       className="min-h-screen flex justify-center w-4/5 border-2 bg-[#f6f6f6] show-lg rounded-md m-4"
       style={{ minHeight: "90vh" }}
     >
-      <div className="flex  w-full rounded-md shadow-lg">
-        {/* Left Section - List of Available Users */}
+      <div className="flex w-full rounded-md shadow-lg">
         <div className="w-1/4 p-4 border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <ul>
@@ -147,25 +145,34 @@ export default function ChatApp() {
           </ul>
         </div>
 
-        {/* Right Section - Chat Messages */}
-        <div className="flex flex-col flex-1  rounded-md">
+        <div className="flex flex-col flex-1 rounded-md">
           {room ? (
             <>
-              <h2 className="text-xl text-black font-bold flex rounded-md  p-2 items-center ">
+              <div className="flex items-center  rounded-md shadow-sm bg-[#f1f1f1] border p-2">
                 {users.find((user) => user.Id === selectedUser) ? (
-                  <img
-                    className="w-10 h-10 rounded-full mr-2"
-                    src={`http://localhost:3001/images/${
-                      users.find((user) => user.Id === selectedUser).picture
-                    }`}
-                    alt="User Avatar"
-                  />
+                  <div className="flex p-2 items-center">
+                    <img
+                      className="w-10 h-10 rounded-full mr-2"
+                      src={`http://localhost:3001/images/${
+                        users.find((user) => user.Id === selectedUser).picture
+                      }`}
+                      alt="User Avatar"
+                    />
+                    <p>
+                      {users.find((user) => user.Id === selectedUser).first_name}
+                    </p>
+                  </div>
                 ) : null}
-                <p>
-                  {users.find((user) => user.Id === selectedUser).first_name}
-                </p>
-              </h2>
-              <div className="rounded p-4  h-full ">
+                {selectedUser !== null && (
+                  <div
+                    className="ml-auto cursor-pointer"
+                    onClick={() => setShowReportMenuForUser(selectedUser)}
+                  >
+                    <p className="text-black p-2 text-lg font-bold ">Report User</p>
+                  </div>
+                )}
+              </div>
+              <div className="rounded p-4 h-full">
                 {messages.map((msg, index) => (
                   <div
                     key={index}
@@ -195,7 +202,7 @@ export default function ChatApp() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4  p-2 bg-white flex">
+              <div className="mt-4 p-2 bg-white flex">
                 <input
                   placeholder="Message"
                   value={message}
@@ -219,6 +226,13 @@ export default function ChatApp() {
           )}
         </div>
       </div>
+      {showReportMenuForUser !== null && (
+        <ReportUserView
+          reportedUserId={showReportMenuForUser}
+          reportingUserId={user1Id}
+          setShowReportMenuForUser={setShowReportMenuForUser}
+        />
+      )}
     </main>
   );
 }

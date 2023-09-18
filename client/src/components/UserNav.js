@@ -13,7 +13,7 @@ const navigation = [
   { name: "Share your car", href: "/AddCar", current: false },
   { name: "Orders", href: "/Orders", current: false },
   { name: "Chat", href: "/chatapp", current: false },
-  // { name: "Contact Us", href: "/ContactUs", current: false },
+  { name: "Contact Us", href: "#footer", current: false },
 ];
 
 function classNames(...classes) {
@@ -49,9 +49,10 @@ export default function UserNav({ handleLogout }) {
 
   const logout = () => {
     notify("success","Successfully logged out");
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     localStorage.removeItem("userId");
     localStorage.removeItem('isAdmin');
+    localStorage.removeItem('filterOptions');
     handleLogout();
     navigate("/");
   };

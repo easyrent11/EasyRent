@@ -95,10 +95,10 @@ router.post("/searchcar", async (req, res) => {
 
 router.post("/reportuser",async (req,res) => {
   const reportDetails = req.body;
+  console.log(reportDetails);
 
   try{
     const result = await UserServices.handleReportUser(db,reportDetails);
-    console.log(result);
     res.send(result);
   }
   catch(error){
