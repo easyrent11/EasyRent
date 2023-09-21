@@ -24,18 +24,11 @@ function classNames(...classes) {
 }
 
 export default function UserNav({ handleLogout }) {
-  const { userOrders, userRenteeOrders } = useUserOrders();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userDetails } = useContext(UserProfileDetails);
   const [notifications, setNotifications] = useState([]);
   const [socket, setSocket] = useState(null);
-  // Create a hidden audio element
-  const [notificationAudio] = useState(() => {
-    const audio = new Audio(notificationSound);
-    audio.style.display = 'none'; // Hide the audio element
-    document.body.appendChild(audio); // Add the audio element to the DOM
-    return audio;
-  });
+
 
   const userProfileImage = userDetails.picture;
   const navigate = useNavigate();
@@ -67,8 +60,9 @@ export default function UserNav({ handleLogout }) {
     socket.on('notification', (notification) => {
       console.log(notification);
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
-      // Play the notification sound when a new notification arrives
-      simulateAudioClick(notificationAudio);
+      // Play the notification sound when a new notification arrives by auto clicking the button to handle chrome policies.
+      document.getElementById("audio").click()
+
     });
 
     setSocket(socket);
@@ -82,16 +76,9 @@ export default function UserNav({ handleLogout }) {
   }, [userId]);
 
   // Function to simulate a click event on the audio element
-  const simulateAudioClick = (audioElement) => {
-    if (audioElement) {
-      try {
-        audioElement.play();
-      } catch (error) {
-        console.error('Failed to play audio:', error);
-      }
-    }
-  };
-
+  const playAudioSound = () => {
+    notificationSound.play();
+  }
 
 
   useEffect(() => {
@@ -240,10 +227,11 @@ export default function UserNav({ handleLogout }) {
               {isDropdownOpen && (
                 <div
                   ref={dropdownRef}
-                  className="absolute right-12 mt-10 top-3 w-48 origin-top-right bg-[#f4f4f4] p-4  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  className="absolute right-12 mt-10 top-3 w-48 origin-top-right bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
                   <NotificationDropdown
                     notifications={notifications}
+                    setNotifications={setNotifications}
                   />
                 </div>
               )}
@@ -266,6 +254,7 @@ export default function UserNav({ handleLogout }) {
                   {item.name}
                 </Link>
               ))}
+              <button id="audio" onClick={playAudioSound} className="none"></button>
             </div>
           </Disclosure.Panel>
         </>

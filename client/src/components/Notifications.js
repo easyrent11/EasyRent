@@ -1,17 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getOrderById, changeOrderStatus } from "../api/UserApi";
+import io from 'socket.io-client';
+
 
 export default function Notifications() {
-  const { orderId, typeOfNotification } = useParams(); // Extract typeOfNotification here
+  const {orderId,typeOfNotification} = useParams(); // Extract typeOfNotification here
   const [orderDetails, setOrderDetails] = useState(null); // Initialize as null
-  const [showButtons, setShowButtons] = useState(typeOfNotification === 'orderRequest');
+  const [socket,setSocket] = useState(null);
   const navigate = useNavigate();
+  
+
+  useEffect(() => {
+    const socket = io.connect("http://localhost:3001");
+    setSocket(socket);
+  
+    // Clean up when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
 
   useEffect(() => {
     getOrderById(orderId)
       .then((res) => {
-        console.log(res.data);
         setOrderDetails(res.data); 
       })
       .catch((error) => console.error("Error fetching order data:", error));
@@ -24,6 +39,7 @@ export default function Notifications() {
     };
     changeOrderStatus(newOrderStatus)
       .then((res) => {
+        socket.emit('notification', {userId:orderDetails.Rentee_id, message: 'The renter accepted your order', type:"order-accepted-notification"})
         navigate("/homepage");
       })
       .catch((err) => {
@@ -38,6 +54,7 @@ export default function Notifications() {
     };
     changeOrderStatus(newOrderStatus)
       .then((res) => {
+        socket.emit('notification', {userId:orderDetails.Rentee_id, message: 'The renter declined your order', type:"order-declined-notification"})
         navigate("/homepage");
       })
       .catch((err) => {
@@ -128,8 +145,6 @@ export default function Notifications() {
         )}
       </div>
 
-      {/* Buttons section */}
-      {typeOfNotification === "orderRequest" && showButtons && orderDetails && (
         <div className="w-1/2 m-2 flex items-center justify-center">
           <button
             onClick={handleAcceptOrder}
@@ -144,7 +159,6 @@ export default function Notifications() {
             Decline Order
           </button>
         </div>
-      )}
     </>
   );
 }

@@ -69,16 +69,15 @@ io.on("connection", (socket) => {
 // To send a notification to a specific user
 function sendNotificationToUser(userId, message, type) {
   const userSocket = usersToSockets.get(userId);
-  console.log("dgsdag=", userId,message,type)
   if (userSocket) {
     userSocket.emit('notification', {message,type});
   }
 }
 
 function saveNotificationToDataBase(notificationDetails){
-  const {userId,message,type} = notificationDetails;
-  const query = `INSERT INTO notifications (userId,message,type) VALUES (? ,? ,?)`;
-  db.query(query, [userId,message,type], (error, results) => {
+  const {userId,message,type, orderId} = notificationDetails;
+  const query = `INSERT INTO notifications (userId,message,type, order_id) VALUES (? ,? ,?,?)`;
+  db.query(query, [userId,message,type, orderId], (error, results) => {
     if (error) {
       console.error("Error saving message:", error);
     } else {

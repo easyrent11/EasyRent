@@ -93,7 +93,6 @@ export default function CarView() {
   renteeId = renteeId ? parseInt(renteeId) : null;
 
   const sendCarOrderRequest = () => {
-    socket.emit('notification', {userId:ownerId, message: 'You have a new order on one of your cars', type:"order-notification"});
 
     // checking if the user provided the order details.
     if (!startDate || !endDate || !startTime || !endTime) {
@@ -149,6 +148,8 @@ export default function CarView() {
           ...prevRenteeOrders,
           res.data.order,
         ]);
+        socket.emit('notification', {userId:ownerId, message: 'You have a new order on one of your cars', type:"order-request-notification", orderId:res.data.order.Order_Id
+      });
         resetFields();
       })
       .catch((err) => {
