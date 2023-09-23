@@ -4,12 +4,10 @@ import CarSortSection from '../components/CarSortSection';
 import CarFilterSection from '../components/CarFilterSection';
 import SearchCar from '../components/SearchCar';
 import { UserProfileDetails } from '../contexts/UserProfileDetails';
-import { useUserOrders } from '../contexts/UserOrdersContext';
 import { AllCarsContext } from '../contexts/AllCarsContext';
 
 
 export default function UserLayout() {
-  const { userOrders, userRenteeOrders } = useUserOrders();
   const { allCars} = useContext(AllCarsContext);
   const userDetails = useContext(UserProfileDetails);
   const [filteredCars, setFilteredCars] = useState([...allCars]); // Copy allCars initially

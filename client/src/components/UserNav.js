@@ -4,11 +4,9 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
-import { useUserOrders } from "../contexts/UserOrdersContext";
 import NotificationDropdown from "./NotificationDropdown";
 import { notify } from "../HelperFunctions/Notify";
-import io from 'socket.io-client';
-import notificationSound from '../Assets/notificationsound.mp3'; // notification audio mp3
+import io from "socket.io-client";
 import { getUserNotifications } from "../api/UserApi";
 
 const navigation = [
@@ -29,40 +27,50 @@ export default function UserNav({ handleLogout }) {
   const [notifications, setNotifications] = useState([]);
   const [socket, setSocket] = useState(null);
 
-
   const userProfileImage = userDetails.picture;
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
-  const userId = parseInt(localStorage.getItem('userId'));
+  const userId = parseInt(localStorage.getItem("userId"));
 
   useEffect(() => {
     getUserNotifications(userDetails.Id)
-    .then((res) => {
-      setNotifications(res.data);
-      console.log(res.data);
-    })
-    .catch((error) => {
-      notify('error', error);
-    })
-  },[userDetails]);
-
+      .then((res) => {
+        setNotifications(res.data);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        notify("error", error);
+      });
+  }, [userDetails]);
 
   useEffect(() => {
     // Connect to the Socket.IO server and authenticate
     const socket = io.connect("http://localhost:3001");
-
     if (userId) {
-      socket.emit('authenticate', userId);
+      socket.emit("authenticate", userId);
     }
 
     // Handle incoming notifications
-    socket.on('notification', (notification) => {
-      console.log(notification);
-      setNotifications((prevNotifications) => [...prevNotifications, notification]);
-      // Play the notification sound when a new notification arrives by auto clicking the button to handle chrome policies.
-      document.getElementById("audio").click()
+    socket.on("notification", (notification) => {
+      console.log("notification in navbar = ", notification);
 
+      // Create a new notification object with default values
+      const newNotification = {
+        id: notification.notificationId,
+        userId: notification.userId,
+        message: notification.message,
+        type: notification.type,
+        isRead: 0, // Set the default value for isRead
+        created_at: new Date().toISOString(), // Set the current timestamp
+        order_id: notification.orderId,
+      };
+
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        newNotification,
+      ]);
+      console.log(notifications);
     });
 
     setSocket(socket);
@@ -74,12 +82,6 @@ export default function UserNav({ handleLogout }) {
       }
     };
   }, [userId]);
-
-  // Function to simulate a click event on the audio element
-  const playAudioSound = () => {
-    notificationSound.play();
-  }
-
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -98,16 +100,19 @@ export default function UserNav({ handleLogout }) {
 
   const logout = () => {
     notify("success", "Successfully logged out");
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     localStorage.removeItem("userId");
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('filterOptions');
+    localStorage.removeItem("isAdmin");
+    localStorage.removeItem("filterOptions");
     handleLogout();
     navigate("/");
   };
 
   return (
-    <Disclosure as="nav" className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0">
+    <Disclosure
+      as="nav"
+      className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
@@ -254,7 +259,6 @@ export default function UserNav({ handleLogout }) {
                   {item.name}
                 </Link>
               ))}
-              <button id="audio" onClick={playAudioSound} className="none"></button>
             </div>
           </Disclosure.Panel>
         </>

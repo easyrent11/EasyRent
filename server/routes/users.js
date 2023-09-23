@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
 // Protected user page route. *****
 router.get("/homepage", verifyToken, (req, res) => {
   // Access user information from req.user
-  const { first_name} = req.user;
+  const { first_name } = req.user;
 
   // Perform actions specific to the authenticated user
   res.json({ message: `Welcome, ${first_name}` });
@@ -93,20 +93,19 @@ router.post("/searchcar", async (req, res) => {
   }
 });
 
-router.post("/reportuser",async (req,res) => {
+router.post("/reportuser", async (req, res) => {
   const reportDetails = req.body;
   console.log(reportDetails);
 
-  try{
-    const result = await UserServices.handleReportUser(db,reportDetails);
+  try {
+    const result = await UserServices.handleReportUser(db, reportDetails);
     res.send(result);
-  }
-  catch(error){
+  } catch (error) {
     res.status(500).send("Internal server error");
   }
-})
+});
 
-router.get('/reports', (req, res) => {
+router.get("/reports", (req, res) => {
   const getReportsQuery = `
     SELECT 
       reports.*, 
@@ -134,7 +133,7 @@ router.get('/reports', (req, res) => {
 });
 
 // Route to get all reports for a specific user
-router.get('/reports/:userId', (req, res) => {
+router.get("/reports/:userId", (req, res) => {
   const userId = req.params.userId;
 
   const getReportsQuery = `
@@ -183,9 +182,9 @@ router.get("/getuser/:id", (req, res) => {
   });
 });
 
-router.put("/updateuserdetails",async (req, res) => {
+router.put("/updateuserdetails", async (req, res) => {
   const updatedUserDetails = req.body;
-  console.log("In backend",updatedUserDetails);
+  console.log("In backend", updatedUserDetails);
 
   try {
     const result = await UserServices.updateUserDetails(db, updatedUserDetails);
@@ -368,39 +367,58 @@ router.get("/orders/:orderId", async (req, res) => {
   }
 });
 
-// Route to change the order status
 router.put("/changeorderstatus", async (req, res) => {
   const { orderId, status } = req.body;
-
   try {
     // Check if the order with the given orderId exists in the database
     const order = await UserServices.getOrderById(db, orderId);
-
     if (!order) {
       return res.status(404).json({ error: "Order not found." });
     }
-
-    // Update the status of the order
-    await UserServices.updateOrderStatus(db, orderId, status);
-
-    return res.json({ message: "Order status updated successfully." });
+    // Update the status of the order and fetch the updated order
+    const updatedOrder = await UserServices.updateOrderStatus(
+      db,
+      orderId,
+      status
+    );
+    return res.json({
+      order: updatedOrder,
+      message: "Order status updated successfully.",
+    });
   } catch (error) {
     console.error("Error updating order status:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
 
-router.put("/changeuserstatus",async(req,res) => {
-  const {userId,newStatus} = req.body;
-  console.log(userId,newStatus);
-  try{
-    const result = await UserServices.changeUserStatus(db,userId,newStatus);
-    return res.json({message:"User status changed"});
+router.put("/decline-conficting-orders", async (req, res) => {
+  const { orderId, carPlatesNumber } = req.body;
+  console.log(orderId,carPlatesNumber);
+  try {
+    // Update the status of the order and fetch the updated order
+    const result = await UserServices.findAndDeclineConflictingOrders(
+      db,
+      orderId,
+      carPlatesNumber
+    );
+    console.log(result);
+    return res.json({conflictingOrders:result});
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return res.status(500).json({ error: "Internal server error." });
   }
-  catch{
+});
+
+router.put("/changeuserstatus", async (req, res) => {
+  const { userId, newStatus } = req.body;
+  console.log(userId, newStatus);
+  try {
+    const result = await UserServices.changeUserStatus(db, userId, newStatus);
+    return res.json({ message: "User status changed" });
+  } catch {
     return res.status(500).json({ error: "Internal server error" });
   }
-})
+});
 
 // Route to get all users.
 
@@ -421,19 +439,18 @@ router.get("/messages/:room", (req, res) => {
   });
 });
 
-router.get("/chatroom/:userId", (req,res) => {
+router.get("/chatroom/:userId", (req, res) => {
   const userId = req.params.userId;
-  const query = ("SELECT * FROM chat_rooms WHERE user1_id = ? or user2_id = ?");
-  db.query(query, [userId,userId], (error,results) => {
-    if(error){
+  const query = "SELECT * FROM chat_rooms WHERE user1_id = ? or user2_id = ?";
+  db.query(query, [userId, userId], (error, results) => {
+    if (error) {
       res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      // send the chat rooms of the user.
+      res.json(results);
     }
-   else {
-    // send the chat rooms of the user.
-    res.json(results);
-  }
-  })
-})
+  });
+});
 
 router.get("/getAllUsers", (req, res) => {
   const query = "SELECT * from users";
@@ -452,15 +469,14 @@ router.get("/getAllUsers", (req, res) => {
 
 router.get("/getlatestorders", (req, res) => {
   const query = "SELECT * FROM orders ORDER BY Order_Date DESC LIMIT 5";
-  db.query(query, (error,results) => {
-    if(error){
+  db.query(query, (error, results) => {
+    if (error) {
       console.error("Failed to retrieve latest orders.", error);
-      res.status(500).json({error:"Internal server error"});
-    }
-    else{
+      res.status(500).json({ error: "Internal server error" });
+    } else {
       res.json(results);
     }
-  })
+  });
 });
 
 router.post("/startChat", async (req, res) => {
@@ -476,46 +492,45 @@ router.post("/startChat", async (req, res) => {
   }
 });
 
-router.get("/orders", async(req,res) => {
+router.get("/orders", async (req, res) => {
   const query = "SELECT * FROM orders";
-  db.query(query, (error,results) => {
-    if(error){
+  db.query(query, (error, results) => {
+    if (error) {
       console.error("Failed to retrieve  orders.", error);
-      res.status(500).json({error:"Internal server error"});
-    }
-    else{
+      res.status(500).json({ error: "Internal server error" });
+    } else {
       res.json(results);
     }
-  })
-})
+  });
+});
 
-router.get("/notifications/:userId", async(req,res) => {
+router.get("/notifications/:userId", async (req, res) => {
   const userId = req.params.userId;
-  const query = "SELECT * FROM notifications WHERE userId = ? AND isRead  = 0";
-  db.query(query,[userId], (error,results) => {
-    if(error){
+  const query =
+    "SELECT * FROM notifications WHERE userId = ? AND isRead  = false";
+  db.query(query, [userId], (error, results) => {
+    if (error) {
       console.error("Failed to retrieve  notifications for user.", error);
-      res.status(500).json({error:"Internal server error"});
-    }
-    else{
+      res.status(500).json({ error: "Internal server error" });
+    } else {
       res.json(results);
     }
-  })
-})
+  });
+});
 
-router.put("/notifications/:notificationId", async(req,res) => {
+router.put("/notifications/:notificationId", async (req, res) => {
   const notificationId = req.params.notificationId;
   try {
-    const result = await UserServices.markNotificationAsRead(db, notificationId);
+    const result = await UserServices.markNotificationAsRead(
+      db,
+      notificationId
+    );
     res.status(200).json(result);
   } catch (error) {
     console.error("Error during marking notification as read", error);
     res.status(401).json({ message: "Something went wrong" });
   }
-})
-
-
-
+});
 
 // multer function for uploading a single profile image.
 const upload = multer({

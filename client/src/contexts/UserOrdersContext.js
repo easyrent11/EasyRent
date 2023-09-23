@@ -16,7 +16,6 @@ export function useUserOrders() {
 export function UserOrdersProvider({ children }) {
   const [userOrders, setUserOrders] = useState([]);
   const [userRenteeOrders, setUserRenteeOrders] = useState([]);
-  const [readNotifications, setReadNotifications] = useState([]); // New state for read notifications
   const userId = localStorage.getItem('userId');
 
   // fetching all the orders where the logged in user is the renter (the one who owns the car.)
@@ -41,18 +40,14 @@ export function UserOrdersProvider({ children }) {
       });
   }, []);
 
-   // Function to mark a notification as "read"
-   const markNotificationAsRead = (orderId) => {
-    setReadNotifications((prevNotifications) => [...prevNotifications, orderId]);
-  };
+
 
   // Provide the state and the function separately
   const contextValue = {
     userOrders,
     userRenteeOrders,
-    readNotifications,
-    markNotificationAsRead,
     setUserRenteeOrders, // Add the function here
+    setUserOrders,
   };
 
 

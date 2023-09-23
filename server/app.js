@@ -14,12 +14,10 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-
 app.use("/images", express.static("images"));
 app.use("/cars", carRoutes);
 app.use("/user", userRoutes);
-app.use("/admin",adminRoutes);
-
+app.use("/admin", adminRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -33,8 +31,7 @@ const io = new Server(server, {
 const usersToSockets = new Map();
 
 io.on("connection", (socket) => {
-
-  socket.on('authenticate', (userId) => {
+  socket.on("authenticate", (userId) => {
     // Store user-to-socket mapping
     usersToSockets.set(userId, socket);
   });
@@ -50,12 +47,25 @@ io.on("connection", (socket) => {
     io.to(data.room).emit("receive_message", data);
   });
 
-  socket.on('notification', (notificationDetails) => {
-    saveNotificationToDataBase(notificationDetails); // saving the notification in db.
-    sendNotificationToUser(notificationDetails.userId, notificationDetails.message, notificationDetails.type); // send the notification to the reciever.
+  // event listen for notification that will call the function to save the notification to db and send the notification to the user.
+  socket.on("notification", (notificationDetails) => {
+    saveNotificationToDataBase(notificationDetails, (error, notificationId) => {
+      if (error) {
+        console.log("error",error);
+        return error;
+      } else {
+        console.log("Notification", notificationId);
+        sendNotificationToUser(
+          notificationDetails.userId,
+          notificationDetails.message,
+          notificationDetails.type,
+          notificationDetails.orderId,
+          notificationId
+        ); // send the notification to the receiver.
+      }
+    });
   });
-
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     // Remove user-to-socket mapping on disconnect
     for (const [user, userSocket] of usersToSockets.entries()) {
       if (userSocket === socket) {
@@ -67,21 +77,26 @@ io.on("connection", (socket) => {
 });
 
 // To send a notification to a specific user
-function sendNotificationToUser(userId, message, type) {
+function sendNotificationToUser(userId, message, type, orderId, notificationId) {
   const userSocket = usersToSockets.get(userId);
   if (userSocket) {
-    userSocket.emit('notification', {message,type});
+    userSocket.emit("notification", {userId, message, type, orderId, notificationId });
   }
 }
 
-function saveNotificationToDataBase(notificationDetails){
-  const {userId,message,type, orderId} = notificationDetails;
-  const query = `INSERT INTO notifications (userId,message,type, order_id) VALUES (? ,? ,?,?)`;
-  db.query(query, [userId,message,type, orderId], (error, results) => {
+// Modify the saveNotificationToDataBase function to accept a callback parameter
+function saveNotificationToDataBase(notificationDetails, callback) {
+  const { userId, message, type, orderId } = notificationDetails;
+  const query = `INSERT INTO notifications (userId, message, type, order_id) VALUES (?, ?, ?, ?)`;
+  db.query(query, [userId, message, type, orderId], (error, results) => {
     if (error) {
       console.error("Error saving message:", error);
+      callback(error, null); // Pass the error to the callback
     } else {
-      console.log("Message saved successfully!");
+      const insertedId = results.insertId; // Get the ID of the inserted row
+      console.log("Inserted Id",insertedId);
+      console.log("Message saved successfully! ID:", insertedId);
+      callback(null, insertedId); // Pass the inserted ID to the callback
     }
   });
 }
@@ -106,7 +121,5 @@ function saveMessageToDB(data) {
 
 // Listen for incoming connections on the same port for both Express app and Socket.IO
 server.listen(port, () => {
- 
-  
   console.log(`Server listening on port ${port}`);
 });

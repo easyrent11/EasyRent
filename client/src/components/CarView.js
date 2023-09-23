@@ -79,7 +79,7 @@ export default function CarView() {
       .catch((err) => {
         notify("error", err);
       });
-  }, [car.Renter_Id]);
+  }, [car]);
 
   const resetFields = () => {
     setStartTime("10:00");
@@ -148,7 +148,7 @@ export default function CarView() {
           ...prevRenteeOrders,
           res.data.order,
         ]);
-        socket.emit('notification', {userId:ownerId, message: 'You have a new order on one of your cars', type:"order-request-notification", orderId:res.data.order.Order_Id
+        socket.emit('notification',{userId:ownerId, message: 'You have a new order on one of your cars', type:"order-request-notification", orderId:res.data.order.Order_Id
       });
         resetFields();
       })

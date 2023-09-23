@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOrderById, changeOrderStatus } from "../api/UserApi";
+import { getOrderById, changeOrderStatus,findAndDeclineConflictingOrders } from "../api/UserApi";
+import { useUserOrders } from "../contexts/UserOrdersContext";
+import {notify} from "../HelperFunctions/Notify";
 import io from 'socket.io-client';
 
-
 export default function Notifications() {
-  const {orderId,typeOfNotification} = useParams(); // Extract typeOfNotification here
+  const {orderId, typeOfNotification} = useParams(); // Extract typeOfNotification here
   const [orderDetails, setOrderDetails] = useState(null); // Initialize as null
-  const [socket,setSocket] = useState(null);
+  const [socket, setSocket] = useState(null);
+  const { setUserOrders  } = useUserOrders();
   const navigate = useNavigate();
   
-
+  
   useEffect(() => {
     const socket = io.connect("http://localhost:3001");
     setSocket(socket);
-  
+
     // Clean up when the component unmounts
     return () => {
       if (socket) {
@@ -23,30 +25,45 @@ export default function Notifications() {
     };
   }, []);
 
-
   useEffect(() => {
     getOrderById(orderId)
       .then((res) => {
-        setOrderDetails(res.data); 
+        setOrderDetails(res.data);
       })
       .catch((error) => console.error("Error fetching order data:", error));
-  }, [orderId]);
+  }, [orderId,typeOfNotification]);
 
+  // function that will handle the accept order logic for the renter to accept the order made on his cars.
+  // we need to also decline all other orders made on the car that conflicts with the order dates.
   const handleAcceptOrder = () => {
     const newOrderStatus = {
       orderId: orderId,
       status: "accepted",
     };
-    changeOrderStatus(newOrderStatus)
-      .then((res) => {
-        socket.emit('notification', {userId:orderDetails.Rentee_id, message: 'The renter accepted your order', type:"order-accepted-notification"})
+    // declining all conflicting orders first.
+    findAndDeclineConflictingOrders({orderId:orderId,carPlatesNumber:orderDetails.Car_Plates_Number})
+    .then((res) => {
+      console.log(res.data);
+      //after successfully declining we send a notification to all the declined order's users
+      res.data.forEach((userId) => {
+        socket.emit('notification', { userId: userId, message: 'The renter declined your order', type: "order-declined-notification", orderId: orderId });
+      });
+      changeOrderStatus(newOrderStatus)
+      .then(() => {
+        // sending a notification to the rentee.
+        socket.emit('notification', { userId: orderDetails.Rentee_id, message: 'The renter accepted your order', type: "order-accepted-notification", orderId:orderId })
         navigate("/homepage");
       })
       .catch((err) => {
         console.log(err);
       });
+    })
+    .catch((res) => {
+      notify('error', `Failed to accept order we got this message ${res}`);
+    })
   };
 
+  // function that will handle the accept order logic for the renter to accept the order made on his cars.
   const handleDeclineOrder = () => {
     const newOrderStatus = {
       orderId: orderId,
@@ -54,7 +71,12 @@ export default function Notifications() {
     };
     changeOrderStatus(newOrderStatus)
       .then((res) => {
-        socket.emit('notification', {userId:orderDetails.Rentee_id, message: 'The renter declined your order', type:"order-declined-notification"})
+        setUserOrders((prevRenteeOrders) => [
+          ...prevRenteeOrders,
+          res.data.order,
+        ]);
+        // sending a notification to the rentee.
+        socket.emit('notification', { userId: orderDetails.Rentee_id, message: 'The renter declined your order', type: "order-declined-notification", orderId:orderId})
         navigate("/homepage");
       })
       .catch((err) => {
@@ -64,7 +86,7 @@ export default function Notifications() {
 
   return (
     <>
-      <div className="w-1/2 m-2 border-2 rounded-md border-black flex flex-col items-center justify-center flex-1">
+       <div className="w-1/2 m-2 border-2 rounded-md border-black flex flex-col items-center justify-center flex-1">
         <h1 className="text-2xl font-semibold mb-4">Order Details</h1>
         {orderDetails && (
           <div className="shadow w-full overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -145,7 +167,8 @@ export default function Notifications() {
         )}
       </div>
 
-        <div className="w-1/2 m-2 flex items-center justify-center">
+      {typeOfNotification === "order-request-notification" && (
+        <div className="w-1/2 m-2 flex  items-center justify-center">
           <button
             onClick={handleAcceptOrder}
             className="px-4 py-2 mx-2 bg-green-500 text-white rounded-md"
@@ -159,6 +182,7 @@ export default function Notifications() {
             Decline Order
           </button>
         </div>
+      )}
     </>
   );
 }

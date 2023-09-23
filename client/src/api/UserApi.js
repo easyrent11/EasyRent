@@ -85,3 +85,7 @@ export const getUserNotifications = (userId) => {
 export const markNotificationAsRead = (notificationId) => {
   return axios.put(`${BASE_URL_USER}/notifications/${notificationId}`);
 }
+
+export const findAndDeclineConflictingOrders = (orderDetails) => {
+  return axios.put(`${BASE_URL_USER}/decline-conficting-orders`, orderDetails);
+}

@@ -220,7 +220,7 @@ async function addCar(db, carData) {
       Transmission_type,
       Description,
       Rental_Price_Per_Day,
-      Renter_Id,
+      Renter_Id
     );
     const addedCar = {
       Manufacturer_Code,
@@ -511,8 +511,10 @@ async function loginUser(db, email, password) {
     }
 
     const user = results[0];
-    if(user.status === "disabled"){
-      throw new Error("Your account was disabled, please check your email if this was a mistake let us know.");
+    if (user.status === "disabled") {
+      throw new Error(
+        "Your account was disabled, please check your email if this was a mistake let us know."
+      );
     }
 
     // Compare the provided password with the hashed password
@@ -747,21 +749,27 @@ async function getOrdersByRenteeId(db, userId) {
   });
 }
 
-// Function to get order by Order_Id
 async function getOrderById(db, orderId) {
-  const query = `SELECT * from orders WHERE Order_Id = ${orderId}`;
+  const query = `SELECT * FROM orders WHERE Order_Id = ?`;
   return new Promise((resolve, reject) => {
-    db.query(query, (error, results) => {
+    db.query(query, [orderId], (error, results) => {
       if (error) {
+        console.error("Error fetching order by ID:", error);
         reject(error);
       } else {
-        resolve(results[0]); // Return the first order if found
+        if (results.length === 0) {
+          console.log("No order found with ID:", orderId);
+          resolve(null);
+        } else {
+          resolve(results[0]); // Return the first order if found
+        }
       }
     });
   });
 }
 
-// Function to update the order status
+
+// Function to update the order status and return the updated order
 async function updateOrderStatus(db, orderId, status) {
   const query = `UPDATE orders SET Status = '${status}' WHERE Order_Id = ${orderId}`;
   return new Promise((resolve, reject) => {
@@ -769,13 +777,78 @@ async function updateOrderStatus(db, orderId, status) {
       if (error) {
         reject(error);
       } else {
-        resolve(results);
+        // Fetch the updated order after updating the status
+        const selectQuery = `SELECT * FROM orders WHERE Order_Id = ${orderId}`;
+        db.query(selectQuery, (selectError, selectResults) => {
+          if (selectError) {
+            reject(selectError);
+          } else {
+            // Assuming selectResults[0] contains the updated order
+            resolve(selectResults[0]);
+          }
+        });
       }
     });
   });
 }
+async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
+  try {
+    // Get the order details for the provided orderId
+    const currentOrder = await getOrderById(db, orderId);
 
-async function markNotificationAsRead(db,notificationId){
+    if (!currentOrder) {
+      console.log("Order not found with ID:", orderId);
+      return [];
+    }
+
+    // Extract date and time details from the current order
+    const currentStartDate = currentOrder.Start_Date;
+    const currentEndDate = currentOrder.End_Date;
+    const currentEndTime = currentOrder.End_Time;
+
+    const sql = `
+      SELECT * FROM orders 
+      WHERE status = 'pending' 
+      AND Order_Id <> ?
+      AND Car_Plates_Number = ?
+      AND ( (Start_Date >= ? AND End_Date <= ?) OR (Start_Date <= ? AND Start_Time <= ?) ) `;
+
+    const queryParams = [
+      orderId,
+      carPlatesNumber,
+      currentStartDate,
+      currentEndDate,
+      currentEndDate,
+      currentEndTime,
+    ];
+
+    const declinedUserIds = []; // Array to store the IDs of users whose orders were declined
+
+    const conflictingOrders = await new Promise((resolve, reject) => {
+      db.query(sql, queryParams, async (error, results) => {
+        if (error) {
+          console.error("Error finding conflicting orders:", error);
+          reject(error);
+        } else {
+          // Update the status of conflicting orders to 'declined'
+          for (const order of results) {
+            await updateOrderStatus(db, order.Order_Id, 'declined');
+            declinedUserIds.push(order.Rentee_id); // Add the User_Id to the array
+          }
+          resolve(results);
+        }
+      });
+    });
+
+    return declinedUserIds; // Return the array of declined user IDs
+  } catch (error) {
+    console.error("Error in findAndDeclineConflictingOrders:", error);
+    throw error;
+  }
+}
+
+
+async function markNotificationAsRead(db, notificationId) {
   const query = `UPDATE notifications SET isRead = 1 WHERE id = ${notificationId}`;
   return new Promise((resolve, reject) => {
     db.query(query, (error, results) => {
@@ -953,13 +1026,11 @@ async function updateUserDetails(db, updatedUserDetails) {
 
 // Function to update user's status
 
-
-async function changeUserStatus(db, userId,newStatus) {
+async function changeUserStatus(db, userId, newStatus) {
   return new Promise((resolve, reject) => {
     const query = `UPDATE users SET status = ? WHERE Id = ?`;
 
-
-    db.query(query,[newStatus,userId], (error, results) => {
+    db.query(query, [newStatus, userId], (error, results) => {
       if (error) {
         console.error("Error updating user status:", error);
         reject("Failed to update user status");
@@ -971,51 +1042,73 @@ async function changeUserStatus(db, userId,newStatus) {
 }
 async function handleReportUser(db, reportDetails) {
   return new Promise((resolve, reject) => {
-    const insertQuery = "INSERT INTO reports (Reported_User_Id, Reporting_User_Id, Report_Cause, Message) VALUES (?, ?, ?, ?)";
-    const incrementCounterQuery = "UPDATE users SET Report_Counter = Report_Counter + 1 WHERE Id = ?";
-    
-    db.query(insertQuery, [reportDetails.reportedUserId, reportDetails.reportingUserId, reportDetails.selectedReportCause, reportDetails.reportMessage], (insertError, insertResults) => {
-      if (insertError) {
-        reject("Error adding report");
-      } else {
-        db.query(incrementCounterQuery, [reportDetails.reportedUserId], (counterError, counterResults) => {
-          if (counterError) {
-            reject("Error incrementing user's report counter");
-          } else {
-            const checkCounterQuery = "SELECT Report_Counter FROM users WHERE Id = ?";
-            db.query(checkCounterQuery, [reportDetails.reportedUserId], (checkCounterError, checkCounterResults) => {
-              if (checkCounterError) {
-                reject("Error fetching user's report counter");
+    const insertQuery =
+      "INSERT INTO reports (Reported_User_Id, Reporting_User_Id, Report_Cause, Message) VALUES (?, ?, ?, ?)";
+    const incrementCounterQuery =
+      "UPDATE users SET Report_Counter = Report_Counter + 1 WHERE Id = ?";
+
+    db.query(
+      insertQuery,
+      [
+        reportDetails.reportedUserId,
+        reportDetails.reportingUserId,
+        reportDetails.selectedReportCause,
+        reportDetails.reportMessage,
+      ],
+      (insertError, insertResults) => {
+        if (insertError) {
+          reject("Error adding report");
+        } else {
+          db.query(
+            incrementCounterQuery,
+            [reportDetails.reportedUserId],
+            (counterError, counterResults) => {
+              if (counterError) {
+                reject("Error incrementing user's report counter");
               } else {
-                if (checkCounterResults[0].Report_Counter >= 3) {
-                  // Report counter reached 3 or more, return all reports for the reported user
-                  const allReportsQuery = "SELECT * FROM reports WHERE Reported_User_Id = ?";
-                  db.query(allReportsQuery, [reportDetails.reportedUserId], (reportsError, reportsResults) => {
-                    if (reportsError) {
-                      reject("Error fetching all reports");
+                const checkCounterQuery =
+                  "SELECT Report_Counter FROM users WHERE Id = ?";
+                db.query(
+                  checkCounterQuery,
+                  [reportDetails.reportedUserId],
+                  (checkCounterError, checkCounterResults) => {
+                    if (checkCounterError) {
+                      reject("Error fetching user's report counter");
                     } else {
-                      resolve(reportsResults);
+                      if (checkCounterResults[0].Report_Counter >= 3) {
+                        // Report counter reached 3 or more, return all reports for the reported user
+                        const allReportsQuery =
+                          "SELECT * FROM reports WHERE Reported_User_Id = ?";
+                        db.query(
+                          allReportsQuery,
+                          [reportDetails.reportedUserId],
+                          (reportsError, reportsResults) => {
+                            if (reportsError) {
+                              reject("Error fetching all reports");
+                            } else {
+                              resolve(reportsResults);
+                            }
+                          }
+                        );
+                      } else {
+                        resolve("Report added and user's counter updated");
+                      }
                     }
-                  });
-                } else {
-                  resolve("Report added and user's counter updated");
-                }
+                  }
+                );
               }
-            });
-          }
-        });
+            }
+          );
+        }
       }
-    });
+    );
   });
 }
-
-
 
 module.exports = {
   registerUser,
   loginUser,
   addCar,
-  searchCar,
   orderCar,
   getOrdersByRenteeId,
   getOrdersByRenterId,
@@ -1027,4 +1120,5 @@ module.exports = {
   changeUserStatus,
   handleReportUser,
   markNotificationAsRead,
+  findAndDeclineConflictingOrders,
 };
