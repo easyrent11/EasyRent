@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { PieChart, Pie, ResponsiveContainer, Cell } from 'recharts';
 
-const COLORS = ['#000000', '#c6200', '#190404'];
+const COLORS = ['#000000', '#c6200', '#F5BA02'];
 
 export default function AdminOrdersStatisticsCircle() {
   const [orderData, setOrderData] = useState({
@@ -86,7 +86,7 @@ export default function AdminOrdersStatisticsCircle() {
 
         <div className="flex items-center   justify-between w-full mb-2">
           <div className='flex items-center'>
-            <span className="w-4 h-4 bg-[#190404] mr-2 rounded-full inline-block"></span>
+            <span className="w-4 h-4 bg-[#F5BA02] mr-2 rounded-full inline-block"></span>
             <p>Accepted</p>
           </div>
           <p>{orderData.accepted} </p>

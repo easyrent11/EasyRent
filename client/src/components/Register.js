@@ -159,20 +159,21 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
           },
         })
         .then((response) => {
-          if (response.data.fileUrl == null) {
-            setProfileUrl("default.jpg");
-          } else {
+          console.log(response.data);
+          if (response.data.fileUrl) {
             const { fileUrl } = response.data;
             const pathname = new URL(fileUrl).pathname;
             const filename = pathname.substring(pathname.lastIndexOf("/") + 1);
             setProfileUrl(filename);
+          } else {
+            setProfileUrl("default.jpg");
           }
       
           const registerInfo = {
             id: governmentId,
             phone_number: phoneNumber,
             driving_license: drivingLicense,
-            picture: profileUrl === null ? "default.jpg" : profileUrl, 
+            picture: profileUrl, 
             email: email,
             password: password,
             city_code: city,
@@ -195,7 +196,6 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
               insertActivity(activityDetails)
               .then((res) => {
                 console.log(res.data);
-                notify("success", res.data.message);
               })
               .catch((error) => notify("error", error));
               notify("success", res.data.message);

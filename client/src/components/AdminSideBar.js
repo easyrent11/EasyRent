@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { BellIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import NotificationDropdown from "./NotificationDropdown";
 import { notify } from "../HelperFunctions/Notify";
+import { getUserNotifications } from "../api/UserApi";
+import io from "socket.io-client";
 
 const adminNavigation = [
   { name: "Dashboard", href: "/adminpage" },
   { name: "Users", href: "/users" },
   { name: "Profile", href: "/profile" },
   { name: "Reports", href: "/reports" },
-  { name: "Chat History", href: "/chathistory"},
+  { name: "Chat History", href: "/chathistory" },
   { name: "Chat App", href: "/ChatApp" },
 ];
 
@@ -20,8 +22,15 @@ function classNames(...classes) {
 }
 
 export default function AdminSideBar({ handleLogout, userDetails }) {
+  const [socket, setSocket] = useState(null); // socket object.
+  const [notifications, setNotifications] = useState([]); // notifications array.
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
+  const userId = parseInt(localStorage.getItem("userId")); // getting admin id
   const navigate = useNavigate();
   const location = useLocation();
+  const dropdownRef = useRef(null);
+
+  // function that will run once the admin clicks logout button
   const logout = () => {
     notify("success", "Successfully logged out");
     localStorage.removeItem("token");
@@ -30,6 +39,72 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
     handleLogout();
     navigate("/");
   };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on cleanup
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // fetching all notifications
+  useEffect(() => {
+    getUserNotifications(userId)
+      .then((res) => {
+        setNotifications(res.data);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        notify("error", error);
+      });
+  }, [userId]);
+
+  useEffect(() => {
+    // Connect to the Socket.IO server and authenticate
+    const socket = io.connect("http://localhost:3001");
+    if (userId) {
+      socket.emit("authenticate", userId);
+    }
+
+    // Handle incoming notifications
+    socket.on("notification", (notification) => {
+      console.log("notification in navbar = ", notification);
+
+      // Create a new notification object with default values
+      const newNotification = {
+        id: notification.notificationId,
+        userId: notification.userId,
+        message: notification.message,
+        type: notification.type,
+        isRead: 0, // Set the default value for isRead
+        created_at: new Date().toISOString(), // Set the current timestamp
+        order_id: notification.orderId,
+      };
+
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        newNotification,
+      ]);
+      console.log(notifications);
+    });
+
+    setSocket(socket);
+
+    // Clean up when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [userId]);
 
   return (
     <>
@@ -59,11 +134,32 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
           </div>
           <button
             type="button"
-            className="rounded-full ml-16 mb-4 bg-black p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
           >
             <span className="sr-only">View notifications</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
+            <BellIcon
+              className="h-6 w-6 bg-black color-white rounded-full"
+              aria-hidden="true"
+            />
+            {notifications.length > 0 && (
+              <span className="absolute top-0 right-9 p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {notifications.length}
+              </span>
+            )}
           </button>
+
+          {isDropdownOpen && (
+            <div
+              ref={dropdownRef}
+              className="absolute left-0 top-12 w-48 origin-top-left bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            >
+              <NotificationDropdown
+                notifications={notifications}
+                setNotifications={setNotifications}
+              />
+            </div>
+          )}
         </div>
         <div className="flex justify-center flex-1 flex-col  w-full m-2 ">
           {adminNavigation.map((item) => (

@@ -43,9 +43,9 @@ export default function Notifications() {
     // declining all conflicting orders first.
     findAndDeclineConflictingOrders({orderId:orderId,carPlatesNumber:orderDetails.Car_Plates_Number})
     .then((res) => {
-      console.log(res.data);
+      console.log("Conflicting Orders = ",res.data.conflictingOrders);
       //after successfully declining we send a notification to all the declined order's users
-      res.data.forEach((userId) => {
+      res.data.conflictingOrders.forEach((userId) => {
         socket.emit('notification', { userId: userId, message: 'The renter declined your order', type: "order-declined-notification", orderId: orderId });
       });
       changeOrderStatus(newOrderStatus)

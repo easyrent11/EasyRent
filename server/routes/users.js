@@ -413,7 +413,7 @@ router.put("/changeuserstatus", async (req, res) => {
   const { userId, newStatus } = req.body;
   console.log(userId, newStatus);
   try {
-    const result = await UserServices.changeUserStatus(db, userId, newStatus);
+    await UserServices.changeUserStatus(db, userId, newStatus);
     return res.json({ message: "User status changed" });
   } catch {
     return res.status(500).json({ error: "Internal server error" });

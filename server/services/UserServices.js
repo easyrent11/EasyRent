@@ -306,8 +306,7 @@ function insertUser(db, user) {
 
 // Function to register a user
 async function registerUser(db, userData) {
-  console.log(userData);
-
+  console.log("Register data = ", userData);
   const {
     id,
     phone_number,
@@ -811,7 +810,7 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
       WHERE status = 'pending' 
       AND Order_Id <> ?
       AND Car_Plates_Number = ?
-      AND ( (Start_Date >= ? AND End_Date <= ?) OR (Start_Date <= ? AND Start_Time <= ?) ) `;
+      AND ( (Start_Date <= ? AND End_Date <= ?) OR (Start_Date >  ?) )`;
 
     const queryParams = [
       orderId,
@@ -821,6 +820,7 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
       currentEndDate,
       currentEndTime,
     ];
+   
 
     const declinedUserIds = []; // Array to store the IDs of users whose orders were declined
 

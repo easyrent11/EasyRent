@@ -102,7 +102,7 @@ export default function StatisticsGraph() {
         <Legend />
         <Bar dataKey="orders" fill="#000000" />   
         <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#190404" />
+        <Bar dataKey="cars" fill="#F5BA02" />
       </BarChart>
     );
   } else if (timeInterval === 'day') {
@@ -141,7 +141,7 @@ export default function StatisticsGraph() {
         <Legend />
         <Bar dataKey="orders" fill="#000000" />   
         <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#190404" />
+        <Bar dataKey="cars" fill="#F5BA02" />
       </BarChart>
     );
   } else {
@@ -154,7 +154,7 @@ export default function StatisticsGraph() {
         <Legend />
         <Bar dataKey="orders" fill="#000000" />   
         <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#190404" />
+        <Bar dataKey="cars" fill="#F5BA02" />
       </BarChart>
     );
   }

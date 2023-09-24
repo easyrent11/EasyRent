@@ -16,6 +16,7 @@ export default function ChatApp() {
   const { userDetails, setUserDetails } = useContext(UserProfileDetails);
   const user1Id = parseInt(localStorage.getItem("userId"));
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     displayAllUsers();
@@ -119,32 +120,47 @@ export default function ChatApp() {
       style={{ minHeight: "90vh" }}
     >
       <div className="flex w-full rounded-md shadow-lg">
-        <div className="w-1/4 p-4 border-r rounded-md h-4/5">
+        <div className="w-1/4 p-4 text-center border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
-          <ul>
-            {users.map((user) => (
-              <li
-                key={user.Id}
-                className={`flex items-center mb-2 cursor-pointer ${
-                  selectedUser === user.Id
-                    ? "bg-[#c6c3c3] rounded-md p-2 text-white"
-                    : " p-2 text-black"
-                }`}
-                onClick={() => startChat(user.Id)}
-              >
-                <img
-                  src={`http://localhost:3001/images/${
-                    user.picture != null ? user.picture : null
-                  }`}
-                  alt={user.first_name}
-                  className="w-8 h-8 rounded-full mr-2"
-                />
-                <span className="text-black font-bold text-lg">
-                  {user.first_name}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <input
+            className="p-2 text-black w-4/5 text-center mb-4 font-bold border-2 rounded-md hover:border-black"
+            type="text"
+            name="searchreports"
+            placeholder="Enter the user's name"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+         <ul>
+  {users.map((user) => {
+    const userFullName = `${user.first_name} ${user.last_name}`;
+    const userMatchesSearch =
+      !searchValue || userFullName.toLowerCase().includes(searchValue.toLowerCase());
+
+    if (userMatchesSearch) {
+      return (
+        <li
+          key={user.Id}
+          className={`flex items-center mb-2 cursor-pointer ${
+            selectedUser === user.Id
+              ? "bg-[#c6c3c3] rounded-md p-2 text-white"
+              : " p-2 text-black"
+          }`}
+          onClick={() => startChat(user.Id)}
+        >
+          <img
+            src={`http://localhost:3001/images/${user.picture || ""}`}
+            alt={user.first_name}
+            className="w-8 h-8 rounded-full mr-2"
+          />
+          <span className="text-black font-bold text-lg">{userFullName}</span>
+        </li>
+      );
+    }
+
+    return null; // Exclude users that don't match the filter
+  })}
+</ul>
+
         </div>
 
         <div className="flex flex-col flex-1 rounded-md">
