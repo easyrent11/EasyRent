@@ -41,32 +41,50 @@ export default function SearchCar() {
     setToTime(e.target.value);
   };
 
-  // function that will run once we submit the form and will send the search info to the backend and recieve the result back.
   const handleFormSubmit = (e) => {
-    e.preventDefault();
-    // creating the search object.
+  e.preventDefault();
 
-    const requestData = {
-      city: city,
-      pickupDate: pickupDate,
-      returnDate: returnDate,
-      startTime: fromTime,
-      endTime: toTime,
-    };
-    searchCars(requestData)
-      .then((res) => {
-        const token = localStorage.getItem('token');
-        if(token){
-          navigate("/homepage");
-        }
-        else{
-          navigate('/DisplaySearchResults');
-        }
-        // updating the Cars List with the new search Array
-        setAllCars(res.data);
-      })
-      .catch((err) => console.log("Failed", err));
+  // Get the current date and time
+  const currentDate = new Date();
+  const currentTime = currentDate.getHours() + ":" + currentDate.getMinutes();
+
+  // Check if pickupDate is in the past
+  if (pickupDate < currentDate.toISOString().split('T')[0] ||
+      (pickupDate === currentDate.toISOString().split('T')[0] && fromTime < currentTime)) {
+    alert("Pickup date and time should not be in the past.");
+    return;
+  }
+
+  // Check if returnDate is in the past
+  if (returnDate < currentDate.toISOString().split('T')[0] ||
+      (returnDate === currentDate.toISOString().split('T')[0] && toTime < currentTime)) {
+    alert("Return date and time should not be in the past.");
+    return;
+  }
+
+  // Creating the search object
+  const requestData = {
+    city: city,
+    pickupDate: pickupDate,
+    returnDate: returnDate,
+    startTime: fromTime,
+    endTime: toTime,
   };
+
+  searchCars(requestData)
+    .then((res) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        navigate("/homepage");
+      } else {
+        navigate('/DisplaySearchResults');
+      }
+      // Updating the Cars List with the new search Array
+      setAllCars(res.data);
+    })
+    .catch((err) => console.log("Failed", err));
+};
+
 
   // function to reset all form fields to their initial values
   const handleFormReset = () => {

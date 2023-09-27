@@ -790,6 +790,7 @@ async function updateOrderStatus(db, orderId, status) {
     });
   });
 }
+// function that will take an orderId and plates number and find and return all conflicting orders with the given order for the given car.
 async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
   try {
     // Get the order details for the provided orderId
@@ -803,25 +804,34 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
     // Extract date and time details from the current order
     const currentStartDate = currentOrder.Start_Date;
     const currentEndDate = currentOrder.End_Date;
+    const currentStartTime = currentOrder.Start_Time;
     const currentEndTime = currentOrder.End_Time;
 
     const sql = `
-      SELECT * FROM orders 
-      WHERE status = 'pending' 
-      AND Order_Id <> ?
-      AND Car_Plates_Number = ?
-      AND ( (Start_Date <= ? AND End_Date <= ?) OR (Start_Date >  ?) )`;
+        SELECT * FROM orders 
+        WHERE status = 'pending' 
+        AND Order_Id <> ?
+        AND Car_Plates_Number = ? AND (Start_Date > ? AND Start_Date < ?) OR 
+        ( (End_Date>? OR (End_Date=? AND End_Time >= ?)) AND (End_Date<? OR (End_Date=? AND End_Time>= ?)) OR
+	      (Start_Date > ? AND End_Date < ? OR (Start_Date=? AND End_Time>=?)))
+      `;
 
     const queryParams = [
       orderId,
       carPlatesNumber,
       currentStartDate,
       currentEndDate,
+      currentStartDate,
+      currentStartDate,
+      currentStartTime,
       currentEndDate,
-      currentEndTime,
+      currentEndDate,
+      currentStartTime,
+      currentStartDate,
+      currentEndDate,
+      currentStartDate,
+      currentStartTime,
     ];
-   
-
     const declinedUserIds = []; // Array to store the IDs of users whose orders were declined
 
     const conflictingOrders = await new Promise((resolve, reject) => {
@@ -1121,4 +1131,5 @@ module.exports = {
   handleReportUser,
   markNotificationAsRead,
   findAndDeclineConflictingOrders,
+  searchCar,
 };
