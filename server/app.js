@@ -13,12 +13,13 @@ const port = process.env.PORT || 3001;
 // middleware.
 app.use(cors());
 app.use(express.json());
-
 app.use("/images", express.static("images"));
+// middleware for users, cars and admin
 app.use("/cars", carRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 
+// creating a new http server for the sockets io.
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -28,7 +29,7 @@ const io = new Server(server, {
 });
 
 // socket io setup for real time notifications and chat app messages
-const usersToSockets = new Map();
+const usersToSockets = new Map(); // a map for all socket objects of users.
 
 io.on("connection", (socket) => {
   socket.on("authenticate", (userId) => {
@@ -79,12 +80,13 @@ io.on("connection", (socket) => {
 // To send a notification to a specific user
 function sendNotificationToUser(userId, message, type, orderId, notificationId) {
   const userSocket = usersToSockets.get(userId);
+  // send a new notification event to the user.
   if (userSocket) {
     userSocket.emit("notification", {userId, message, type, orderId, notificationId });
   }
 }
 
-// Modify the saveNotificationToDataBase function to accept a callback parameter
+// a function that will take notification details object and a callback and save the notification to db and return the id.
 function saveNotificationToDataBase(notificationDetails, callback) {
   const { userId, message, type, orderId } = notificationDetails;
   const query = `INSERT INTO notifications (userId, message, type, order_id) VALUES (?, ?, ?, ?)`;
@@ -106,8 +108,6 @@ function saveNotificationToDataBase(notificationDetails, callback) {
 function saveMessageToDB(data) {
   const { room, message, user_id } = data;
 
-  // You can use your database query method here to insert the message into the database
-  // For example, using MySQL with the "mysql2" package:
   const query = `INSERT INTO messages (chat_room_id, user_id, text) VALUES (?, ?, ?)`;
   db.query(query, [room, user_id, message], (error, results) => {
     if (error) {

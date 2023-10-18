@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 import { SearchCarListResult } from "../contexts/SearchCarListResult";
 import Car from "../components/Car";
-
+// the page for search results for none registered users.
 export default function SearchResultDisplay() {
     const {carList} = useContext(SearchCarListResult);
+    // if no cars available display a message.
     if (!carList || carList.length === 0) {
       return (
         <div className='flex items-center justify-center'>

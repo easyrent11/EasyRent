@@ -1,5 +1,6 @@
 import React from 'react';
 
+// the admin's main page.
 function AdminPage(){
   return (
     <main className='flex items-center justify-center w-full min-h-screen border-2 border-red-500'>

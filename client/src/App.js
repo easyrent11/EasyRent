@@ -41,6 +41,7 @@ import { SearchCarListResult } from "./contexts/SearchCarListResult";
 import { AllCarsContext } from "./contexts/AllCarsContext";
 import { UserProfileDetails } from "./contexts/UserProfileDetails";
 import { UserOrdersProvider } from "./contexts/UserOrdersContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 // ########################################################################################
 // #                             Imports Of pages.                                        #
@@ -152,6 +153,7 @@ function App() {
         <AllCarsContext.Provider value={{ allCars, setAllCars }}>
           <UserProfileDetails.Provider value={{ userDetails, setUserDetails }}>
             <UserOrdersProvider>
+              <NotificationProvider>
               <Router>
                 <div
                   className={
@@ -339,6 +341,8 @@ function App() {
                 </div>
                 <Footer />
               </Router>
+
+              </NotificationProvider>
             </UserOrdersProvider>
           </UserProfileDetails.Provider>
         </AllCarsContext.Provider>

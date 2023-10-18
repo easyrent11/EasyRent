@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate} from "react-router-dom";
 import { getOrderById, changeOrderStatus,findAndDeclineConflictingOrders } from "../api/UserApi";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import {notify} from "../HelperFunctions/Notify";
 import io from 'socket.io-client';
+import { useNotificationContext } from "../contexts/NotificationContext"
 
 export default function Notifications() {
-  const {orderId, typeOfNotification} = useParams(); // Extract typeOfNotification here
-  const [orderDetails, setOrderDetails] = useState(null); // Initialize as null
+  const {orderId, typeOfNotification} = useParams();
+  const [orderDetails, setOrderDetails] = useState(null);
   const [socket, setSocket] = useState(null);
   const { setUserOrders  } = useUserOrders();
   const navigate = useNavigate();
-  
-  
+  const {notifications,handleNotificationClick} = useNotificationContext();
+
   useEffect(() => {
     const socket = io.connect("http://localhost:3001");
     setSocket(socket);
@@ -43,11 +44,30 @@ export default function Notifications() {
     // declining all conflicting orders first.
     findAndDeclineConflictingOrders({orderId:orderId,carPlatesNumber:orderDetails.Car_Plates_Number})
     .then((res) => {
-      console.log("Conflicting Orders = ",res.data.conflictingOrders);
+      // filtering out the notifications that are for conflicting orders.
+      if (res.data && Array.isArray(res.data.conflictingOrders)) {
+        const conflictingOrders = res.data.conflictingOrders;
+        conflictingOrders.forEach((order) => {
+          notifications.forEach((notification) => {
+            if(order.Order_Id == notification.order_id){
+              handleNotificationClick(notification.id);
+            }
+          })
+        }) 
+      }
+
       //after successfully declining we send a notification to all the declined order's users
-      res.data.conflictingOrders.forEach((userId) => {
-        socket.emit('notification', { userId: userId, message: 'The renter declined your order', type: "order-declined-notification", orderId: orderId });
+      res.data.conflictingOrders.forEach((order) => {
+        const userId = order.UserId; // get the user id.
+        // send a decline order notification to the user.
+        socket.emit('notification', {
+          userId: userId,
+          message: 'The renter declined your order',
+          type: "order-declined-notification",
+          orderId: order.orderId
+        });
       });
+      
       changeOrderStatus(newOrderStatus)
       .then(() => {
         // sending a notification to the rentee.

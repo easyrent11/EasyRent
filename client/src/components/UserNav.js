@@ -8,6 +8,7 @@ import NotificationDropdown from "./NotificationDropdown";
 import { notify } from "../HelperFunctions/Notify";
 import io from "socket.io-client";
 import { getUserNotifications } from "../api/UserApi";
+import { useNotificationContext } from "../contexts/NotificationContext"
 
 const navigation = [
   { name: "Dashboard", href: "/homepage", current: true },
@@ -24,7 +25,7 @@ function classNames(...classes) {
 export default function UserNav({ handleLogout }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const { userDetails } = useContext(UserProfileDetails);
-  const [notifications, setNotifications] = useState([]);
+  const { notifications, setNotifications} = useNotificationContext();
   const [socket, setSocket] = useState(null);
 
   const userProfileImage = userDetails.picture;

@@ -29,6 +29,7 @@ router.get("/getcar/:PlatesNumber", async (req, res) => {
     res.status(500).json({ error: "Error retrieving car" });
   }
 });
+// route to get a given users car via id.
 router.get("/getcarwithuserid/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
@@ -66,22 +67,17 @@ router.post("/deleteoldimages", async (req, res) => {
 });
 
 
-
+// route to delete a car via plates number. 
 router.put("/deletecar/:platesNumber", async (req, res) => {
   const { platesNumber } = req.params;
   try {
+    // check if the car we are trying to delete exists in the orders (in use)
     const carExistsInOrders = await carServices.carExistsInOrders(db, platesNumber);
-    
+    // car exist in orders, we return that its in use.
     if (carExistsInOrders.length > 0) {
       res.status(200).json({exists:true});
-    } else {
-      // if the car doesnt exist in the orders that means its not in use or theres no request on it, we change the status.
-      // // Delete car images first
-      // const result = await carServices.deleteCarPictures(db, platesNumber);
-      // // Now delete the car from the cars table
-      // const deleteCarResult = await carServices.deleteCar(db, platesNumber);
+    } else {                                                               
       const result = await carServices.deleteCar(db,platesNumber);
-      
       if (result) {
         res.json({ message: "Car deleted successfully" });
       } else {
@@ -92,17 +88,6 @@ router.put("/deletecar/:platesNumber", async (req, res) => {
     res.status(500).json({ message: "Failed to delete car and images" });
   }
 });
-
-
-// router.get('/carexistsinorders/:platesNumber', async(req,res) => {
-//   const { platesNumber } = req.params;
-//   try {
-//     const result = await carServices.carExistsInOrders(db, platesNumber);
-//     res.json({ message: `${result}` });
-//   } catch (error) {
-//     res.status(500).json({ message: "Failed to check if car exists in orders." });
-//   }
-// })
 
 // route for updating car images in the database.
 router.post("/insertimages", async (req, res) => {
@@ -118,7 +103,7 @@ router.post("/insertimages", async (req, res) => {
     res.status(500).json({ message: "Failed to insert car images." });
   }
 });
-
+// route to get all the images of a car via plates number.
 router.get("/getallcarimages/:PlatesNumber", async (req, res) => {
   const PlatesNumber = req.params.PlatesNumber;
   try {

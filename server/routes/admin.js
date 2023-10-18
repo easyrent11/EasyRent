@@ -3,6 +3,8 @@ const router = express.Router();
 const verifyToken = require("../middleware/auth");
 const db = require("../models/db");
 const AdminServices = require("../services/AdminServices");
+
+// route for the main admin page.
 router.get("/adminpage", verifyToken, (req, res) => {
   const { isadmin } = req.user;
   if (isadmin === 1) {
@@ -12,19 +14,19 @@ router.get("/adminpage", verifyToken, (req, res) => {
     res.status(403).json({ message: "Access denied" });
   }
 });
-
+// route to get the order statistics
 router.get("/getorderstatistics",async (req, res) => {
   try {
-    const ordersToday = await AdminServices.getOrdersToday(db); // Assuming db is your database connection
-    const ordersThisMonth = await AdminServices.getOrdersThisMonth(db); // Assuming db is your database connection
-    const ordersThisYear = await AdminServices.getOrdersThisYear(db); // Assuming db is your database connection
+    const ordersToday = await AdminServices.getOrdersToday(db); 
+    const ordersThisMonth = await AdminServices.getOrdersThisMonth(db); 
+    const ordersThisYear = await AdminServices.getOrdersThisYear(db); 
     res.status(200).json({today:ordersToday, thisMonth:ordersThisMonth, thisYear:ordersThisYear});
   } catch (error) {
     console.error("Error fetching order statistics", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
+// route to get the best seller of the current month.
 router.get("/bestmonthlyseller",async (req,res) => {
   try{
     const bestSeller = await AdminServices.getUserWithMostAcceptedOrdersThisMonth(db);
@@ -34,7 +36,7 @@ router.get("/bestmonthlyseller",async (req,res) => {
     res.status(500).json({error:"Internal Server Error"});
   }
 })
-
+// route to get the data for the graph about the orders.
 router.get("/getgraphdata", async(req,res) => {
   try{
     const graphData = await AdminServices.getGraphData(db);
@@ -45,7 +47,7 @@ router.get("/getgraphdata", async(req,res) => {
   }
 })
 
-
+// route to log user activties.
 router.post('/logActivity',async (req, res) => {
   const { user_id, activity_type, details } = req.body;
   try{
@@ -56,7 +58,7 @@ router.post('/logActivity',async (req, res) => {
     res.status(500).json({error:"Internal Server Error"});
   }
 });
-
+// route to get a users latest activites
 router.get("/getlatestactivities", async(req,res) => {
   try{
     const results = await AdminServices.getLatestActivities(db);

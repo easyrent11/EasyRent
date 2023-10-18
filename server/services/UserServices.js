@@ -161,7 +161,7 @@ function insertCarImages(db, platesNumber, imageUrls) {
   return Promise.all(insertPromises);
 }
 
-// Function to add a car
+// The main function that will execute all of the above functions with the validations and successfully add a car to the website.
 async function addCar(db, carData) {
   const {
     Manufacturer_Code,
@@ -369,9 +369,10 @@ async function registerUser(db, userData) {
 #####################################################################
 */
 
-// Function to retrieve user by email
+// Function that get user details and check if those details exist in the website.
 async function checkUserDetailsExist(db, userDetails) {
   const { email, Id, phoneNumber, drivingLicense } = userDetails;
+  // function that will check if the given email exists.
   function checkIfEmailExists() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM users WHERE email = ?";
@@ -385,6 +386,7 @@ async function checkUserDetailsExist(db, userDetails) {
       });
     });
   }
+  // function that will check if the given user id exists.
   function checkIfUserIdExists() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM users WHERE id = ?";
@@ -398,6 +400,7 @@ async function checkUserDetailsExist(db, userDetails) {
       });
     });
   }
+  // function that will check if the given plates number exists.
   function checkPhoneNumberExists() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM users WHERE phone_number = ?";
@@ -411,6 +414,7 @@ async function checkUserDetailsExist(db, userDetails) {
       });
     });
   }
+  // function that will check if the given driving license exist.
   function checkIfDrivingLicenseExists() {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM users WHERE driving_license = ?";
@@ -492,6 +496,7 @@ async function comparePasswords(password, hashedPassword) {
   return await bcrypt.compare(password, hashedPassword);
 }
 
+// function that will generate a jwt token and return it.
 function generateToken(userId, expiresIn) {
   const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn,
@@ -499,7 +504,7 @@ function generateToken(userId, expiresIn) {
 
   return accessToken;
 }
-// Function to handle user login
+// Function to log in the user.
 async function loginUser(db, email, password) {
   try {
     // Check if the user exists in the database
@@ -549,6 +554,7 @@ async function loginUser(db, email, password) {
 #                   USER CAR SEARCH SERVICE                         #
 #####################################################################
 */
+// function that will take search attributes and search for cars with the given attributes.
 async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
   const sql = `
     SELECT c.*, m.model_name, mf.Manufacturer_Name, GROUP_CONCAT(ci.image_url) AS car_urls
@@ -613,6 +619,8 @@ async function searchCar(db, city, pickupDate, returnDate, startTime, endTime) {
 #                   Order CAR SERVICE                               #
 #####################################################################
 */
+
+// function that will take an order details object and create an order
 async function orderCar(db, orderDetails) {
   console.log(orderDetails);
   const {
@@ -717,7 +725,7 @@ async function orderCar(db, orderDetails) {
 
 /*
 ##################################################################################
-#           Function to get all orders based on renter id and rentee id          #                            
+#                             ORDERS FUNCTIONS                                   #                            
 ##################################################################################
 */
 // Function to fetch orders with renter_id matching userId
@@ -733,7 +741,6 @@ async function getOrdersByRenterId(db, userId) {
     });
   });
 }
-
 // Function to fetch orders with rentee_id matching userId
 async function getOrdersByRenteeId(db, userId) {
   const query = `SELECT * FROM orders WHERE Rentee_id = ${userId}`;
@@ -747,7 +754,7 @@ async function getOrdersByRenteeId(db, userId) {
     });
   });
 }
-
+// function that retrieve an order via order id.
 async function getOrderById(db, orderId) {
   const query = `SELECT * FROM orders WHERE Order_Id = ?`;
   return new Promise((resolve, reject) => {
@@ -766,8 +773,6 @@ async function getOrderById(db, orderId) {
     });
   });
 }
-
-
 // Function to update the order status and return the updated order
 async function updateOrderStatus(db, orderId, status) {
   const query = `UPDATE orders SET Status = '${status}' WHERE Order_Id = ${orderId}`;
@@ -790,7 +795,7 @@ async function updateOrderStatus(db, orderId, status) {
     });
   });
 }
-// function that will take an orderId and plates number and find and return all conflicting orders with the given order for the given car.
+// function that takes an order id and plates number and return all conflicting order details and decline them.
 async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
   try {
     // Get the order details for the provided orderId
@@ -805,17 +810,23 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
     const currentStartDate = currentOrder.Start_Date;
     const currentEndDate = currentOrder.End_Date;
     const currentStartTime = currentOrder.Start_Time;
-    const currentEndTime = currentOrder.End_Time;
-
+    // query that will find the conflicting orders.
     const sql = `
         SELECT * FROM orders 
         WHERE status = 'pending' 
         AND Order_Id <> ?
-        AND Car_Plates_Number = ? AND (Start_Date > ? AND Start_Date < ?) OR 
-        ( (End_Date>? OR (End_Date=? AND End_Time >= ?)) AND (End_Date<? OR (End_Date=? AND End_Time>= ?)) OR
-	      (Start_Date > ? AND End_Date < ? OR (Start_Date=? AND End_Time>=?)))
+        AND Car_Plates_Number = ?
+        AND (
+          (Start_Date > ? AND Start_Date < ?) OR 
+          (
+            (End_Date > ? OR (End_Date = ? AND End_Time >= ?)) AND 
+            (End_Date < ? OR (End_Date = ? AND End_Time >= ?))
+          ) OR
+          (Start_Date > ? AND End_Date < ?) OR 
+          (Start_Date = ? AND End_Time >= ?)
+        )
       `;
-
+    // creating the query parameter object.
     const queryParams = [
       orderId,
       carPlatesNumber,
@@ -832,9 +843,9 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
       currentStartDate,
       currentStartTime,
     ];
-    const declinedUserIds = []; // Array to store the IDs of users whose orders were declined
+    const declinedOrderInformation = [];
 
-    const conflictingOrders = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       db.query(sql, queryParams, async (error, results) => {
         if (error) {
           console.error("Error finding conflicting orders:", error);
@@ -842,67 +853,30 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
         } else {
           // Update the status of conflicting orders to 'declined'
           for (const order of results) {
-            await updateOrderStatus(db, order.Order_Id, 'declined');
-            declinedUserIds.push(order.Rentee_id); // Add the User_Id to the array
+            if (order.Order_Id !== orderId) { // Exclude the specific orderId
+              await updateOrderStatus(db, order.Order_Id, 'declined');
+              declinedOrderInformation.push({
+                Order_Id: order.Order_Id,
+                UserId: order.Rentee_id
+              });
+            }
           }
           resolve(results);
         }
       });
     });
 
-    return declinedUserIds; // Return the array of declined user IDs
+    return declinedOrderInformation;
   } catch (error) {
     console.error("Error in findAndDeclineConflictingOrders:", error);
     throw error;
   }
 }
-
-
-async function markNotificationAsRead(db, notificationId) {
-  const query = `UPDATE notifications SET isRead = 1 WHERE id = ${notificationId}`;
-  return new Promise((resolve, reject) => {
-    db.query(query, (error, results) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(results);
-      }
-    });
-  });
-}
-
-// function to start chat.
-const startChat = (db, user1Id, user2Id) => {
-  return new Promise((resolve, reject) => {
-    // Check if a chat room already exists between user1 and user2
-    const query = `SELECT id FROM chat_rooms WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)`;
-    db.query(query, [user1Id, user2Id, user2Id, user1Id], (error, results) => {
-      if (error) {
-        console.error("Error checking chat room:", error);
-        reject("Internal Server Error");
-      }
-
-      if (results.length > 0) {
-        // If a chat room exists, return its ID
-        resolve({ room: results[0].id });
-      } else {
-        // If a chat room doesn't exist, create a new one
-        const createQuery = `INSERT INTO chat_rooms (user1_id, user2_id) VALUES (?, ?)`;
-        db.query(
-          createQuery,
-          [user1Id, user2Id],
-          (createError, createResults) => {
-            if (createError) {
-              console.error("Error creating chat room:", createError);
-              reject("Internal Server Error");
-            }
-            resolve({ room: createResults.insertId });
-          }
-        );
-      }
-    });
-  });
-};
+/*
+##################################################################################
+#                           END OF ORDER FUNCTIONS                               #                            
+##################################################################################
+*/
 
 /*
 ##################################################################################
@@ -910,6 +884,7 @@ const startChat = (db, user1Id, user2Id) => {
 ##################################################################################
 */
 
+// function that takes a image file name and deletes the file from the local images folder.
 function deletePreviousPicture(filename) {
   const filePath = path.join(__dirname, "../images/", filename);
   if (fs.existsSync(filePath)) {
@@ -922,7 +897,7 @@ function deletePreviousPicture(filename) {
     });
   }
 }
-
+// function that takes new user details and updates the user details with the given ones.
 async function updateUserProfile(db, updatedUserDetails) {
   return new Promise((resolve, reject) => {
     const updateUserQuery = `
@@ -949,7 +924,7 @@ async function updateUserProfile(db, updatedUserDetails) {
     });
   });
 }
-
+// function that will insert a user city first and then use the above function to update the details.
 async function insertCityAndThenUpdateUser(db, updatedUserDetails) {
   return new Promise((resolve, reject) => {
     const insertCityQuery = `
@@ -973,9 +948,10 @@ async function insertCityAndThenUpdateUser(db, updatedUserDetails) {
     });
   });
 }
-
+// the main function that will execute both functions above to successfully update the user details.
 async function updateUserDetails(db, updatedUserDetails) {
   return new Promise(async (resolve, reject) => {
+    // checking if the user has a previous profile picture
     const findPreviousPictureQuery = `SELECT picture FROM users WHERE id = ${updatedUserDetails.Id}`;
 
     db.query(findPreviousPictureQuery, async (error, results) => {
@@ -994,7 +970,7 @@ async function updateUserDetails(db, updatedUserDetails) {
         } else {
           console.log("No previous picture found in the user database.");
         }
-
+        // checking if the city to update exists or not.
         const checkCityQuery = `SELECT COUNT(*) AS count FROM cities WHERE city_code = ${updatedUserDetails.city_code}`;
         db.query(checkCityQuery, async (error, results) => {
           if (error) {
@@ -1027,15 +1003,14 @@ async function updateUserDetails(db, updatedUserDetails) {
     });
   });
 }
-
 /*
 ##################################################################################
-#                       Service function to update change status                 #                            
+#                     End Of Services to update user details                     #                            
 ##################################################################################
 */
 
-// Function to update user's status
 
+// Function to update user's status
 async function changeUserStatus(db, userId, newStatus) {
   return new Promise((resolve, reject) => {
     const query = `UPDATE users SET status = ? WHERE Id = ?`;
@@ -1050,6 +1025,7 @@ async function changeUserStatus(db, userId, newStatus) {
     });
   });
 }
+// function that will report a user 
 async function handleReportUser(db, reportDetails) {
   return new Promise((resolve, reject) => {
     const insertQuery =
@@ -1114,6 +1090,54 @@ async function handleReportUser(db, reportDetails) {
     );
   });
 }
+
+// Function that takes a notification id and marks the notification as read.
+async function markNotificationAsRead(db, notificationId) {
+  const query = `UPDATE notifications SET isRead = 1 WHERE id = ${notificationId}`;
+  return new Promise((resolve, reject) => {
+    db.query(query, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
+// function to start chat room between 2 users so they can talk privately.
+const startChat = (db, user1Id, user2Id) => {
+  return new Promise((resolve, reject) => {
+    // Check if a chat room already exists between user1 and user2
+    const query = `SELECT id FROM chat_rooms WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)`;
+    db.query(query, [user1Id, user2Id, user2Id, user1Id], (error, results) => {
+      if (error) {
+        console.error("Error checking chat room:", error);
+        reject("Internal Server Error");
+      }
+
+      if (results.length > 0) {
+        // If a chat room exists, return its ID
+        resolve({ room: results[0].id });
+      } else {
+        // If a chat room doesn't exist, create a new one
+        const createQuery = `INSERT INTO chat_rooms (user1_id, user2_id) VALUES (?, ?)`;
+        db.query(
+          createQuery,
+          [user1Id, user2Id],
+          (createError, createResults) => {
+            if (createError) {
+              console.error("Error creating chat room:", createError);
+              reject("Internal Server Error");
+            }
+            resolve({ room: createResults.insertId });
+          }
+        );
+      }
+    });
+  });
+};
+
 
 module.exports = {
   registerUser,

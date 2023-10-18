@@ -7,6 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const UserServices = require("../services/UserServices");
 const bcrypt = require("bcrypt");
+
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
@@ -19,7 +20,7 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ error: "Failed to register user" });
   }
 });
-
+// route to checkc if user details exist in the website.
 router.post("/userdetailsexist", (req, res) => {
   const userDetails = req.body;
   UserServices.checkUserDetailsExist(db, userDetails)
@@ -31,6 +32,7 @@ router.post("/userdetailsexist", (req, res) => {
       res.status(500).json({ error: "An error occurred" });
     });
 });
+
 // login route.
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -92,7 +94,7 @@ router.post("/searchcar", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
+// route to report a user 
 router.post("/reportuser", async (req, res) => {
   const reportDetails = req.body;
   console.log(reportDetails);
@@ -104,7 +106,7 @@ router.post("/reportuser", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
-
+// route to get all reports.
 router.get("/reports", (req, res) => {
   const getReportsQuery = `
     SELECT 
@@ -182,6 +184,7 @@ router.get("/getuser/:id", (req, res) => {
   });
 });
 
+// route to update user details.
 router.put("/updateuserdetails", async (req, res) => {
   const updatedUserDetails = req.body;
   console.log("In backend", updatedUserDetails);
@@ -194,7 +197,7 @@ router.put("/updateuserdetails", async (req, res) => {
     res.status(500).json({ error: "Failed to update user details" });
   }
 });
-
+// route to change password.
 router.post("/changepassword", (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
   console.log(userId, currentPassword, newPassword);
@@ -420,8 +423,6 @@ router.put("/changeuserstatus", async (req, res) => {
   }
 });
 
-// Route to get all users.
-
 // Route to get messages for a specific chat room
 router.get("/messages/:room", (req, res) => {
   const room = req.params.room;
@@ -438,7 +439,7 @@ router.get("/messages/:room", (req, res) => {
     }
   });
 });
-
+// route to get all chatrooms for a user via id.
 router.get("/chatroom/:userId", (req, res) => {
   const userId = req.params.userId;
   const query = "SELECT * FROM chat_rooms WHERE user1_id = ? or user2_id = ?";
@@ -451,7 +452,7 @@ router.get("/chatroom/:userId", (req, res) => {
     }
   });
 });
-
+// route to get all users.
 router.get("/getAllUsers", (req, res) => {
   const query = "SELECT * from users";
 
@@ -466,7 +467,7 @@ router.get("/getAllUsers", (req, res) => {
     }
   });
 });
-
+// route to get a users latest orders.
 router.get("/getlatestorders", (req, res) => {
   const query = "SELECT * FROM orders ORDER BY Order_Date DESC LIMIT 5";
   db.query(query, (error, results) => {
@@ -478,7 +479,7 @@ router.get("/getlatestorders", (req, res) => {
     }
   });
 });
-
+// route to initialize a chat between 2 people.
 router.post("/startChat", async (req, res) => {
   let { user1Id, user2Id } = req.body;
   // convert userId from string to int.
@@ -491,7 +492,7 @@ router.post("/startChat", async (req, res) => {
     res.status(401).json({ message: "Something went wrong" });
   }
 });
-
+// route to get all orders.
 router.get("/orders", async (req, res) => {
   const query = "SELECT * FROM orders";
   db.query(query, (error, results) => {
@@ -503,7 +504,7 @@ router.get("/orders", async (req, res) => {
     }
   });
 });
-
+// route to get all unread notifications for a user via id.
 router.get("/notifications/:userId", async (req, res) => {
   const userId = req.params.userId;
   const query =
@@ -517,7 +518,7 @@ router.get("/notifications/:userId", async (req, res) => {
     }
   });
 });
-
+// route to mark a notification as read via id.
 router.put("/notifications/:notificationId", async (req, res) => {
   const notificationId = req.params.notificationId;
   try {

@@ -143,7 +143,6 @@ export default function CarView() {
     sendOrderRequest(orderRequest) // Use the renamed function here
       .then((res) => {
         notify("success", "Order request sent successfully!");
-        console.log(res.data.order);
         setUserRenteeOrders((prevRenteeOrders) => [
           ...prevRenteeOrders,
           res.data.order,

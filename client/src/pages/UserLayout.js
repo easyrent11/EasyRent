@@ -6,7 +6,7 @@ import SearchCar from '../components/SearchCar';
 import { UserProfileDetails } from '../contexts/UserProfileDetails';
 import { AllCarsContext } from '../contexts/AllCarsContext';
 
-
+// the user's home page.
 export default function UserLayout() {
   const { allCars} = useContext(AllCarsContext);
   const userDetails = useContext(UserProfileDetails);
@@ -14,7 +14,7 @@ export default function UserLayout() {
 
   
   
-
+  // function to filter cars.
   function filterCars(filterOptions) {
     let filteredCars = [... allCars]; //copying the array.
     if (filterOptions.manufacturer) {
@@ -71,7 +71,7 @@ export default function UserLayout() {
   }
 
 
-  // You can update filteredCars whenever allCars changes
+  // use effect that will apply filter options everytime the page refreshes, if there are any.
   useEffect(() => {
     if(!localStorage.getItem('filterOptions'))
       setFilteredCars([...allCars]); // Copy allCars when it changes

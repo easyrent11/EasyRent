@@ -28,7 +28,7 @@ function checkIfCarExists(db, platesNumber) {
     );
   });
 }
-
+// function that will retrieve all the cars with their images.
 function getAllCarsWithImages() {
   return new Promise((resolve, reject) => {
     const query = `
@@ -62,6 +62,8 @@ function getAllCarsWithImages() {
 //#####################################################################
 //#                    DELETE CAR IMAGES AND CAR SERVICE              #
 //#####################################################################
+
+// function that checks if a given car exists in one of the orders in the website (if the car is used).
 async function carExistsInOrders(db, platesNumber) {
   platesNumber = Number(platesNumber);
   return new Promise((resolve, reject) => {
@@ -126,6 +128,21 @@ async function deleteCar(db, platesNumber) {
   });
 }
 
+// helper function that takes a filename of a picture and deletes it from the images folder.
+function deletePictureFromFolder(filename) {
+  const filePath = path.join(__dirname, "../images/", filename);
+
+  if (fs.existsSync(filePath)) {
+    fs.unlink(filePath, (error) => {
+      if (error) {
+        console.error("Error deleting previous car picture:", error);
+      } else {
+        console.log("Previous car picture deleted successfully");
+      }
+    });
+  }
+}
+// function that takes a car and deletes all of its images from the local folder in the server.
 async function deleteCarPictures(db, Plates_Number) {
   return new Promise(async (resolve, reject) => {
     db.query(
@@ -180,7 +197,7 @@ async function deleteCarPictures(db, Plates_Number) {
   });
 }
 
-// helper function that takes the plates number of a car and deletes all of its images.
+// helper function that takes the plates number of a car and deletes all of its images from the database.
 function deletePictureFromDataBase(db, Plates_Number) {
   return new Promise((resolve, reject) => {
     db.query(
@@ -216,22 +233,6 @@ function deletePictureFromDataBase(db, Plates_Number) {
     );
   });
 }
-
-// helper function that takes a filename of a picture and deletes it from the images folder.
-function deletePictureFromFolder(filename) {
-  const filePath = path.join(__dirname, "../images/", filename);
-
-  if (fs.existsSync(filePath)) {
-    fs.unlink(filePath, (error) => {
-      if (error) {
-        console.error("Error deleting previous car picture:", error);
-      } else {
-        console.log("Previous car picture deleted successfully");
-      }
-    });
-  }
-}
-
 /*
 #####################################################################
 #             UPDATE CAR ATTRIBUTES SERVICE                         #
@@ -298,7 +299,7 @@ function updateCarDetails(db, updatedCarDetails) {
       });
     };
 
-    // Function to update the car details in the cars table
+    // Function to update the car details in the database.
     const updateCarDetailsInCarsTable = () => {
       // Get the previous car details from the database
       const findPreviousCarQuery = `SELECT * FROM cars WHERE Plates_Number = ${Plates_Number}`;
@@ -357,7 +358,7 @@ function updateCarDetails(db, updatedCarDetails) {
     };
   });
 }
-
+// function that retrieves a car via plates number along with its images.
 async function getCarWithPlatesNumber(db, PlatesNumber) {
   const query = `
   SELECT c.*, GROUP_CONCAT(i.image_url) AS car_urls
@@ -376,7 +377,7 @@ async function getCarWithPlatesNumber(db, PlatesNumber) {
     });
   });
 }
-
+// function that retrieves a given user's cars 
 async function getCarsWithUserId(db, userId) {
   const query = `select * from cars WHERE Renter_Id = ${userId}`;
   return new Promise((resolve, reject) => {
@@ -395,7 +396,7 @@ async function getCarsWithUserId(db, userId) {
 #             INSERT CAR IMAGES SERVICE                             #
 #####################################################################
 */
-
+// function that retrieves all of the images of a car.
 function fetchAllCarImages(db, PlatesNumber) {
   return new Promise((resolve, reject) => {
     if (!PlatesNumber) {
@@ -418,7 +419,6 @@ function fetchAllCarImages(db, PlatesNumber) {
 }
 // Function to insert car images
 function insertCarImages(db, platesNumber, imageUrls) {
-  console.log("In User services = ", platesNumber, imageUrls);
   const insertPromises = imageUrls.map((url) => {
     return new Promise((resolve, reject) => {
       db.query(

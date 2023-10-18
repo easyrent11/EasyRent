@@ -1,3 +1,4 @@
+// functions that select a style for an element.
 export const selectStyle = {
   control: (base, state) => ({
     ...base,

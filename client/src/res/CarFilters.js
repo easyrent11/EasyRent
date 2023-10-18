@@ -1,16 +1,3 @@
-// export const filterCarsByPriceRange = (cars, lowPrice, highPrice) => {
-//     let filteredList = [...cars];
-  
-//     // Filter by price range
-//     filteredList = filteredList.filter(
-//       (car) => car.Rental_Price_Per_Day >= lowPrice && car.Rental_Price_Per_Day <= highPrice
-//     );
-  
-//     return filteredList;
-//   };
-
-// CarFilters.js
-
 export function filterCars(allCars, filters) {
     return allCars.filter((car) => {
       // Filter by manufacturer

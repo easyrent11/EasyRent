@@ -1,7 +1,7 @@
 // Function to retrieve the count of orders that were made today
 async function getOrdersToday(db) {
   return new Promise((resolve, reject) => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split("T")[0]; // converting the date to a normal date format yy:mm:dd.
     const query =
       "SELECT COUNT(*) AS orderCount FROM orders WHERE DATE(Order_Date) = ?";
 
@@ -19,6 +19,7 @@ async function getOrdersToday(db) {
 // Function to retrieve the count of orders that were made this month
 async function getOrdersThisMonth(db) {
   return new Promise((resolve, reject) => {
+    // formatting the current date and month to the normal date format of yy:mm:dd
     const currentDate = new Date();
     const firstDayOfMonth = new Date(
       currentDate.getFullYear(),
@@ -60,7 +61,7 @@ async function getOrdersThisYear(db) {
     });
   });
 }
-
+// function that retrieves the best seller of the month
 function getUserWithMostAcceptedOrdersThisMonth(db) {
   return new Promise((resolve, reject) => {
     const currentDate = new Date();
@@ -98,7 +99,7 @@ function getUserWithMostAcceptedOrdersThisMonth(db) {
 }
 
 
-
+// function that retrieves the graph data for the admin that has all the orders , cars and users registered 
 async function getGraphData(db) {
   return new Promise((resolve, reject) => {
     const ordersQuery = "SELECT * FROM orders";
@@ -113,7 +114,7 @@ async function getGraphData(db) {
         reject("Internal server error");
         return;
       }
-
+      // getting the orders.
       const orderCreationDates = ordersResults.map(row => row.Order_Date);
       graphData.orderCreationDates = orderCreationDates;
 
@@ -123,7 +124,7 @@ async function getGraphData(db) {
           reject("Internal server error");
           return;
         }
-
+        // getting the registered users.
         const userRegistrationDates = usersResults.map(row => row.register_date);
         graphData.userRegistrationDates = userRegistrationDates;
 
@@ -133,7 +134,7 @@ async function getGraphData(db) {
             reject("Internal server error");
             return;
           }
-
+          // getting the cars
           const carRegistrationDates = carsResults.map(row => row.upload_date);
           graphData.carRegistrationDates = carRegistrationDates;
 
@@ -144,7 +145,7 @@ async function getGraphData(db) {
   });
 }
 
-// Function to insert a user
+// Function to log a user's activty
 async function insertActivity(db, user_id, activity_type, details) {
   const query = `
   INSERT INTO activities (user_id, activity_type, details)
@@ -160,7 +161,7 @@ async function insertActivity(db, user_id, activity_type, details) {
     });
   });
 }
-
+// function to get the latest activties in the website.
 async function getLatestActivities(db){
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM activities ORDER BY activity_time DESC LIMIT 10";

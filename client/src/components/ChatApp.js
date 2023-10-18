@@ -26,7 +26,6 @@ export default function ChatApp() {
     axios
       .get("http://localhost:3001/user/getAllUsers")
       .then((response) => {
-        console.log(response.data);
         // Filter out the logged-in user from the users array
         const filteredUsers = response.data.filter(
           (user) => user.Id !== user1Id
@@ -163,10 +162,10 @@ export default function ChatApp() {
 
         </div>
 
-        <div className="flex flex-col flex-1 rounded-md">
+        <div className="flex flex-col flex-1  rounded-md">
           {room ? (
             <>
-              <div className="flex items-center  rounded-md shadow-sm bg-[#f1f1f1] border p-2">
+              <div className="flex items-center rounded-md shadow-sm bg-[#f1f1f1] border p-2">
                 {users.find((user) => user.Id === selectedUser) ? (
                   <div className="flex p-2 items-center">
                     <img
