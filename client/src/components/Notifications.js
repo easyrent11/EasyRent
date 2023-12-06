@@ -187,7 +187,7 @@ export default function Notifications() {
         )}
       </div>
 
-      {typeOfNotification === "order-request-notification" && (
+      {typeOfNotification === "order-request-notification" && orderDetails && orderDetails.status === 'pending' && (
         <div className="w-1/2 m-2 flex  items-center justify-center">
           <button
             onClick={handleAcceptOrder}

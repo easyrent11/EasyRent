@@ -122,7 +122,7 @@ function App() {
         console.error("Error fetching cars:", error);
       });
   }, []);
-
+  
   // try to get the token if the token exists change the isLogged state.
   useEffect(() => {
     const token = localStorage.getItem("token");

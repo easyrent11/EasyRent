@@ -18,10 +18,12 @@ export default function ChatApp() {
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
 
+  // use effect to display all users.
   useEffect(() => {
     displayAllUsers();
   }, [room]);
 
+  // function that will fetch all users from the backend
   function displayAllUsers() {
     axios
       .get("http://localhost:3001/user/getAllUsers")
@@ -37,6 +39,7 @@ export default function ChatApp() {
       });
   }
 
+  // function that will fetch the image of the selected user.
   function getSelectedUserImage(givenUserId) {
     const user = users.find((user) => user.Id == givenUserId);
 
@@ -47,7 +50,7 @@ export default function ChatApp() {
       return `http://localhost:3001/images/${userDetails.picture}`;
     }
   }
-
+  // function that will fetch all messages for the given room
   function fetchMessagesForRoom() {
     if (room) {
       axios
@@ -61,7 +64,7 @@ export default function ChatApp() {
         });
     }
   }
-
+  // function that will start a chat between 2 users.
   function startChat(user2Id) {
     const roomInfo = {
       user1Id: user1Id,
@@ -79,18 +82,24 @@ export default function ChatApp() {
         console.error("Error creating/retrieving chat room:", error);
       });
   }
-
+  // use memo to fetch all messages for a specific room.
   useMemo(() => {
     fetchMessagesForRoom();
   }, [room]);
 
+  // function to send a message to a user.
   function sendMessage() {
     socket.emit("send_message", { message, room, user_id: user1Id });
-    socket.emit('notification', {userId:selectedUser, message: 'You have a new message', type:"recieve-message-notification"});
+    socket.emit("notification", {
+      userId: selectedUser,
+      message: "You have a new message",
+      type: "recieve-message-notification",
+    });
 
     setMessage("");
   }
 
+  // useeffect to listen for incoming messages from users.
   useEffect(() => {
     socket.on("receive_message", (data) => {
       if (data.room !== room) {
@@ -129,37 +138,39 @@ export default function ChatApp() {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-         <ul>
-  {users.map((user) => {
-    const userFullName = `${user.first_name} ${user.last_name}`;
-    const userMatchesSearch =
-      !searchValue || userFullName.toLowerCase().includes(searchValue.toLowerCase());
+          <ul>
+            {users.map((user) => {
+              const userFullName = `${user.first_name} ${user.last_name}`;
+              const userMatchesSearch =
+                !searchValue ||
+                userFullName.toLowerCase().includes(searchValue.toLowerCase());
 
-    if (userMatchesSearch) {
-      return (
-        <li
-          key={user.Id}
-          className={`flex items-center mb-2 cursor-pointer ${
-            selectedUser === user.Id
-              ? "bg-[#c6c3c3] rounded-md p-2 text-white"
-              : " p-2 text-black"
-          }`}
-          onClick={() => startChat(user.Id)}
-        >
-          <img
-            src={`http://localhost:3001/images/${user.picture || ""}`}
-            alt={user.first_name}
-            className="w-8 h-8 rounded-full mr-2"
-          />
-          <span className="text-black font-bold text-lg">{userFullName}</span>
-        </li>
-      );
-    }
+              if (userMatchesSearch) {
+                return (
+                  <li
+                    key={user.Id}
+                    className={`flex items-center mb-2 cursor-pointer ${
+                      selectedUser === user.Id
+                        ? "bg-[#c6c3c3] rounded-md p-2 text-white"
+                        : " p-2 text-black"
+                    }`}
+                    onClick={() => startChat(user.Id)}
+                  >
+                    <img
+                      src={`http://localhost:3001/images/${user.picture || ""}`}
+                      alt={user.first_name}
+                      className="w-8 h-8 rounded-full mr-2"
+                    />
+                    <span className="text-black font-bold text-lg">
+                      {userFullName}
+                    </span>
+                  </li>
+                );
+              }
 
-    return null; // Exclude users that don't match the filter
-  })}
-</ul>
-
+              return null; // Exclude users that don't match the filter
+            })}
+          </ul>
         </div>
 
         <div className="flex flex-col flex-1  rounded-md">
@@ -176,7 +187,10 @@ export default function ChatApp() {
                       alt="User Avatar"
                     />
                     <p>
-                      {users.find((user) => user.Id === selectedUser).first_name}
+                      {
+                        users.find((user) => user.Id === selectedUser)
+                          .first_name
+                      }
                     </p>
                   </div>
                 ) : null}
@@ -185,7 +199,9 @@ export default function ChatApp() {
                     className="ml-auto cursor-pointer"
                     onClick={() => setShowReportMenuForUser(selectedUser)}
                   >
-                    <p className="text-black p-2 text-lg font-bold ">Report User</p>
+                    <p className="text-black p-2 text-lg font-bold ">
+                      Report User
+                    </p>
                   </div>
                 )}
               </div>

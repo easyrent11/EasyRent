@@ -92,3 +92,4 @@ export const markNotificationAsRead = (notificationId) => {
 export const findAndDeclineConflictingOrders = (orderDetails) => {
   return axios.put(`${BASE_URL_USER}/decline-conficting-orders`, orderDetails);
 }
+

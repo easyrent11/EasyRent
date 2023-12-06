@@ -396,7 +396,6 @@ router.put("/changeorderstatus", async (req, res) => {
 
 router.put("/decline-conficting-orders", async (req, res) => {
   const { orderId, carPlatesNumber } = req.body;
-  console.log(orderId,carPlatesNumber);
   try {
     // Update the status of the order and fetch the updated order
     const result = await UserServices.findAndDeclineConflictingOrders(

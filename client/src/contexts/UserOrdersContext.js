@@ -46,7 +46,7 @@ export function UserOrdersProvider({ children }) {
   const contextValue = {
     userOrders,
     userRenteeOrders,
-    setUserRenteeOrders, // Add the function here
+    setUserRenteeOrders,
     setUserOrders,
   };
 

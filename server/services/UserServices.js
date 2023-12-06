@@ -730,7 +730,7 @@ async function orderCar(db, orderDetails) {
 */
 // Function to fetch orders with renter_id matching userId
 async function getOrdersByRenterId(db, userId) {
-  const query = `SELECT * FROM orders WHERE Renter_Id = ${userId}`;
+  const query = `SELECT * FROM orders WHERE Renter_Id = ${userId} and status!='cancelled'`;
   return new Promise((resolve, reject) => {
     db.query(query, (error, results) => {
       if (error) {
@@ -743,7 +743,7 @@ async function getOrdersByRenterId(db, userId) {
 }
 // Function to fetch orders with rentee_id matching userId
 async function getOrdersByRenteeId(db, userId) {
-  const query = `SELECT * FROM orders WHERE Rentee_id = ${userId}`;
+  const query = `SELECT * FROM orders WHERE Rentee_id = ${userId} and status!='cancelled'`;
   return new Promise((resolve, reject) => {
     db.query(query, (error, results) => {
       if (error) {
@@ -781,13 +781,12 @@ async function updateOrderStatus(db, orderId, status) {
       if (error) {
         reject(error);
       } else {
-        // Fetch the updated order after updating the status
         const selectQuery = `SELECT * FROM orders WHERE Order_Id = ${orderId}`;
         db.query(selectQuery, (selectError, selectResults) => {
           if (selectError) {
             reject(selectError);
           } else {
-            // Assuming selectResults[0] contains the updated order
+
             resolve(selectResults[0]);
           }
         });
@@ -853,7 +852,7 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
         } else {
           // Update the status of conflicting orders to 'declined'
           for (const order of results) {
-            if (order.Order_Id !== orderId) { // Exclude the specific orderId
+            if (order.Order_Id !== orderId) { 
               await updateOrderStatus(db, order.Order_Id, 'declined');
               declinedOrderInformation.push({
                 Order_Id: order.Order_Id,

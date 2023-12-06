@@ -38,8 +38,8 @@ export default function CarView() {
   let { encryptedPlatesNumber } = useParams();
   // decryping the encrypted plates number from the parameters.
   let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
-  // extracting the car from the car list using the plates Number to match it to the one we click on.
- 
+
+  // use effect to connect to the socket.
   useEffect(() => {
     const socket = io.connect("http://localhost:3001");
     setSocket(socket);
@@ -52,6 +52,7 @@ export default function CarView() {
     };
   }, []);
  
+  // usememo that will fetch a car and its images based on plates number
   useMemo(() => {
     getCar(platesNumber)
       .then((res) => {
@@ -69,6 +70,7 @@ export default function CarView() {
     return [];
   }, [car]);
 
+  // use effect that will fetch all user details based on renter id.
   useEffect(() => {
     getAllUserDetails(car.Renter_Id)
       .then((result) => {
@@ -81,6 +83,7 @@ export default function CarView() {
       });
   }, [car]);
 
+  // method that will reset the form fields.
   const resetFields = () => {
     setStartTime("10:00");
     setEndTime("10:00");
@@ -88,10 +91,26 @@ export default function CarView() {
     setEndDate("");
   };
 
+  // function that generates the current date of an order in 'yy:mm:dd hh:mm:ss' format 
+  function getCurrentDate(){
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleString('en-US', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+    });
+    return formattedDate;
+  }
+
+
   // get the rentee id.
   let renteeId = localStorage.getItem("userId");
   renteeId = renteeId ? parseInt(renteeId) : null;
 
+  // function that will send the order request to the renter
   const sendCarOrderRequest = () => {
 
     // checking if the user provided the order details.
@@ -127,7 +146,7 @@ export default function CarView() {
       console.log("Error: Car rents should be only from 1 hour and above.");
       return;
     }
-
+    // creating an order details object.
     const orderRequest = {
       Start_Date: startDate,
       End_Date: endDate,
@@ -137,10 +156,11 @@ export default function CarView() {
       End_Time: endTime,
       status: "pending",
       Renter_Id: ownerId,
-      Order_Date: new Date().toISOString(),
+      Order_Date: getCurrentDate()
     };
-
-    sendOrderRequest(orderRequest) // Use the renamed function here
+    console.log("order request = ",orderRequest);
+    // sending the order to the renter.
+    sendOrderRequest(orderRequest) 
       .then((res) => {
         notify("success", "Order request sent successfully!");
         setUserRenteeOrders((prevRenteeOrders) => [
