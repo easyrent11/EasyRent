@@ -12,10 +12,9 @@ import { Link } from "react-router-dom";
 import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { notify } from "../HelperFunctions/Notify";
 import { getCar } from "../api/CarApi";
-import io from 'socket.io-client';
+import io from "socket.io-client";
 
 export default function CarView() {
-
   let flag = false;
 
   const navigate = useNavigate();
@@ -39,11 +38,26 @@ export default function CarView() {
   // decryping the encrypted plates number from the parameters.
   let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
 
+  useEffect(() => {
+    // Check if search parameters exist in localStorage
+    const storedStartDate = localStorage.getItem('startDate');
+    const storedEndDate = localStorage.getItem('endDate');
+    const storedStartTime = localStorage.getItem('startTime');
+    const storedEndTime = localStorage.getItem('endTime');
+
+    // If search parameters exist, set them in the state
+    if (storedStartDate && storedEndDate && storedStartTime && storedEndTime) {
+      setStartDate(storedStartDate);
+      setEndDate(storedEndDate);
+      setStartTime(storedStartTime);
+      setEndTime(storedEndTime);
+    }
+  }, []);
   // use effect to connect to the socket.
   useEffect(() => {
     const socket = io.connect("http://localhost:3001");
     setSocket(socket);
-  
+
     // Clean up when the component unmounts
     return () => {
       if (socket) {
@@ -51,7 +65,7 @@ export default function CarView() {
       }
     };
   }, []);
- 
+
   // usememo that will fetch a car and its images based on plates number
   useMemo(() => {
     getCar(platesNumber)
@@ -91,28 +105,12 @@ export default function CarView() {
     setEndDate("");
   };
 
-  // function that generates the current date of an order in 'yy:mm:dd hh:mm:ss' format 
-  function getCurrentDate(){
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleString('en-US', { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit', 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    second: '2-digit' 
-    });
-    return formattedDate;
-  }
-
-
   // get the rentee id.
   let renteeId = localStorage.getItem("userId");
   renteeId = renteeId ? parseInt(renteeId) : null;
 
   // function that will send the order request to the renter
   const sendCarOrderRequest = () => {
-
     // checking if the user provided the order details.
     if (!startDate || !endDate || !startTime || !endTime) {
       notify("error", "Error: Please fill in all required fields.");
@@ -156,19 +154,21 @@ export default function CarView() {
       End_Time: endTime,
       status: "pending",
       Renter_Id: ownerId,
-      Order_Date: getCurrentDate()
     };
-    console.log("order request = ",orderRequest);
     // sending the order to the renter.
-    sendOrderRequest(orderRequest) 
+    sendOrderRequest(orderRequest)
       .then((res) => {
         notify("success", "Order request sent successfully!");
         setUserRenteeOrders((prevRenteeOrders) => [
           ...prevRenteeOrders,
           res.data.order,
         ]);
-        socket.emit('notification',{userId:ownerId, message: 'You have a new order on one of your cars', type:"order-request-notification", orderId:res.data.order.Order_Id
-      });
+        socket.emit("notification", {
+          userId: ownerId,
+          message: "You have a new order on one of your cars",
+          type: "order-request-notification",
+          orderId: res.data.order.Order_Id,
+        });
         resetFields();
       })
       .catch((err) => {
@@ -185,6 +185,10 @@ export default function CarView() {
       navigate("/DisplaySearchResults");
     }
   };
+
+  const saveOwnerId = () => {
+    localStorage.setItem('targetedUser', ownerId);
+  }
 
   return (
     <div className="shadow-lg min-h-full mb-4 border-2  bg-[#f6f6f6] rounded-lg flex flex-col items-center">
@@ -331,7 +335,7 @@ export default function CarView() {
               >
                 Send Request
               </button>
-              <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1">
+              <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1" onClick={saveOwnerId}>
                 <Link to="/ChatApp">Start Chat with Seller</Link>
               </button>
             </div>

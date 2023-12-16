@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getOrderById, getAllUserDetails } from "../api/UserApi";
 import { getCar } from "../api/CarApi";
+import { formatDate } from "../HelperFunctions/FormatDate";
 
 export default function Report() {
   const [order, setOrder] = useState({});
@@ -52,11 +53,11 @@ export default function Report() {
       // Parse the date strings into Date objects
       const startDate = new Date(order.Start_Date);
       const endDate = new Date(order.End_Date);
-  
+
       // Calculate the number of days between start and end dates
       const timeDifference = endDate.getTime() - startDate.getTime();
       const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
-  
+
       // Calculate the total renting price
       const total = numberOfDays * car.Rental_Price_Per_Day;
       setTotalPrice(total);
@@ -71,47 +72,42 @@ export default function Report() {
         <table className="table-auto w-full">
           <tbody>
             <tr>
-              <td className="font-bold">Order ID:</td>
+              <td className="font-bold">Order ID : </td>
               <td>{order.Order_Id}</td>
             </tr>
             <tr>
-              <td className="font-bold">Start Date:</td>
-              <td>{order.Start_Date}</td>
+              <td className="font-bold">Start Date : </td>
+              <td>{formatDate(order.Start_Date)}</td>
             </tr>
             <tr>
-              <td className="font-bold">End Date:</td>
-              <td>{order.End_Date}</td>
+              <td className="font-bold">End Date : </td>
+              <td>{formatDate(order.End_Date)}</td>
             </tr>
             <tr>
-              <td className="font-bold">Order ID:</td>
+              <td className="font-bold">Start Time :</td>
               <td>{order.Start_Time}</td>
             </tr>
             <tr>
-              <td className="font-bold">Start Date:</td>
+              <td className="font-bold">End Time : </td>
               <td>{order.End_Time}</td>
             </tr>
             <tr>
-              <td className="font-bold">End Date:</td>
-              <td>{order.status}</td>
+              <td className="font-bold">Total Rental Time</td>
+              <td>
+                {order.Start_Date && order.End_Date && (
+                  <>
+                    {new Date(order.End_Date).getDate() -
+                      new Date(order.Start_Date).getDate()}
+                    {""} day/s
+                  </>
+                )}
+              </td>
             </tr>
-            <tr>
-  <td className="font-bold">Total Rental Time</td>
-  <td>
-    {order.Start_Date && order.End_Date && (
-      <>
-        {new Date(order.End_Date).getDate() -
-          new Date(order.Start_Date).getDate()}{" "}
-        days
-      </>
-    )}
-  </td>
-</tr>
 
             <tr>
-              <td className="font-bold">End Date:</td>
-              <td>{order.Order_Date}</td>
+              <td className="font-bold">Order Date : </td>
+              <td>{formatDate(order.Order_Date)}</td>
             </tr>
-            {/* Add more order details as needed */}
           </tbody>
         </table>
       </section>
@@ -122,7 +118,9 @@ export default function Report() {
           <tbody>
             <tr>
               <td className="font-bold">Name:</td>
-              <td>{renter.first_name} {renter.last_name}</td>
+              <td>
+                {renter.first_name} {renter.last_name}
+              </td>
             </tr>
             <tr>
               <td className="font-bold">Email:</td>
@@ -143,7 +141,9 @@ export default function Report() {
           <tbody>
             <tr>
               <td className="font-bold">Name:</td>
-              <td>{rentee.first_name} {rentee.last_name}</td>
+              <td>
+                {rentee.first_name} {rentee.last_name}
+              </td>
             </tr>
             <tr>
               <td className="font-bold">Email:</td>

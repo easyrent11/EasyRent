@@ -5,6 +5,7 @@ import CarFilterSection from '../components/CarFilterSection';
 import SearchCar from '../components/SearchCar';
 import { UserProfileDetails } from '../contexts/UserProfileDetails';
 import { AllCarsContext } from '../contexts/AllCarsContext';
+import { clearSearchParameters } from '../HelperFunctions/ClearSearchParams';
 
 // the user's home page.
 export default function UserLayout() {
@@ -12,6 +13,7 @@ export default function UserLayout() {
   const userDetails = useContext(UserProfileDetails);
   const [filteredCars, setFilteredCars] = useState([...allCars]); // Copy allCars initially
 
+  
   
   
   // function to filter cars.
@@ -79,6 +81,25 @@ export default function UserLayout() {
       filterCars(JSON.parse(localStorage.getItem('filterOptions')));
     }
   }, [allCars]);
+
+
+  // a use effect that clears the search parameters if a page refreshes.
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      clearSearchParameters(); // calling the function that will remove the search parameters from the local storage.
+      
+      // Cancel the default behavior to show a prompt before leaving the page
+      event.preventDefault();
+      // Chrome requires returnValue to be set
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []); // Empty dependency array ensures this runs only on mount
 
 
 

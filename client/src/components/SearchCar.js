@@ -5,6 +5,7 @@ import { searchCars } from "../api/UserApi";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
+import {clearSearchParameters} from "../HelperFunctions/ClearSearchParams";
 
 export default function SearchCar() {
   const navigate = useNavigate();
@@ -21,7 +22,6 @@ export default function SearchCar() {
   const [returnDate, setReturnDate] = useState("");
   const [fromTime, setFromTime] = useState("10:00");
   const [toTime, setToTime] = useState("10:00");
-
 
   // on change event listener handlers for all the use states..
   const handleCityChange = (selectedOption) => {
@@ -41,49 +41,66 @@ export default function SearchCar() {
     setToTime(e.target.value);
   };
 
+  
   const handleFormSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Get the current date and time
-  const currentDate = new Date();
-  const currentTime = currentDate.getHours() + ":" + currentDate.getMinutes();
+    // Get the current date and time
+    const currentDate = new Date();
+    const currentTime = currentDate.getHours() + ":" + currentDate.getMinutes();
 
-  // Check if pickupDate is in the past
-  if (pickupDate < currentDate.toISOString().split('T')[0] ||
-      (pickupDate === currentDate.toISOString().split('T')[0] && fromTime < currentTime)) {
-    alert("Pickup date and time should not be in the past.");
-    return;
-  }
+    // Check if pickupDate is in the past
+    if (
+      pickupDate < currentDate.toISOString().split("T")[0] ||
+      (pickupDate === currentDate.toISOString().split("T")[0] &&
+        fromTime < currentTime)
+    ) {
+      alert("Pickup date and time should not be in the past.");
+      return;
+    }
 
-  // Check if returnDate is in the past
-  if (returnDate < currentDate.toISOString().split('T')[0] ||
-      (returnDate === currentDate.toISOString().split('T')[0] && toTime < currentTime)) {
-    alert("Return date and time should not be in the past.");
-    return;
-  }
+    // Check if return date is in the past
+    if (
+      returnDate < currentDate.toISOString().split("T")[0] ||
+      (returnDate === currentDate.toISOString().split("T")[0] &&
+        toTime < currentTime)
+    ) {
+      alert("Return date and time should not be in the past.");
+      return;
+    }
 
-  // Creating the search object
-  const requestData = {
-    city: city,
-    pickupDate: pickupDate,
-    returnDate: returnDate,
-    startTime: fromTime,
-    endTime: toTime,
+    clearSearchParameters(); // clearing previous search parameters.
+    handleFormReset(); // reset the form fields.
+    
+    // Creating the search object
+    const requestData = {
+      city: city,
+      pickupDate: pickupDate,
+      returnDate: returnDate,
+      startTime: fromTime,
+      endTime: toTime,
+    };
+    
+    searchCars(requestData)
+      .then((res) => {
+        const { pickupDate, returnDate, startTime, endTime } = requestData;
+        // Saving search params in localStorage
+        localStorage.setItem('startDate', pickupDate);
+        localStorage.setItem('endDate', returnDate);
+        localStorage.setItem('startTime', startTime);
+        localStorage.setItem('endTime', endTime);
+        const token = localStorage.getItem("token");
+        if (token) {
+          navigate("/homepage");
+        } else {
+          navigate("/DisplaySearchResults");
+        }
+        // Updating the Cars List with the new search Array
+        setAllCars(res.data);
+      })
+      .catch((err) => console.log("Failed", err));
   };
 
-  searchCars(requestData)
-    .then((res) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        navigate("/homepage");
-      } else {
-        navigate('/DisplaySearchResults');
-      }
-      // Updating the Cars List with the new search Array
-      setAllCars(res.data);
-    })
-    .catch((err) => console.log("Failed", err));
-};
 
 
   // function to reset all form fields to their initial values
@@ -99,9 +116,7 @@ export default function SearchCar() {
   return (
     <form
       className="flex items-center justify-center p-2 m-4 rounded-md w-1/2 bg-[#f6f6f6]"
-      // className="flex items-center justify-center flex-wrap xl:1/2 max-w-1/2 sm:max-w-full md:max-w-3/4 2xl:w-1/2 lg:w-2/3 "
       onSubmit={handleFormSubmit}
-      onReset={handleFormReset}
     >
       <div className="flex-2 m-2 p-2">
         <Select

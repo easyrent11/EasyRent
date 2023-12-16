@@ -7,11 +7,8 @@ import {deleteCar} from "../api/CarApi";
 import { Link } from 'react-router-dom';
 import { AllCarsContext } from '../contexts/AllCarsContext';
 import {notify} from "../HelperFunctions/Notify";
-import { useNavigate } from 'react-router-dom';
 
 export default function Car({car,btnText,navigationLocation}) {
-  // creating a use navigate object to be able to navigate to different links.
-  const navigate = useNavigate();
   // getting the secret key for encryption.
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
   // getting the set all cars function from the context.

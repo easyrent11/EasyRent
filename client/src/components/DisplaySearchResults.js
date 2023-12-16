@@ -3,13 +3,28 @@ import { AllCarsContext } from "../contexts/AllCarsContext";
 import Car from "../components/Car";
 import CarSortSection from "../components/CarSortSection";
 import CarFilterSection from '../components/CarFilterSection';
+import { useLocation } from "react-router-dom";
+
 const carsPerPage = 4; // Number of cars to show per page
 
 export default function AllCarsSection() {
+  const location = useLocation();
   const { allCars } = useContext(AllCarsContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchFilteredCars, setSearchFilteredCars] = useState([...allCars]); // Copy allCars initially
+  const searchParams = new URLSearchParams(location.search);
+ const pickupDate = searchParams.get("pickupDate");
+  const returnDate = searchParams.get("returnDate");
+  const fromTime = searchParams.get("fromTime");
+  const toTime = searchParams.get("toTime");
 
+  const dateSearchParams = {
+    pickupDate,
+    returnDate,
+    fromTime,
+    toTime
+  }
+  
 
   function filterCars(filterOptions) {
     let filteredCars = [...allCars]; //copying the array.
@@ -115,7 +130,7 @@ export default function AllCarsSection() {
           <CarSortSection />
           <article className="flex border-2 border-blue-900 min-h-screen  flex-wrap w-full p-4">
             {currentCars.map((car, index) => (
-              <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation} />
+              <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation} searchParams={dateSearchParams}/>
             ))}
           </article>
           <div className="flex self-center align-self-end mt-4">

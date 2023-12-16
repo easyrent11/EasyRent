@@ -18,6 +18,24 @@ export default function ChatApp() {
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
 
+  // Check if there's a targetedUser in localStorage
+useEffect(() => {
+  const targetedUser = localStorage.getItem("targetedUser");
+  if (targetedUser) {
+    const targetedUserId = parseInt(targetedUser);
+    console.log("targeted user", targetedUserId);
+    if (
+      !isNaN(targetedUserId) &&
+      users.some((user) => user.Id === targetedUserId)
+    ) {
+      startChat(targetedUserId); // Start a chat with the targeted user
+      // clear the local storage.
+      localStorage.removeItem('targetedUser')
+    }
+  }
+}, [localStorage.getItem("targetedUser"), users]); // Add targetedUser and users to the dependency array
+
+
   // use effect to display all users.
   useEffect(() => {
     displayAllUsers();
@@ -82,6 +100,8 @@ export default function ChatApp() {
         console.error("Error creating/retrieving chat room:", error);
       });
   }
+  // mark all the messages for the targeted user as read (user2Id).
+  
   // use memo to fetch all messages for a specific room.
   useMemo(() => {
     fetchMessagesForRoom();
