@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getOrdersByRenterId, getOrdersByRenteeId } from '../api/UserApi';
+import io from "socket.io-client";
 
 const UserOrdersContext = createContext();
 
@@ -16,7 +17,47 @@ export function useUserOrders() {
 export function UserOrdersProvider({ children }) {
   const [userOrders, setUserOrders] = useState([]);
   const [userRenteeOrders, setUserRenteeOrders] = useState([]);
+  const [socket, setSocket] = useState(null);
+
   const userId = localStorage.getItem('userId');
+
+  useEffect(() => {
+    // Connect to the Socket.IO server and authenticate
+    const socket = io.connect("http://localhost:3001");
+    
+    socket.on("notification", (notification) => {
+      console.log("in context")
+      if (notification.type === "order-request-notification") {
+        getOrdersByRenterId(userId)
+          .then((res) => {
+            setUserOrders(res.data); // Store the fetched orders in state
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+  
+        getOrdersByRenteeId(userId)
+          .then((res) => {
+            setUserRenteeOrders(res.data); // Store the fetched orders in state
+          })
+          .catch((err) => {
+            console.log(err);
+            // Handle error
+          });
+      }
+    });
+  
+    setSocket(socket);
+  
+    // Clean up when the component unmounts
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+
 
   // fetching all the orders where the logged in user is the renter (the one who owns the car.)
   useEffect(() => {

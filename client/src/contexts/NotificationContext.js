@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { markNotificationAsRead } from "../api/UserApi";
+import { markNotificationAsRead,markAllNotificationsAsRead } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 
 // Create the context
@@ -27,12 +27,24 @@ export const NotificationProvider = ({ children }) => {
         notify("error", error);
       });
   };
+
+  // function to clear all user notifications
+  const handleClearAllNotifications = () => {
+    markAllNotificationsAsRead()
+    .then((res) => {
+      setNotifications([]); // empty the notifications array.
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
   return (
     <NotificationContext.Provider
       value={{
         notifications,
         setNotifications,
         handleNotificationClick,
+        handleClearAllNotifications,
       }}
     >
       {children}

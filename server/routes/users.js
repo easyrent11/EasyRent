@@ -451,6 +451,32 @@ router.get("/chatroom/:userId", (req, res) => {
     }
   });
 });
+
+// route to mark messages as read
+router.put("/mark-user-messages-asread",async (req,res) => {
+  let {user1Id,chatroom_id} = req.body;
+  console.log(user1Id,chatroom_id);
+  try {
+    await UserServices.markMessagesAsRead(db,user1Id, chatroom_id);
+    res.status(200).json("chat page was marked");
+  } catch (error) {
+    console.error("Error during marking the chat page:", error);
+    res.status(401).json({ message: "Something went wrong" });
+  }
+})
+// route that will find the amount of unread messages for each chat room.
+router.get('/unread-messages/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const unreadMessages = await UserServices.checkUnreadMessages(db, userId);
+    res.status(200).json(unreadMessages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // route to get all users.
 router.get("/getAllUsers", (req, res) => {
   const query = "SELECT * from users";
@@ -531,6 +557,16 @@ router.put("/notifications/:notificationId", async (req, res) => {
     res.status(401).json({ message: "Something went wrong" });
   }
 });
+// route to mark all notifications as read.
+router.put('/markallnotifications', async(req,res) => {
+  try {
+    await UserServices.markAllNotificationsAsRead(db);
+    res.status(200).json("Notifications deleted");
+  } catch (error) {
+    console.error("Error during marking notifications as read", error);
+    res.status(401).json({ message: "Something went wrong" });
+  }
+})
 
 // multer function for uploading a single profile image.
 const upload = multer({
