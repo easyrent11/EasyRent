@@ -13,7 +13,8 @@ import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { notify } from "../HelperFunctions/Notify";
 import { getCar } from "../api/CarApi";
 import io from "socket.io-client";
-
+import {formatDate} from "../HelperFunctions/FormatDate";
+import {diff} from "../HelperFunctions/TimeDifference";
 export default function CarView() {
   let flag = false;
 
@@ -105,45 +106,55 @@ export default function CarView() {
     setEndDate("");
   };
 
+  // function to check if search dates are valid returns true if invalid or false if valid.
+  const checkDate = (dateObj1,dateObj2) => {
+    const dateOne = dateObj1.date;
+    const timeOne = dateObj1.time;
+    const dateTwo = dateObj2.date;
+    const timeTwo =  dateObj2.time;
+
+    return formatDate(dateOne) > formatDate(dateTwo) || (formatDate(dateOne) === formatDate(dateTwo) && diff(timeOne,timeTwo) < 1);
+  }
+
   // get the rentee id.
   let renteeId = localStorage.getItem("userId");
   renteeId = renteeId ? parseInt(renteeId) : null;
 
   // function that will send the order request to the renter
   const sendCarOrderRequest = () => {
+
     // checking if the user provided the order details.
     if (!startDate || !endDate || !startTime || !endTime) {
       notify("error", "Error: Please fill in all required fields.");
       return;
     }
-    // Check if the startDate is smaller than the endDate
-    if (new Date(startDate) >= new Date(endDate)) {
-      notify("error", "Error: Start date must be smaller than the end date.");
+    // Check if the Start Date and End Date are invalid
+    const dateObj1 = {
+      date:startDate,
+      time:startTime
+    };
+    const dateObj2 = {
+      date:endDate,
+      time:endTime,
+    }
+    // check if the start date is smaller than the end date or equal with more than 1 hour difference
+    if (checkDate(dateObj1,dateObj2)) {
+      notify("error", "Start date must be smaller than the end date or equal with a time difference more than 1 hour.");
       return;
     }
-    // Check if the startDate is smaller than the endDate
-    if (new Date(startDate) < new Date() || new Date(endDate) < new Date()) {
-      notify(
-        "error",
-        "Error: Please pick a valid start date,end date that is not in the past"
-      );
+
+    // check if the start date is bigger than the current date or equal with more than 1 hour difference
+    const currentDate = new Date();
+    const currentDateObj = {
+      date:formatDate(currentDate,true),
+      time: currentDate.getHours() + ":" + currentDate.getMinutes()
+    }
+    if(checkDate(currentDateObj,dateObj1)){
+      notify("error", "Please dont pick dates in the past.");
       return;
     }
-    // Converting start and end times to Date objects
-    const startTimeDate = new Date(`1970-01-01T${startTime}:00Z`);
-    const endTimeDate = new Date(`1970-01-01T${endTime}:00Z`);
 
-    // Calculating the time difference in milliseconds
-    const timeDifferenceMs = endTimeDate - startTimeDate;
 
-    // Checking if the startDate and endDate are the same
-    const isSameDate = startDate === endDate;
-
-    // Checking  if the time difference is less than one hour (3600000 milliseconds) when the start date and end date are the same
-    if (isSameDate && timeDifferenceMs < 3600000) {
-      console.log("Error: Car rents should be only from 1 hour and above.");
-      return;
-    }
     // creating an order details object.
     const orderRequest = {
       Start_Date: startDate,
@@ -165,11 +176,13 @@ export default function CarView() {
         ]);
         socket.emit("notification", {
           userId: ownerId,
+          targetId:renteeId,
           message: "You have a new order on one of your cars",
           type: "order-request-notification",
           orderId: res.data.order.Order_Id,
         });
         resetFields();
+        window.location.href = "/homepage"; // redirect user to the home page after sending a car request
       })
       .catch((err) => {
         console.log(err);
@@ -185,7 +198,7 @@ export default function CarView() {
       navigate("/DisplaySearchResults");
     }
   };
-
+  // save the target user id in order to go to the chatapp if clicked.
   const saveOwnerId = () => {
     localStorage.setItem('targetedUser', ownerId);
   }

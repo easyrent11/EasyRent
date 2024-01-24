@@ -1,13 +1,13 @@
-import React from 'react'
+import React from "react";
 import FirstSection from "../components/FirstSection";
-import SectionThree from '../components/SectionThree';
+import SectionThree from "../components/SectionThree";
+import "../index.css"; // Import the global CSS file
 
-// the home page.
 export default function HomeLayout() {
   return (
     <>
-        <FirstSection/>
-        <SectionThree/>
+      <FirstSection />
+      <SectionThree />
     </>
-  )
+  );
 }

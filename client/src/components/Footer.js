@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 
 export default function Footer() {
+  const isAdmin = localStorage.getItem('isAdmin');
   return (
     <footer className="bg-black  py-6 w-full">
       <article className="flex items-center justify-around m-2 p-2  ">
@@ -33,7 +34,7 @@ export default function Footer() {
           </p>
         </section>
         {/* Navigate */}
-        <div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
+        {!isAdmin &&<div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
           <h2 className="m-4 text-2xl"> Navigate </h2>
           <Link to="/FAQ" className="text-[#CC6200] mb-2">
             FAQ
@@ -48,6 +49,7 @@ export default function Footer() {
             > About 
             </ScrollLink>
         </div>
+        }
       </article>
 
       {/* Social Media Icons */}

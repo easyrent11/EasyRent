@@ -856,7 +856,7 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
               await updateOrderStatus(db, order.Order_Id, 'declined');
               declinedOrderInformation.push({
                 Order_Id: order.Order_Id,
-                UserId: order.Rentee_id
+                startchat: order.Rentee_id
               });
             }
           }
@@ -1104,6 +1104,45 @@ async function markNotificationAsRead(db, notificationId) {
   });
 }
 
+// a function that will mark all the messages that a user recieved from a specific person as read when he clicks on his chat page.
+async function markMessagesAsRead(db,user1Id, chatroom_id){
+  console.log(user1Id, chatroom_id);
+  return new Promise((resolve, reject) => {
+    const query = `
+    UPDATE messages 
+    SET isRead = 1 
+    WHERE chat_room_id = ? 
+    AND user_id != ? `;
+    db.query(query, [chatroom_id, user1Id], (error,results) => {
+      if(error){
+        console.log("Error marking messages as read : ", error);
+      }
+      else{
+        resolve("marked messages as read");
+      }
+    })
+  });
+}
+
+async function checkUnreadMessages(db,user1Id){
+  return new Promise((resolve,reject) => {
+    const query = `
+      SELECT user_id AS sender_user_id, COUNT(*) AS unread_count
+      FROM messages
+      WHERE user_id != ? AND chat_room_id IS NOT NULL AND isRead = 0
+      GROUP BY user_id
+    `;
+    db.query(query, [user1Id], (error,results) => {
+      if(error){
+        reject(error);
+      }
+      else{
+        resolve(results);
+      }
+    })
+  })
+}
+
 // function to start chat room between 2 users so they can talk privately.
 const startChat = (db, user1Id, user2Id) => {
   return new Promise((resolve, reject) => {
@@ -1137,6 +1176,20 @@ const startChat = (db, user1Id, user2Id) => {
   });
 };
 
+async function markAllNotificationsAsRead(db){
+  return new Promise((resolve, reject) => {
+    const query = "UPDATE notifications SET isRead = 1";
+    db.query(query, (error,results) => {
+      if(error){
+        console.log("Error marking notifications as read : ", error);
+      }
+      else{
+        resolve("notifications deleted");
+      }
+    })
+  });
+}
+
 
 module.exports = {
   registerUser,
@@ -1155,4 +1208,7 @@ module.exports = {
   markNotificationAsRead,
   findAndDeclineConflictingOrders,
   searchCar,
+  markMessagesAsRead,
+  checkUnreadMessages,
+  markAllNotificationsAsRead
 };

@@ -4,6 +4,8 @@ import { FiSend } from "react-icons/fi";
 import io from "socket.io-client";
 import axios from "axios";
 import ReportUserView from "./ReportUserView";
+import { markChatMessagesAsRead } from "../api/UserApi";
+import { checkUnreadMessages } from "../api/UserApi";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -17,29 +19,61 @@ export default function ChatApp() {
   const user1Id = parseInt(localStorage.getItem("userId"));
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [newMessagesAmount, setNewMessagesAmount] = useState([]);
 
+  
   // Check if there's a targetedUser in localStorage
-useEffect(() => {
-  const targetedUser = localStorage.getItem("targetedUser");
-  if (targetedUser) {
-    const targetedUserId = parseInt(targetedUser);
-    console.log("targeted user", targetedUserId);
-    if (
-      !isNaN(targetedUserId) &&
-      users.some((user) => user.Id === targetedUserId)
-    ) {
-      startChat(targetedUserId); // Start a chat with the targeted user
-      // clear the local storage.
-      localStorage.removeItem('targetedUser')
+  useEffect(() => {
+    const targetedUser = localStorage.getItem("targetedUser");
+    if (targetedUser) {
+      const targetedUserId = parseInt(targetedUser);
+      if (
+        !isNaN(targetedUserId) &&
+        users.some((user) => user.Id === targetedUserId)
+      ) {
+        startChat(targetedUserId); // Start a chat with the targeted user
+        // clear the local storage.
+        localStorage.removeItem("targetedUser");
+      }
     }
-  }
-}, [localStorage.getItem("targetedUser"), users]); // Add targetedUser and users to the dependency array
-
+  }, [localStorage.getItem("targetedUser"), users]); // Add targetedUser and users to the dependency array
 
   // use effect to display all users.
   useEffect(() => {
     displayAllUsers();
   }, [room]);
+
+  // use effect to fetch the amount of unread messages for a user.
+  useEffect(() => {
+    checkUnreadMessages(user1Id)
+      .then((res) => {
+        setNewMessagesAmount(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+   // use effect to handle cleanup logic when leaving the component
+   useEffect(() => {
+    return () => {
+      if (room) {
+        const chatRoomInfo = {
+          user1Id,
+          chatroom_id: room,
+        };
+
+        markChatMessagesAsRead(chatRoomInfo)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    };
+  }, [room, user1Id]);
+
 
   // function that will fetch all users from the backend
   function displayAllUsers() {
@@ -70,7 +104,9 @@ useEffect(() => {
   }
   // function that will fetch all messages for the given room
   function fetchMessagesForRoom() {
+
     if (room) {
+      console.log("room inside fetch messages for room = ",room);
       axios
         .get(`http://localhost:3001/user/messages/${room}`)
         .then((response) => {
@@ -84,14 +120,48 @@ useEffect(() => {
   }
   // function that will start a chat between 2 users.
   function startChat(user2Id) {
+    // mark messages as read for the previous chat when entering a new chat.
+    const chatRoomInfo = {
+      user1Id,
+      chatroom_id: room,
+    };
+    markChatMessagesAsRead(chatRoomInfo)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     const roomInfo = {
       user1Id: user1Id,
       user2Id: user2Id,
     };
-
+    const updatedNewMessagesAmount = [...newMessagesAmount]; // Copy the state
+    const unreadMessagesForTargetIndex = updatedNewMessagesAmount.findIndex(
+      (unread) => unread.sender_user_id === user2Id
+    );
+    if (unreadMessagesForTargetIndex !== -1) {
+      updatedNewMessagesAmount[unreadMessagesForTargetIndex] = {
+        ...updatedNewMessagesAmount[unreadMessagesForTargetIndex],
+        unread_count: 0, // Set unread count to 0 for the selected user
+      };
+      setNewMessagesAmount(updatedNewMessagesAmount);
+    }
+    // remove the user2Id message count from the array (make it 0)
     axios
       .post("http://localhost:3001/user/startChat", roomInfo)
       .then((response) => {
+        const chatRoomInfo = {
+          user1Id,
+          chatroom_id: response.data.room,
+        };
+        markChatMessagesAsRead(chatRoomInfo)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         setRoom(response.data.room);
         setSelectedUser(user2Id);
         socket.emit("join_room", response.data.room);
@@ -100,18 +170,20 @@ useEffect(() => {
         console.error("Error creating/retrieving chat room:", error);
       });
   }
-  // mark all the messages for the targeted user as read (user2Id).
-  
+
   // use memo to fetch all messages for a specific room.
   useMemo(() => {
     fetchMessagesForRoom();
   }, [room]);
+
+
 
   // function to send a message to a user.
   function sendMessage() {
     socket.emit("send_message", { message, room, user_id: user1Id });
     socket.emit("notification", {
       userId: selectedUser,
+      targetId:user1Id,
       message: "You have a new message",
       type: "recieve-message-notification",
     });
@@ -122,9 +194,9 @@ useEffect(() => {
   // useeffect to listen for incoming messages from users.
   useEffect(() => {
     socket.on("receive_message", (data) => {
-      if (data.room !== room) {
-        setRoom(data.room);
-      }
+      // if (data.room !== room) {
+      //   setRoom(data.room);
+      // }
       if (data.room === room) {
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -165,6 +237,15 @@ useEffect(() => {
                 !searchValue ||
                 userFullName.toLowerCase().includes(searchValue.toLowerCase());
 
+              // Find the user's unread message count from newMessagesAmount
+              const unreadMessages = newMessagesAmount.find(
+                (unread) => unread.sender_user_id === user.Id
+              );
+              // get the amount of unread messages for the current person while iterating the users list.
+              const unreadCount = unreadMessages
+                ? unreadMessages.unread_count
+                : 0;
+
               if (userMatchesSearch) {
                 return (
                   <li
@@ -176,11 +257,21 @@ useEffect(() => {
                     }`}
                     onClick={() => startChat(user.Id)}
                   >
-                    <img
-                      src={`http://localhost:3001/images/${user.picture || ""}`}
-                      alt={user.first_name}
-                      className="w-8 h-8 rounded-full mr-2"
-                    />
+                    <div className="relative">
+                      <img
+                        src={`http://localhost:3001/images/${
+                          user.picture || ""
+                        }`}
+                        alt={user.first_name}
+                        className="w-8 h-8 rounded-full mr-2"
+                      />
+                      {unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+
                     <span className="text-black font-bold text-lg">
                       {userFullName}
                     </span>

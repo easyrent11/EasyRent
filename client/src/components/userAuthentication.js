@@ -12,7 +12,6 @@ const useAuthentication = () => {
       // User is not authenticated, redirect to login page or handle accordingly
       navigate('/');
     }
-
     // Set the token in the request headers for subsequent API calls
     axios.defaults.headers.common['Authorization'] = token;
   }, [navigate]);

@@ -55,10 +55,10 @@ export default function Car({car,btnText,navigationLocation}) {
 
   return (
     
-    <article className='flex border-2 border-red-500 w-1/2 h-1/2'>
+    <article className='flex w-1/2 h-1/2'>
       <div className="w-full flex flex-col items-center justify-center rounded-md m-7 bg-white">
           <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
-            <figure className="flex flex-col items-center w-full border-2  h-full justify-center ">
+            <figure className="flex flex-col items-center w-full   h-full justify-center ">
               <img
                 className="w-full h-full rounded-md object-cover"
                 src={`http://localhost:3001/images/${car.car_urls[0]}`}

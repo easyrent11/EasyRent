@@ -4,12 +4,12 @@ import { Element } from "react-scroll";
 export default function SectionThree() {
   return (
     <>
-      <Element id="about" name="about">
+      <Element id="about" name="about" className="flex flex-1">
         <section
           id="about"
-          className="flex items-center  p-4 justify-around w-full bg-[#EDEDED]"
+          className="flex items-center flex-1  p-4 justify-around w-full bg-[#EDEDED]"
         >
-          <div className="flex flex-wrap w-2/6 p-4">
+          <div className="flex flex-wrap w-2/6  p-4">
             <h2 className="text-2xl mx-auto pb-4 text-black font-bold mb-4">
               About Us
             </h2>

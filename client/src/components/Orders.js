@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import { useNavigate, Link } from "react-router-dom";
 import { changeOrderStatus } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import { formatDate } from "../HelperFunctions/FormatDate";
+import {getOrderById} from "../api/UserApi";
+
+
+import io from "socket.io-client";
+const socket = io.connect("http://localhost:3001");
 
 const Orders = () => {
   const navigate = useNavigate();
-  const { userOrders, userRenteeOrders, setUserRenteeOrders } = useUserOrders();
+  const { userOrders, userRenteeOrders, setUserRenteeOrders,fetchUserOrders } = useUserOrders();
+  const [renterId, setRenterId] = useState(null);
+
+
+  useEffect(() => {
+    // Call the fetch function when the component mounts
+    fetchUserOrders();
+  }, [fetchUserOrders]);
+
 
   // function that cancels a user's order.
   function handleCancelOrder(orderId) {
+    // get the renter id 
+    getOrderById(orderId)
+    .then((res) => {
+      console.log("res data from get order by id",res.data);
+      setRenterId(res.data.Renter_Id); //save the renter id.
+
+    })  
+    .catch((error) => {
+      console.log(error);
+    })
     // declare the new status.
     const status = "cancelled";
     // change the status to cancelled.
@@ -25,12 +48,19 @@ const Orders = () => {
           (order) => order.Order_Id !== canceledOrderId
         );
         setUserRenteeOrders(updatedOrders);
+        socket.emit("order-cancelled", {userId:renterId,orderId:canceledOrderId });
         notify("success", "Your order has been successfully cancelled");
       })
       .catch((err) => {
         notify("error", `Failed to cancel order ${err}`);
       });
   }
+
+  useEffect(() => {
+    socket.on('order-cancelled', (data) => {
+      console.log("I got data from cancel order ", data);
+    })
+  },[renterId])
 
   return (
     <div className="flex-1 p-4">

@@ -62,13 +62,13 @@ export default function CarSortSection() {
   };
 
   return (
-    <div className="w-full flex justify-between border-2 border-red-500 items-center bg-[#f6f6f6] m-4">
+    <div className="w-full flex justify-between rounded-md items-center bg-[#f6f6f6]">
       <div className="w-1/2 p-4 m-4">
         <button
           onClick={handleResetSearch}
-          className="bg-black p-2 size-md text-white rounded-md"
+          className="bg-red-500 p-2 size-md text-white font-bold rounded-md"
         >
-          Clear Search
+          Clear Car Search Results
         </button>
       </div>
       <div className="flex  justify-end items-center  w-1/2 ">

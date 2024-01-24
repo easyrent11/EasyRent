@@ -50,6 +50,7 @@ io.on("connection", (socket) => {
 
   // event listen for notification that will call the function to save the notification to db and send the notification to the user.
   socket.on("notification", (notificationDetails) => {
+    console.log("notification = ",notificationDetails);
     saveNotificationToDataBase(notificationDetails, (error, notificationId) => {
       if (error) {
         console.log("error",error);
@@ -58,6 +59,7 @@ io.on("connection", (socket) => {
         console.log("Notification", notificationId);
         sendNotificationToUser(
           notificationDetails.userId,
+          notificationDetails.targetId,
           notificationDetails.message,
           notificationDetails.type,
           notificationDetails.orderId,
@@ -78,19 +80,21 @@ io.on("connection", (socket) => {
 });
 
 // To send a notification to a specific user
-function sendNotificationToUser(userId, message, type, orderId, notificationId) {
+function sendNotificationToUser(userId,targetId, message, type, orderId, notificationId) {
+  console.log(targetId);
   const userSocket = usersToSockets.get(userId);
   // send a new notification event to the user.
   if (userSocket) {
-    userSocket.emit("notification", {userId, message, type, orderId, notificationId });
+    userSocket.emit("notification", {userId,targetId, message, type, orderId, notificationId });
   }
 }
 
 // a function that will take notification details object and a callback and save the notification to db and return the id.
 function saveNotificationToDataBase(notificationDetails, callback) {
-  const { userId, message, type, orderId } = notificationDetails;
-  const query = `INSERT INTO notifications (userId, message, type, order_id) VALUES (?, ?, ?, ?)`;
-  db.query(query, [userId, message, type, orderId], (error, results) => {
+  console.log(notificationDetails);
+  const { userId,targetId, message, type, orderId } = notificationDetails;
+  const query = `INSERT INTO notifications (userId,targetId, message, type, order_id) VALUES (?, ?, ?, ?,?)`;
+  db.query(query, [userId,targetId, message, type, orderId], (error, results) => {
     if (error) {
       console.error("Error saving message:", error);
       callback(error, null); // Pass the error to the callback

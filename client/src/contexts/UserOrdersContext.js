@@ -18,8 +18,8 @@ export function UserOrdersProvider({ children }) {
   const [userRenteeOrders, setUserRenteeOrders] = useState([]);
   const userId = localStorage.getItem('userId');
 
-  // fetching all the orders where the logged in user is the renter (the one who owns the car.)
-  useEffect(() => {
+  
+  const fetchUserOrders = () => {
     getOrdersByRenterId(userId)
       .then((res) => {
         setUserOrders(res.data); // Store the fetched orders in state
@@ -27,9 +27,7 @@ export function UserOrdersProvider({ children }) {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-  // fetching all the orders where the logged in user is the rentee (the one who wants to rent the car.)
-  useEffect(() => {
+
     getOrdersByRenteeId(userId)
       .then((res) => {
         setUserRenteeOrders(res.data); // Store the fetched orders in state
@@ -38,8 +36,12 @@ export function UserOrdersProvider({ children }) {
         console.log(err);
         // Handle error
       });
-  }, []);
+  };
 
+  // Fetch orders initially
+  useEffect(() => {
+    fetchUserOrders();
+  }, []);
 
 
   // Provide the state and the function separately
@@ -48,6 +50,7 @@ export function UserOrdersProvider({ children }) {
     userRenteeOrders,
     setUserRenteeOrders,
     setUserOrders,
+    fetchUserOrders,
   };
 
 

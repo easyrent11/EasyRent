@@ -54,7 +54,6 @@ export default function UserNav({ handleLogout }) {
 
     // Handle incoming notifications
     socket.on("notification", (notification) => {
-      console.log("notification in navbar = ", notification);
 
       // Create a new notification object with default values
       const newNotification = {
@@ -112,11 +111,11 @@ export default function UserNav({ handleLogout }) {
   return (
     <Disclosure
       as="nav"
-      className="w-full border-2 bg-[#f6f6f6] rounded-md m-8 mt-0"
+      className="w-full border-2 bg-[#f6f6f6]  rounded-md m-8 mt-0"
     >
       {({ open }) => (
         <>
-          <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full border-2 px-2 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -200,19 +199,7 @@ export default function UserNav({ handleLogout }) {
                           </Link>
                         )}
                       </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to="/user/settings"
-                            className={classNames(
-                              active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
-                            )}
-                          >
-                            Settings
-                          </Link>
-                        )}
-                      </Menu.Item>
+                  
                       <Menu.Item>
                         {({ active }) => (
                           <button

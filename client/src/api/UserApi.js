@@ -93,3 +93,15 @@ export const findAndDeclineConflictingOrders = (orderDetails) => {
   return axios.put(`${BASE_URL_USER}/decline-conficting-orders`, orderDetails);
 }
 
+// api call to mark chat messages as read
+export const markChatMessagesAsRead = (chatRoomInfo) => {
+  return axios.put(`${BASE_URL_USER}/mark-user-messages-asread`, chatRoomInfo);
+}
+
+// api call that will fetch the amount of unread messages for every person for the logged in user.
+export const checkUnreadMessages = (user1Id) => {
+  return axios.get(`${BASE_URL_USER}/unread-messages/${user1Id}`);
+} 
+export const markAllNotificationsAsRead = () => {
+  return axios.put(`${BASE_URL_USER}/markallnotifications`);
+}

@@ -110,11 +110,11 @@ export default function UserLayout() {
 
       <h1 className="text-3xl mb-4">All Available Cars On The Website : </h1>
       <div className="flex  items-start justify-around p-4 m-4 w-3/4 ">
-        <div className="bg-[#f6f6f6] rounded-md p-4 h-full">
+        <div className="bg-[#f6f6f6] rounded-md  p-4 h-full">
           <CarFilterSection filterCars={filterCars} filteredCars={filteredCars} allCars={allCars} setFilteredCars={setFilteredCars} />
         </div>
 
-        <div className="flex flex-col items-center w-4/5">
+        <div className="flex flex-col rounded-md items-center w-4/5 ">
           <CarSortSection />
           <AllCarsSection filteredCars={filteredCars} />
         </div>

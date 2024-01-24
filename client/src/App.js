@@ -16,6 +16,7 @@ import FAQ from "./components/FAQ";
 import ContactUs from "./components/ContactUs";
 import Footer from "./components/Footer";
 import PrivateRoute from "./components/PrivateRoute";
+import NoAccountPrivateRoute from "./components/NoAccountPrivateRoute";
 import UserNav from "./components/UserNav";
 import PageNotFound from "./components/PageNotFound";
 import AddCar from "./components/AddCar";
@@ -30,7 +31,6 @@ import ChatApp from "./components/ChatApp";
 import PrivateAdminRoute from "./components/PrivateAdminRoute";
 import AdminDashboard from "./components/AdminDashBoard";
 import AdminProfile from "./components/AdminProfile";
-import ViewUserProfile from "./components/ViewUserProfile";
 import AdminUserReports from "./components/AdminUserReports";
 import AdminUserChatHistory from "./components/AdminUserChatHistory";
 import AdminChatHistory from "./components/AdminChatHistory";
@@ -174,18 +174,46 @@ function App() {
                   )}
 
                   <Routes>
-                    <Route path="/" element={<HomeLayout />} />
+                    {/* Normal User Routes  NO ADMIN */}
+                  
+                    <Route path="/" element={
+                      <NoAccountPrivateRoute
+                        component={HomeLayout}
+                      />
+                    }
+                    />
+                    
                     <Route
                       path="/CarView/:encryptedPlatesNumber"
-                      element={<CarView />}
+                      element={
+                        <NoAccountPrivateRoute
+                          component={CarView}
+                        />
+                      }
                     />
+                    <Route path="/FAQ" element={
+                      <NoAccountPrivateRoute
+                        component={FAQ}
+                      />
+                    } 
+                    />
+                    <Route path="/ContactUs" element={
+                      <NoAccountPrivateRoute
+                        component={ContactUs}
+                      />
+                    } />
+                
+                    {/* Routes for only logged in users. NO ADMIN */}
                     <Route
                       path="/CarOwnerView/:encryptedPlatesNumber"
-                      element={<CarOwnerView setAllCars={setAllCars} />}
+                      element={
+                        <PrivateRoute
+                          openLogin={openLogin}
+                          component={CarOwnerView}
+                          setAllCars={setAllCars}
+                        />
+                      }
                     />
-                    <Route path="/ViewUserProfile/:encryptedId" element={<ViewUserProfile/>}/>
-                    <Route path="/FAQ" element={<FAQ />} />
-                    <Route path="/ContactUs" element={<ContactUs />} />
                     <Route
                       path="/AddCar"
                       element={

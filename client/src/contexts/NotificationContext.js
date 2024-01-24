@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { markNotificationAsRead } from "../api/UserApi";
+import { markNotificationAsRead,markAllNotificationsAsRead } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 
 // Create the context
@@ -14,6 +14,11 @@ export const NotificationProvider = ({ children }) => {
   
   // Function that will mark a notification as read.
   const handleNotificationClick = (notificationId) => {
+    // finding the current target notification
+    const targetNotification = notifications.find(notification => notification.id === notificationId)
+    console.log("IN CONTEXT",targetNotification);
+    // saving the target user id from the current notification to local storage.
+    localStorage.setItem('targetedUser', targetNotification.targetId);
     markNotificationAsRead(notificationId)
       .then((res) => {
         // Filter out the clicked notification from the notifications list
@@ -27,12 +32,24 @@ export const NotificationProvider = ({ children }) => {
         notify("error", error);
       });
   };
+
+  // function to clear all user notifications
+  const handleClearAllNotifications = () => {
+    markAllNotificationsAsRead()
+    .then((res) => {
+      setNotifications([]); // empty the notifications array.
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
   return (
     <NotificationContext.Provider
       value={{
         notifications,
         setNotifications,
         handleNotificationClick,
+        handleClearAllNotifications,
       }}
     >
       {children}
