@@ -1,7 +1,7 @@
 // UserOrdersContext.js
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getOrdersByRenterId, getOrdersByRenteeId } from '../api/UserApi';
+
 
 const UserOrdersContext = createContext();
 
@@ -16,6 +16,7 @@ export function useUserOrders() {
 export function UserOrdersProvider({ children }) {
   const [userOrders, setUserOrders] = useState([]);
   const [userRenteeOrders, setUserRenteeOrders] = useState([]);
+
   const userId = localStorage.getItem('userId');
 
   

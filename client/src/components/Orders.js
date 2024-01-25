@@ -145,6 +145,7 @@ const Orders = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {userOrders.map((order) => (
+                  
                   <tr key={order.Order_Id}>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900"
@@ -181,14 +182,7 @@ const Orders = () => {
                       {order.status}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {new Date(order.Order_Date).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
+                      {formatDate(order.Order_Date)}
                     </td>
                     {order.status === "pending" && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
