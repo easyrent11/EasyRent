@@ -6,6 +6,7 @@ import axios from "axios";
 import ReportUserView from "./ReportUserView";
 import { markChatMessagesAsRead } from "../api/UserApi";
 import { checkUnreadMessages } from "../api/UserApi";
+import { useNotificationContext } from "../contexts/NotificationContext";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -20,6 +21,9 @@ export default function ChatApp() {
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [newMessagesAmount, setNewMessagesAmount] = useState([]);
+
+  // getting the notifications array from the dropdown.
+  const { notifications} = useNotificationContext();
 
   
   // Check if there's a targetedUser in localStorage

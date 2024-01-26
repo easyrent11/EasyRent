@@ -14,8 +14,9 @@ import { notify } from "../HelperFunctions/Notify";
 import { getCar } from "../api/CarApi";
 import io from "socket.io-client";
 import {formatDate} from "../HelperFunctions/FormatDate";
-import {diff} from "../HelperFunctions/TimeDifference";
-export default function CarView() {
+import { checkDate } from "../HelperFunctions/checkDate";
+
+export default function CarView({openLogin}) {
   let flag = false;
 
   const navigate = useNavigate();
@@ -106,15 +107,6 @@ export default function CarView() {
     setEndDate("");
   };
 
-  // function to check if search dates are valid returns true if invalid or false if valid.
-  const checkDate = (dateObj1,dateObj2) => {
-    const dateOne = dateObj1.date;
-    const timeOne = dateObj1.time;
-    const dateTwo = dateObj2.date;
-    const timeTwo =  dateObj2.time;
-
-    return formatDate(dateOne) > formatDate(dateTwo) || (formatDate(dateOne) === formatDate(dateTwo) && diff(timeOne,timeTwo) < 1);
-  }
 
   // get the rentee id.
   let renteeId = localStorage.getItem("userId");
@@ -122,7 +114,12 @@ export default function CarView() {
 
   // function that will send the order request to the renter
   const sendCarOrderRequest = () => {
-
+    // check if the user is logged in or not.
+    const token = localStorage.getItem('token');
+    if(!token){
+      openLogin();
+      return;
+    }
     // checking if the user provided the order details.
     if (!startDate || !endDate || !startTime || !endTime) {
       notify("error", "Error: Please fill in all required fields.");

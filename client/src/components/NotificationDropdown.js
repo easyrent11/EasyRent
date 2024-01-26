@@ -4,9 +4,8 @@ import { useNotificationContext } from "../contexts/NotificationContext";
 import { getAllUserDetails } from "../api/UserApi";
 import moment from "moment";
 
-const NotificationDropdown = () => {
+const NotificationDropdown = ({notifications, setNotifications}) => {
   const {
-    notifications,
     handleClearAllNotifications,
     handleNotificationClick,
   } = useNotificationContext();
@@ -18,6 +17,7 @@ const NotificationDropdown = () => {
         notifications.map(async (notification) => {
           if (notification.type === "recieve-message-notification") {
             try {
+              console.log("Notification = ", notification);
               const userDetails = await getAllUserDetails(notification.targetId);
               if (userDetails) {
                 console.log(userDetails);

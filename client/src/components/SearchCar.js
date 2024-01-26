@@ -5,7 +5,10 @@ import { searchCars } from "../api/UserApi";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
-import {clearSearchParameters} from "../HelperFunctions/ClearSearchParams";
+import { clearSearchParameters } from "../HelperFunctions/ClearSearchParams";
+import { formatDate } from "../HelperFunctions/FormatDate";
+import { checkDate } from "../HelperFunctions/checkDate";
+import { notify } from "../HelperFunctions/Notify";
 
 export default function SearchCar() {
   const navigate = useNavigate();
@@ -41,37 +44,47 @@ export default function SearchCar() {
     setToTime(e.target.value);
   };
 
-  
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    // Get the current date and time
-    const currentDate = new Date();
-    const currentTime = currentDate.getHours() + ":" + currentDate.getMinutes();
-
-    // Check if pickupDate is in the past
-    if (
-      pickupDate < currentDate.toISOString().split("T")[0] ||
-      (pickupDate === currentDate.toISOString().split("T")[0] &&
-        fromTime < currentTime)
-    ) {
-      alert("Pickup date and time should not be in the past.");
+    // checking if the user provided the order details.
+    if (!city || !pickupDate || !returnDate || !fromTime || !toTime) {
+      notify("error", "Error: Please fill in all required fields.");
       return;
     }
 
-    // Check if return date is in the past
-    if (
-      returnDate < currentDate.toISOString().split("T")[0] ||
-      (returnDate === currentDate.toISOString().split("T")[0] &&
-        toTime < currentTime)
-    ) {
-      alert("Return date and time should not be in the past.");
+    // Check if the Start Date and End Date are invalid
+    const dateObj1 = {
+      date: pickupDate,
+      time: fromTime,
+    };
+    const dateObj2 = {
+      date: returnDate,
+      time: toTime,
+    };
+    // check if the start date is smaller than the end date or equal with more than 1 hour difference
+    if (checkDate(dateObj1, dateObj2)) {
+      notify(
+        "error",
+        "Start date must be smaller than the end date or equal with a time difference more than 1 hour."
+      );
+      return;
+    }
+
+    // check if the start date is bigger than the current date or equal with more than 1 hour difference
+    const currentDate = new Date();
+    const currentDateObj = {
+      date: formatDate(currentDate, true),
+      time: currentDate.getHours() + ":" + currentDate.getMinutes(),
+    };
+    if (checkDate(currentDateObj, dateObj1)) {
+      notify("error", "Please dont pick dates in the past or dates with time difference less than 1 hour from now.");
       return;
     }
 
     clearSearchParameters(); // clearing previous search parameters.
     handleFormReset(); // reset the form fields.
-    
+
     // Creating the search object
     const requestData = {
       city: city,
@@ -80,15 +93,15 @@ export default function SearchCar() {
       startTime: fromTime,
       endTime: toTime,
     };
-    
+
     searchCars(requestData)
       .then((res) => {
         const { pickupDate, returnDate, startTime, endTime } = requestData;
         // Saving search params in localStorage
-        localStorage.setItem('startDate', pickupDate);
-        localStorage.setItem('endDate', returnDate);
-        localStorage.setItem('startTime', startTime);
-        localStorage.setItem('endTime', endTime);
+        localStorage.setItem("startDate", pickupDate);
+        localStorage.setItem("endDate", returnDate);
+        localStorage.setItem("startTime", startTime);
+        localStorage.setItem("endTime", endTime);
         const token = localStorage.getItem("token");
         if (token) {
           navigate("/homepage");
@@ -100,8 +113,6 @@ export default function SearchCar() {
       })
       .catch((err) => console.log("Failed", err));
   };
-
-
 
   // function to reset all form fields to their initial values
   const handleFormReset = () => {

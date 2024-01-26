@@ -16,8 +16,7 @@ export const NotificationProvider = ({ children }) => {
   const handleNotificationClick = (notificationId) => {
     // finding the current target notification
     const targetNotification = notifications.find(notification => notification.id === notificationId)
-    console.log("IN CONTEXT",targetNotification);
-    // saving the target user id from the current notification to local storage.
+    // saving the target user id from the current notification to local storage to go to his chatapp.
     localStorage.setItem('targetedUser', targetNotification.targetId);
     markNotificationAsRead(notificationId)
       .then((res) => {

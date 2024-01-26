@@ -187,6 +187,7 @@ function App() {
                       path="/CarView/:encryptedPlatesNumber"
                       element={
                         <NoAccountPrivateRoute
+                          openLogin={openLogin}
                           component={CarView}
                         />
                       }
@@ -247,6 +248,7 @@ function App() {
                         <PrivateRoute
                           openLogin={openLogin}
                           component={ChatApp}
+                          flag={"true"}
                         />
                       }
                     />
@@ -256,6 +258,7 @@ function App() {
                         <PrivateRoute
                           openLogin={openLogin}
                           component={Notifications}
+                          flag={"true"}
                         />
                       }
                     />

@@ -59,6 +59,7 @@ export default function UserNav({ handleLogout }) {
       const newNotification = {
         id: notification.notificationId,
         userId: notification.userId,
+        targetId:notification.targetId,
         message: notification.message,
         type: notification.type,
         isRead: 0, // Set the default value for isRead

@@ -34,7 +34,7 @@ export default function Footer() {
           </p>
         </section>
         {/* Navigate */}
-        {!isAdmin &&<div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
+        {isAdmin !== 'true' &&<div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
           <h2 className="m-4 text-2xl"> Navigate </h2>
           <Link to="/FAQ" className="text-[#CC6200] mb-2">
             FAQ
