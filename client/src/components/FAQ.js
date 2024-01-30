@@ -21,14 +21,8 @@ export default function FAQ() {
         "Yes, you can modify or cancel your rent request as long as you have not actually met with the renter and took the car already.",
     },
     {
-      question: "Do you offer airport pickup and drop-off services?",
-      answer:
-        "Yes, we provide airport pickup and drop-off services for your convenience. When making your reservation, select the airport as the pickup or drop-off location, and our staff will meet you there.",
-    },
-    {
-      question: "What is the age requirement to rent a car?",
-      answer:
-        "The minimum age requirement to rent a car is 17 years old. However, additional fees may apply for drivers under 25 years old. Please refer to our Terms and Conditions for more details.",
+      question: "How is the car key exchange facilitated between the renter and rentee?",
+      answer: "At EasyRent, we act as a reliable intermediary for car rentals. The key exchange process is organized between the renter and rentee. When a reservation is confirmed, both parties will receive contact details to coordinate the meeting. Typically, the renter and rentee will meet in person at an agreed-upon location to exchange keys. This process is repeated when the car is returned. Our platform ensures a smooth booking experience while allowing for a personal and secure key handover.",
     },
   ];
   const [expandedIndex, setExpandedIndex] = useState(null);

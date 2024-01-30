@@ -1,11 +1,10 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/UserApi";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { getAllUserDetails } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
-
+import ResetPasswordView from "./ResetPasswordView";
 
 export default function Login({ onClose, handleLogin }) {
   const { setUserDetails } = useContext(UserProfileDetails);
@@ -13,8 +12,14 @@ export default function Login({ onClose, handleLogin }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [openForgotPasswordView, setOpenForgotPasswordView] = useState(false);
 
- 
+  const handleOpenForgotPassword = () => {
+    setOpenForgotPasswordView(true);
+  }
+  const handleCloseForgotPassword = () => {
+    setOpenForgotPasswordView(false);
+  }
   // handle the login submit.
   const handleFormLogin = (e) => {
     e.preventDefault();
@@ -121,11 +126,12 @@ export default function Login({ onClose, handleLogin }) {
           </form>
           <p className="text-center mt-10">
             Forgot your password?
-            <Link to="/login" className="p-2 text-[#CC6200]">
+            <button className="p-2 text-[#CC6200]" onClick={handleOpenForgotPassword}>
               Reset
-            </Link>
+            </button>
           </p>
         </div>
+        {openForgotPasswordView && <ResetPasswordView onClose={handleCloseForgotPassword}/>}
       </section>
     </>
   );

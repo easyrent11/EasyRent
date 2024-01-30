@@ -6,6 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 import { notify } from "../HelperFunctions/Notify";
 import {insertActivity} from "../api/AdminApi";
+import HelpTextPopup from "../components/HelpTextPopup";
 
 export default function Register({ onClose, openLogin, setAllUsers }) {
   const [firstName, setFirstName] = useState("");
@@ -24,6 +25,35 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
   const [showLogin, setShowLogin] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [profileUrl, setProfileUrl] = useState(null);
+  const [showHelpPopup, setShowHelpPopup] = useState(false);
+  const [helpTextContent, setHelpTextContent] = useState('');
+
+  // helper text object to help the user to know what is considered a valid registeration field.
+  const helpText = {
+    firstName: "Valid input: Only letters (both upper and lower case)",
+    lastName: "Valid input: Only letters (both upper and lower case)",
+    email: "Valid input: A valid email address",
+    phoneNumber: "Valid input: Israeli phone number format",
+    password:
+      "Valid input: Minimum eight characters, at least one uppercase letter, one lowercase letter, one number, and one special character",
+    verifyPassword: "Valid input: Must match the password",
+    streetName: "Valid input: Only letters, spaces, and digits",
+    governmentId: "Valid input: 9 digits",
+    drivingLicense: "Valid input: 9 digits",
+  };
+  // function to show what a valid text field looks like for a specific registeration input.
+  const renderHelpText = (field) => (
+    <span
+      className="ml-1 font-bold text-lg text-[#CC6200] cursor-pointer"
+      onClick={() => {
+        setHelpTextContent(helpText[field]);
+        setShowHelpPopup(true);
+      }}
+    >
+      ?
+    </span>
+  );
+
 
   const handleCityChange = (selectedOption) => {
     setCity(selectedOption.value);
@@ -77,8 +107,7 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
     const validateDrivingLicense = (drivingLicense) =>
       /^\d{9}$/.test(drivingLicense);
     const validateStreetName = (streetName) =>
-      /^[a-zA-Z][a-zA-Z\d\s-]*$/.test(streetName);
-
+    /^[a-zA-Z\d\s-]*$/.test(streetName);
     const validateForm = () => {
       let errors = {};
 
@@ -234,7 +263,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
         </p>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block mb-2">First Name</label>
+            <label className="block mb-2">
+              First Name
+              {renderHelpText('firstName')}
+            </label>
             <input
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -243,7 +275,11 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Last Name</label>
+            <label className="block mb-2">
+              Last Name
+              {renderHelpText('lastName')}
+
+            </label>
             <input
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -252,7 +288,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Email Address</label>
+            <label className="block mb-2">
+              Email Address
+              {renderHelpText('email')}
+            </label>
             <input
               type="email"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -261,7 +300,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Phone Number</label>
+            <label className="block mb-2">
+              Phone Number
+              {renderHelpText('phoneNumber')}
+              </label>
             <input
               type="tel"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -270,7 +312,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Password</label>
+            <label className="block mb-2">
+              Password
+              {renderHelpText('password')}
+            </label>
             <input
               type="password"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -299,7 +344,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Street Name </label>
+            <label className="block mb-2">
+              Street Name 
+              {renderHelpText('streetName')}
+            </label>
             <input
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -317,7 +365,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Government ID</label>
+            <label className="block mb-2">
+              Government ID
+              {renderHelpText('governmentId')}
+            </label>
             <input
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -326,7 +377,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             />
           </div>
           <div>
-            <label className="block mb-2">Driving License</label>
+            <label className="block mb-2">
+              Driving License
+              {renderHelpText('drivingLicense')}
+              </label>
             <input
               type="text"
               className="border border-gray-300 px-4 py-2 rounded-md w-full"
@@ -345,6 +399,12 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
         <p className="text-center text-red-700 font-bold">{errorMessage}</p>
       </form>
       {showLogin && <Login onClose={toggleLogin} />}
+      {showHelpPopup && (
+        <HelpTextPopup
+          onClose={() => setShowHelpPopup(false)}
+          helpText={helpTextContent}
+        />
+      )}
     </div>
   );
 }

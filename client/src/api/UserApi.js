@@ -105,3 +105,7 @@ export const checkUnreadMessages = (user1Id) => {
 export const markAllNotificationsAsRead = () => {
   return axios.put(`${BASE_URL_USER}/markallnotifications`);
 }
+
+export const forgotPassword = (email) => {
+  return axios.post(`${BASE_URL_USER}/forgotpassword`, {email});
+}

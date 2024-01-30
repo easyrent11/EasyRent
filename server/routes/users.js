@@ -7,7 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const UserServices = require("../services/UserServices");
 const bcrypt = require("bcrypt");
-
+const sendEmail = require("../email/sendEmail");
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
@@ -19,6 +19,53 @@ router.post("/register", async (req, res) => {
     console.error("Error registering user:", error);
     res.status(500).json({ error: "Failed to register user" });
   }
+});
+// route to reset password in case a user forgot his password.
+router.post("/forgotpassword", async (req, res) => {
+  const { email } = req.body;
+  // check if given email exists in the database.
+  const checkEmailQuery = "SELECT * FROM users WHERE email = ?";
+  db.query(checkEmailQuery, [email], async (error, results) => {
+    if (error) {
+      res.status(500).json({ error: "An Error Occured" });
+    }
+    if (results.length === 0) {
+      // email not found
+      res.status(404).json({ error: "The email you entered was not found" });
+    }
+    try {
+      const temporaryPassword = await sendEmail(email);
+      console.log(temporaryPassword);
+      // Hash the temporary password
+      bcrypt.hash(temporaryPassword, 10, (error, newHashedPassword) => {
+        if (error) {
+          console.error("Error hashing temporary password : ", error);
+          res.status(500).json({ error: "Internal Server Error" });
+          return;
+        }
+
+        const updateQuery = `UPDATE users SET password = ? WHERE email = ?`;
+
+        db.query(updateQuery, [newHashedPassword, email], (error) => {
+          if (error) {
+            console.error("Error updating user's new password : ", error);
+            res.status(500).json({ error: "Internal Server Error" });
+            return;
+          }
+
+          // Password update successful
+          res.status(200).json({ message: "Email sent and your password was reset successfully" });
+        });
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({
+          error:
+            "Failed to send email please double check that you wrote your email",
+        });
+    }
+  });
 });
 // route to checkc if user details exist in the website.
 router.post("/userdetailsexist", (req, res) => {
@@ -94,7 +141,7 @@ router.post("/searchcar", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-// route to report a user 
+// route to report a user
 router.post("/reportuser", async (req, res) => {
   const reportDetails = req.body;
   console.log(reportDetails);
@@ -404,7 +451,7 @@ router.put("/decline-conficting-orders", async (req, res) => {
       carPlatesNumber
     );
     console.log(result);
-    return res.json({conflictingOrders:result});
+    return res.json({ conflictingOrders: result });
   } catch (error) {
     console.error("Error updating order status:", error);
     return res.status(500).json({ error: "Internal server error." });
@@ -453,19 +500,19 @@ router.get("/chatroom/:userId", (req, res) => {
 });
 
 // route to mark messages as read
-router.put("/mark-user-messages-asread",async (req,res) => {
-  let {user1Id,chatroom_id} = req.body;
-  console.log(user1Id,chatroom_id);
+router.put("/mark-user-messages-asread", async (req, res) => {
+  let { user1Id, chatroom_id } = req.body;
+  console.log(user1Id, chatroom_id);
   try {
-    await UserServices.markMessagesAsRead(db,user1Id, chatroom_id);
+    await UserServices.markMessagesAsRead(db, user1Id, chatroom_id);
     res.status(200).json("chat page was marked");
   } catch (error) {
     console.error("Error during marking the chat page:", error);
     res.status(401).json({ message: "Something went wrong" });
   }
-})
+});
 // route that will find the amount of unread messages for each chat room.
-router.get('/unread-messages/:userId', async (req, res) => {
+router.get("/unread-messages/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const unreadMessages = await UserServices.checkUnreadMessages(db, userId);
@@ -474,8 +521,6 @@ router.get('/unread-messages/:userId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 // route to get all users.
 router.get("/getAllUsers", (req, res) => {
@@ -558,7 +603,7 @@ router.put("/notifications/:notificationId", async (req, res) => {
   }
 });
 // route to mark all notifications as read.
-router.put('/markallnotifications', async(req,res) => {
+router.put("/markallnotifications", async (req, res) => {
   try {
     await UserServices.markAllNotificationsAsRead(db);
     res.status(200).json("Notifications deleted");
@@ -566,7 +611,7 @@ router.put('/markallnotifications', async(req,res) => {
     console.error("Error during marking notifications as read", error);
     res.status(401).json({ message: "Something went wrong" });
   }
-})
+});
 
 // multer function for uploading a single profile image.
 const upload = multer({

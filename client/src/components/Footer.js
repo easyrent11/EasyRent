@@ -1,11 +1,11 @@
 import React from "react";
 import { FaFacebook, FaInstagram, FaGithub } from "react-icons/fa";
-import { FiMapPin, FiPhone } from "react-icons/fi";
+import { FiMapPin, FiPhone, FiMail } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 
 export default function Footer() {
-  const isAdmin = localStorage.getItem('isAdmin');
+  const isAdmin = localStorage.getItem("isAdmin");
   return (
     <footer className="bg-black  py-6 w-full">
       <article className="flex items-center justify-around m-2 p-2  ">
@@ -22,34 +22,42 @@ export default function Footer() {
         </div>
 
         {/* Contact Info */}
-        <section id="contactus" className="flex flex-col items-start justify-center text-white w-1/4 ml-4 ">
+        <section
+          id="contactus"
+          className="flex flex-col items-start justify-center text-white w-1/4 ml-4 "
+        >
           <h4 className="text-xl font-bold p-2 m-1 mb-4">Contact Info</h4>
           <p className="flex items-center justify-center p-2 m-1">
-            {" "}
-            <FiMapPin className="m-1"  />Street Address: 123 EasyRent St, Haifa, Israel
+            <FiMapPin className="m-1" />
+            Street Address: 123 EasyRent St, Haifa, Israel
           </p>
           <p className="flex items-center justify-center p-2 m-1">
-            {" "}
-            <FiPhone className="m-1" /> Phone: 123-456-7890{" "}
+            <FiPhone className="m-1" /> Phone: 123-456-7890
+          </p>
+          <p className="flex items-center justify-center p-2 m-1">
+            <FiMail className="m-1" /> Email: easyrent11@outlook.com
           </p>
         </section>
         {/* Navigate */}
-        {isAdmin !== 'true' &&<div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
-          <h2 className="m-4 text-2xl"> Navigate </h2>
-          <Link to="/FAQ" className="text-[#CC6200] mb-2">
-            FAQ
-          </Link>
-          <ScrollLink
+        {isAdmin !== "true" && (
+          <div className="flex flex-col items-center justify-center p-2 m-2 text-2lg  text-white">
+            <h2 className="m-4 text-2xl"> Navigate </h2>
+            <Link to="/FAQ" className="text-[#CC6200] mb-2">
+              FAQ
+            </Link>
+            <ScrollLink
               className="cursor-pointer mb-2 text-[#CC6200]"
               activeClass="active"
               to="about"
               spy={true}
               smooth={true}
               duration={500}
-            > About 
+            >
+              {" "}
+              About
             </ScrollLink>
-        </div>
-        }
+          </div>
+        )}
       </article>
 
       {/* Social Media Icons */}
