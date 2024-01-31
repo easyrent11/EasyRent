@@ -109,3 +109,7 @@ export const markAllNotificationsAsRead = () => {
 export const forgotPassword = (email) => {
   return axios.post(`${BASE_URL_USER}/forgotpassword`, {email});
 }
+
+export const markChatNotificationsAsRead = (idObject) => {
+  return axios.put(`${BASE_URL_USER}/markchatnotificationsread`, idObject);
+}

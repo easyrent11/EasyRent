@@ -7,7 +7,8 @@ import ReportUserView from "./ReportUserView";
 import { markChatMessagesAsRead } from "../api/UserApi";
 import { checkUnreadMessages } from "../api/UserApi";
 import { useNotificationContext } from "../contexts/NotificationContext";
-
+import { markChatNotificationsAsRead } from "../api/UserApi";
+import { notify } from "../HelperFunctions/Notify";
 const socket = io.connect("http://localhost:3001");
 
 export default function ChatApp() {
@@ -23,9 +24,8 @@ export default function ChatApp() {
   const [newMessagesAmount, setNewMessagesAmount] = useState([]);
 
   // getting the notifications array from the dropdown.
-  const { notifications} = useNotificationContext();
+  const { notifications, setNotifications } = useNotificationContext();
 
-  
   // Check if there's a targetedUser in localStorage
   useEffect(() => {
     const targetedUser = localStorage.getItem("targetedUser");
@@ -58,8 +58,8 @@ export default function ChatApp() {
       });
   }, []);
 
-   // use effect to handle cleanup logic when leaving the component
-   useEffect(() => {
+  // use effect to handle cleanup logic when leaving the component
+  useEffect(() => {
     return () => {
       if (room) {
         const chatRoomInfo = {
@@ -77,7 +77,6 @@ export default function ChatApp() {
       }
     };
   }, [room, user1Id]);
-
 
   // function that will fetch all users from the backend
   function displayAllUsers() {
@@ -108,9 +107,8 @@ export default function ChatApp() {
   }
   // function that will fetch all messages for the given room
   function fetchMessagesForRoom() {
-
     if (room) {
-      console.log("room inside fetch messages for room = ",room);
+      console.log("room inside fetch messages for room = ", room);
       axios
         .get(`http://localhost:3001/user/messages/${room}`)
         .then((response) => {
@@ -124,6 +122,32 @@ export default function ChatApp() {
   }
   // function that will start a chat between 2 users.
   function startChat(user2Id) {
+    // send request to backend to mark all notifications between the 2 users as read.
+
+    // defining the ids object.
+    const idObject = {
+      "user1Id":user1Id,
+      "user2Id":user2Id
+    };
+    markChatNotificationsAsRead(idObject)
+      .then((res) => {
+        console.log(res);
+        // update the local notifications array to exclude the notifications.
+        const excludedNotifications = notifications.filter(
+          (notification) =>
+            !(
+              notification.userId === user1Id &&
+              notification.targetId === user2Id &&
+              notification.type === "recieve-message-notification"
+            )
+        );
+        // update the notifications array.
+        setNotifications(excludedNotifications);
+      })
+      .catch((error) => {
+        notify("error", error);
+      });
+
     // mark messages as read for the previous chat when entering a new chat.
     const chatRoomInfo = {
       user1Id,
@@ -180,14 +204,12 @@ export default function ChatApp() {
     fetchMessagesForRoom();
   }, [room]);
 
-
-
   // function to send a message to a user.
   function sendMessage() {
     socket.emit("send_message", { message, room, user_id: user1Id });
     socket.emit("notification", {
       userId: selectedUser,
-      targetId:user1Id,
+      targetId: user1Id,
       message: "You have a new message",
       type: "recieve-message-notification",
     });

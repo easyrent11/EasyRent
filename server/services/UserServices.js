@@ -1189,7 +1189,19 @@ async function markAllNotificationsAsRead(db){
     })
   });
 }
-
+// mark chat notifications as read query function
+async function markChatNotificationsAsRead(user1Id, user2Id, db) {
+  const query = "UPDATE notifications SET isRead = 1 WHERE userId = ? AND targetId = ? AND type = 'recieve-message-notification' ";
+  return new Promise((resolve, reject) => {
+    db.query(query, [user1Id, user2Id], (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
 
 module.exports = {
   registerUser,
@@ -1210,5 +1222,6 @@ module.exports = {
   searchCar,
   markMessagesAsRead,
   checkUnreadMessages,
-  markAllNotificationsAsRead
+  markAllNotificationsAsRead,
+  markChatNotificationsAsRead,
 };
