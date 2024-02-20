@@ -133,7 +133,7 @@ export default function UserNav({ handleLogout }) {
                   <Logo />
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4  items-center justify-center h-full">
+                  <div className="flex space-x-4  items-centerjustify-center h-full">
                     {navigation.map((item) => (
                       <Link
                         key={item.name}
