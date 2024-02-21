@@ -129,10 +129,10 @@ export default function SearchCar() {
 
   return (
     <form
-      className="flex flex-col lg:flex-row xl:order-1 xl:w-1/2 xl:flex-col xl:items-start 2xl:flex-row 2xl:w-4/5 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-4/5 lg:w-full  bg-[#f6f6f6]"
+      className="flex flex-col lg:flex-row xl:order-2 2xl:order-1 xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
       onSubmit={handleFormSubmit}
     >
-       <div className="w-full lg:w-1/2 xl:w-full m-2 p-2">
+       <div className="w-full 4 m-2 p-2">
         <Select
           id="city"
           value={{ value: city, label: selectedCityLabel }}
@@ -143,7 +143,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full lg:w-2/12 xl:w-full  m-2 p-2">
+      <div className="w-full  m-2 p-2">
         <input
           type="date"
           id="pickupdate"
@@ -153,7 +153,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full  xl:w-full  xl:flex-1 lg:w-2/12 m-2 p-2">
+      <div className="w-full m-2 p-2">
         <input
           type="time"
           id="fromtime"
@@ -163,7 +163,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full xl:w-full  xl:flex-1 lg:w-2/12 m-2 p-2">
+      <div className="w-full m-2 p-2">
         <input
           type="date"
           id="returnDate"
@@ -173,7 +173,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full  xl:w-full  xl:flex-1 lg:w-2/12 m-2 p-2">
+      <div className="w-full  m-2 p-2">
         <input
           type="time"
           id="totime"
@@ -183,7 +183,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="flex w-full xl:w-full  lg:w-2/12  justify-center  items-center">
+      <div className="flex w-full justify-center  items-center">
         <button
           type="submit"
           className="bg-black text-1xl  text-white p-2 w-full rounded-md"

@@ -10,7 +10,7 @@ export default function Footer() {
     <footer className="bg-black  py-6 w-full">
       <article className="flex flex-col  lg:flex-row lg:flex-wrap lg:flex-1 lg:items-start items-center justify-around m-2 p-2  ">
         {/* About Us */}
-        <div className="text-white  w-full  p-2 lg:w-2/6 lg:p-4">
+        <div className="text-white 2xl:w-1/5 w-full  p-2 lg:w-2/6 lg:p-4">
           <h4 className="text-xl font-bold mb-4">About Us</h4>
           <p>
             EasyRent is a car rental website that provides a seamless and
@@ -24,7 +24,7 @@ export default function Footer() {
         {/* Contact Info */}
         <section
           id="contactus"
-          className="flex flex-col w-full  lg:flex-1   p-2 items-start  justify-center text-white lg:w-1/4 lg:ml-4"
+          className="flex flex-col w-full  lg:flex-1 2xl:items-center 2xl:w-1/5 2xl:flex-none   p-2 items-start  justify-center text-white lg:w-1/4 lg:ml-4"
         >
           <h4 className="text-xl font-bold m-2">Contact Info</h4>
           <p className="flex items-center lg:mt-4 lg:mb-4">
@@ -40,7 +40,7 @@ export default function Footer() {
         </section>
         {/* Navigate */}
         {isAdmin !== "true" && (
-          <div className="flex flex-col  w-full  lg:w-2/12 items-start lg:items-center lg:justify-center m-4 lg:p-0 lg:m-0 lg:ml-1 text-2lg  text-white">
+          <div className="flex flex-col  w-full  lg:w-2/12 2xl:w-1/5 items-start lg:items-center lg:justify-center m-4 lg:p-0 lg:m-0 lg:ml-1 text-2lg  text-white">
             <h2 className="m-4 text-2xl"> Navigate </h2>
             <Link to="/FAQ" className="text-[#CC6200] mt-0 m-4 lg:mb-2">
               FAQ

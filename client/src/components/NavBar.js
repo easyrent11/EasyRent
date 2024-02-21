@@ -96,7 +96,7 @@ export default function NavBar({ openLogin, openRegister }) {
             Contact Us
           </ScrollLink>
         </div>
-        <div className=" flex items-center  justify-end mr-56 lg:mr-0 w-1/2">
+        <div className=" flex items-center  justify-end mr-56 lg:mr-0 2xl:mr-56 w-1/2">
           <button
             className="m-2 hover:border-[#b8b8b8] border-2 rounded-md p-2"
             onClick={openLogin}

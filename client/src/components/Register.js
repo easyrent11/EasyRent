@@ -244,7 +244,7 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
-      <form className="bg-[#E7E7E7] max-w-lg p-6 mx-auto rounded-lg">
+      <form className="bg-[#E7E7E7] w-full h-full overflow-y-auto border-2 border-red-500 md:max-w-lg p-6 mx-auto rounded-lg">
         <div className="flex justify-end">
           <button
             type="button"
