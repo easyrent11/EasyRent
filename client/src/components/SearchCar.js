@@ -129,7 +129,7 @@ export default function SearchCar() {
 
   return (
     <form
-      className="flex flex-col lg:flex-row xl:order-2 2xl:order-1 xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
+      className="flex flex-col lg:flex-row  xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
       onSubmit={handleFormSubmit}
     >
        <div className="w-full 4 m-2 p-2">

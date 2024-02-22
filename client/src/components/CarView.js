@@ -201,7 +201,7 @@ export default function CarView({openLogin}) {
   }
 
   return (
-    <div className="shadow-lg min-h-full mb-4 border-2  bg-[#f6f6f6] rounded-lg flex flex-col items-center">
+    <div className="shadow-lg min-h-full border-2 border-red-500 mb-4 bg-[#f6f6f6] rounded-lg flex flex-col items-center">
       <div className="text-right m-2  w-full ">
         <button
           className="p-2 m-2 rounded-md text-2xl text-gray-500 transform hover:scale-110"
@@ -232,7 +232,7 @@ export default function CarView({openLogin}) {
       </section>
       {/* Displaying additional car information. */}
 
-      <div className="flex p-2 m-2">
+      <div className="flex flex-col lg:flex-row p-2 m-2">
         <section className="w-full max-w-3xl mt-10 p-6 mr-4  bg-white shadow-md rounded-lg">
           <h2 className="text-2xl">Car Owner : </h2>
           <figure className="flex flex-col items-center justify-center ">

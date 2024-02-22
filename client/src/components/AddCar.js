@@ -191,7 +191,7 @@ export default function AddCar() {
   };
 
   return (
-    <div className="flex flex-col w-1/4 justify-center items-center bg-[#f6f6f6] shadow-lg rounded-lg p-6">
+    <div className="flex flex-col w-full md:w-1/2 2xl:w-1/4 justify-center items-center bg-[#f6f6f6] shadow-lg rounded-lg p-6">
       <h2 className="text-2xl text-center font-semibold mb-4">Add Car</h2>
 
       <form className="w-full  p-6 mx-auto rounded-lg">

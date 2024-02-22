@@ -121,7 +121,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
 
   return (
     <>
-      <div className="w-full flex  p-4 flex-col justify-between">
+      <div className="w-full flex flex-col justify-between p-4">
         <h2 className="font-bold text-xl text-center">Car Results Filters</h2>
         <div className="my-4">
           <h3>Price Range</h3>

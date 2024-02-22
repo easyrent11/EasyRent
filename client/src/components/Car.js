@@ -55,8 +55,8 @@ export default function Car({car,btnText,navigationLocation}) {
 
   return (
     
-    <article className='flex w-1/2 h-1/2'>
-      <div className="w-full flex flex-col items-center justify-center rounded-md m-7 bg-white">
+    <article className='flex w-full lg:w-1/2 lg:h-1/2'>
+      <div className="w-full flex flex-col  items-center justify-center rounded-md m-7 bg-white">
           <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
             <figure className="flex flex-col items-center w-full   h-full justify-center ">
               <img
@@ -92,7 +92,7 @@ export default function Car({car,btnText,navigationLocation}) {
             </p>
           </div>
 
-          <div className="flex items-center justify-between p-2">
+          <div className="flex items-center   justify-between p-2">
             <p className="text-[#00215e]">₪{car.Rental_Price_Per_Day}/day</p>
             <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
               {!ownerIsLoggedUser &&  <button onClick={handleBtnClick} className="bg-black text-white p-2 rounded-md">{btnText}</button>} 

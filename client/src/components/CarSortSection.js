@@ -1,11 +1,19 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Select from "react-select";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { getAllCars } from "../api/CarApi";
 import { clearSearchParameters } from "../HelperFunctions/ClearSearchParams";
+import CarFilterPopout from "./CarFilterPopOut";
+
 export default function CarSortSection() {
   // getting all of the cars list from the context so we can preform a sort and update the list after.
   const { allCars, setAllCars } = useContext(AllCarsContext);
+  const [showFilterSection, setShowFilterSection] = useState(false);
+
+  // function to toggle and untoggle car filter section.
+  const toggleCarFilterSection = () => {
+    setShowFilterSection(!showFilterSection);
+  };
 
   // function to reset the car list after search.
   const handleResetSearch = () => {
@@ -62,26 +70,37 @@ export default function CarSortSection() {
   };
 
   return (
-    <div className="w-full flex justify-between rounded-md items-center bg-[#f6f6f6]">
-      <div className="w-1/2 p-4 m-4">
+    <div className="w-full mb-4 flex justify-between lg:rounded-md items-center bg-[#f6f6f6] relative">
+      <div className="w-4/5 h-full  flex items-center lg:justify-between justify-around  lg:w-1/2 p-2 2xl:w-1/3">
         <button
           onClick={handleResetSearch}
-          className="bg-red-500 p-2 size-md text-white font-bold rounded-md"
+          className="bg-red-500 hover:bg-black p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-white font-bold rounded-md"
         >
-          Clear Car Search Results
+          Clear Search Results
         </button>
+        <div className="lg:hidden bg-[#f6f6f6]  p-4 rounded-md">
+          <button onClick={toggleCarFilterSection}>Car Filters</button>
+        </div>
       </div>
-      <div className="flex  justify-end items-center  w-1/2 ">
-        <p className="text-xl  p-2 m-2">Sort By</p>
+
+      <div className="flex flex-col  p-2 h-full lg:justify-end justify-center items-center lg:items-end lg:w-1/2 2xl:w-1/4">
         <Select
-          className="w-3/12"
+          className="lg:w-1/2 text-center p-2 w-full"
           styles={customStyles}
           options={options}
           onChange={handleOptionSelect}
-          placeholder="Select an option"
+          placeholder="Car Sort Options"
           isSearchable={false}
         />
       </div>
+
+      {showFilterSection && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+          <div className="bg-white w-full p-4 rounded-md">
+            <CarFilterPopout toggleCarFilterSection={toggleCarFilterSection} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,13 +9,13 @@ import { notify } from "../HelperFunctions/Notify";
 import io from "socket.io-client";
 import { getUserNotifications } from "../api/UserApi";
 import { useNotificationContext } from "../contexts/NotificationContext"
-
+import {Link as ScrollLink} from "react-scroll";
 const navigation = [
   { name: "Dashboard", href: "/homepage", current: true },
   { name: "Share your car", href: "/AddCar", current: false },
   { name: "Orders", href: "/Orders", current: false },
   { name: "Chat", href: "/chatapp", current: false },
-  { name: "Contact Us", href: "#footer", current: false },
+  { name: "Contact Us", href: "contactus", current: false },
 ];
 
 function classNames(...classes) {
@@ -118,8 +118,8 @@ export default function UserNav({ handleLogout }) {
         <>
           <div className="mx-auto w-full border-2 px-2 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
-              <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+              <div className="absolute inset-y-0 left-0 flex items-center  md:hidden">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-black">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -128,26 +128,42 @@ export default function UserNav({ handleLogout }) {
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="flex flex-1  items-center justify-center max-w-full max-h-full sm:items-stretch sm:justify-start">
+              <div className="flex flex-1  items-center justify-center max-w-full max-h-full md:items-stretch md:justify-start">
                 <div className="flex flex-shrink-0 items-center">
                   <Logo />
                 </div>
-                <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4  items-centerjustify-center h-full">
+                <div className="hidden sm:ml-6  md:block">
+                  <div className="flex space-x-4  h-full items-center justify-center">
                     {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={classNames(
-                          item.current
-                            ? "bg-gray-900 text-white"
-                            : "text-black hover:bg-gray-900 hover:text-white",
-                          "rounded-md px-3 py-2 text-sm font-medium"
-                        )}
-                        aria-current={item.current ? "page" : undefined}
-                      >
+                      <React.Fragment key={item.name}>
+                        {item.name === "Contact Us" ? (
+                          <ScrollLink
+                          to={item.href}
+                          className={classNames(
+                            item.current
+                              ? "bg-gray-900 text-white"
+                              : "text-black  hover:bg-gray-900 hover:text-white",
+                            "rounded-md px-3  py-2 flex items-center text-sm h-4/5 font-medium"
+                          )} spy={true} smooth={true} duration={500}
+                          >
                         {item.name}
-                      </Link>
+                        </ScrollLink>
+                        ):(
+                          <Link
+                          key={item.name}
+                          to={item.href}
+                          className={classNames(
+                            item.current
+                              ? "bg-gray-900 text-white"
+                              : "text-black  hover:bg-gray-900 hover:text-white",
+                            "rounded-md px-3 py-2 flex items-center h-4/5 text-sm font-medium"
+                          )}
+                          aria-current={item.current ? "page" : undefined}
+                        >
+                          {item.name}
+                        </Link>
+                        )}
+                        </React.Fragment>
                     ))}
                   </div>
                 </div>
@@ -231,7 +247,7 @@ export default function UserNav({ handleLogout }) {
               )}
             </div>
           </div>
-          <Disclosure.Panel className="sm:hidden">
+          <Disclosure.Panel className="md:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => (
                 <Link
@@ -240,7 +256,7 @@ export default function UserNav({ handleLogout }) {
                   className={classNames(
                     item.current
                       ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                      : "text-black hover:bg-gray-700 hover:text-white",
                     "block rounded-md px-3 py-2 text-base font-medium"
                   )}
                   aria-current={item.current ? "page" : undefined}
