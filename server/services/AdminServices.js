@@ -164,7 +164,7 @@ async function insertActivity(db, user_id, activity_type, details) {
 // function to get the latest activties in the website.
 async function getLatestActivities(db){
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM activities ORDER BY activity_time DESC LIMIT 10";
+    const query = "SELECT * FROM activities ORDER BY activity_time DESC LIMIT 5";
     db.query(query,(error, results) => {
       if (error) {
         console.error(error);

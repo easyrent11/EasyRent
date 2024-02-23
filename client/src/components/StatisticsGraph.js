@@ -94,7 +94,7 @@ export default function StatisticsGraph() {
     }));
 
     chartComponent = (
-      <BarChart width={1650} height={400} data={yearlyChartData}>
+      <BarChart width={1250} height={400} data={yearlyChartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="year" />
         <YAxis />
@@ -133,7 +133,7 @@ export default function StatisticsGraph() {
     }));
 
     chartComponent = (
-      <BarChart width={1650} height={400} data={dailyChartData}>
+      <BarChart width={1250} height={400} data={dailyChartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="day" />
         <YAxis />
@@ -146,7 +146,7 @@ export default function StatisticsGraph() {
     );
   } else {
     chartComponent = (
-      <BarChart width={1660}  height={400} data={chartData}>
+      <BarChart width={1250}  height={400} data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" />
         <YAxis />
@@ -161,7 +161,7 @@ export default function StatisticsGraph() {
   return (
     <Paper className=" flex flex-col items-center justify-center w-full mt-8 ">
       <div className="flex items-center justify-center w-full p-2 m-2">
-        <Typography className='w-full p-2 m-2' variant="h6">Statistics Graph</Typography>
+        <Typography className='w-full  p-2 m-2' variant="h6">Statistics Graph</Typography>
         <FormControl className='p-2 m-2 w-2/12'>
           <InputLabel>Time Frame</InputLabel>
           <Select
@@ -174,7 +174,7 @@ export default function StatisticsGraph() {
           </Select>
         </FormControl>
       </div>
-      <div className="w-full p-2 relative">
+      <div className="w-full  p-2 relative">
         {chartComponent}
       </div>
     </Paper>

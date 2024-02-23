@@ -29,7 +29,7 @@ export default function AllCarsSection({filteredCars}) {
   };
 
   const navigationLocation = "/CarView";
-
+  console.log("current cars, = ", currentCars);
   return (
     <div className="flex flex-col p-4   lg:p-0 items-center min-h-screen w-full  bg-[#f5f5f5] rounded-md">
       <article className="flex flex-col lg:flex-row justify-center  lg:justify-start   min-h-screen  lg:flex-wrap w-full p-4">

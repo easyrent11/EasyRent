@@ -128,7 +128,7 @@ export default function AllCarsSection() {
         </div>
         <div className="flex flex-col rounded-md shadow-md items-center min-h-screen w-4/5 p-4 bg-[#f5f5f5] ">
           <CarSortSection />
-          <article className="flex border-2 border-blue-900 min-h-screen  flex-wrap w-full p-4">
+          <article className="flex  min-h-screen  flex-wrap w-full p-4">
             {currentCars.map((car, index) => (
               <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation} searchParams={dateSearchParams}/>
             ))}

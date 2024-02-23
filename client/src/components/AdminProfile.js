@@ -185,10 +185,10 @@ export default function UserProfile() {
   
   return (
     <>
-      <div className="flex flex-col items-center justify-around flex-1 w-4/5 border-2 border-red-500">
+      <div className="flex flex-col items-center justify-around flex-1 w-4/5 ">
       <h1 className="text-3xl mt-8 font-bold ">{userDetails.first_name} Profile Details</h1>
 
-        <div className="w-4/5 border-2 h-3/4 border-red-500 m-2 flex">
+        <div className="w-4/5  h-3/4 m-2 flex">
           <div className="w-1/2 ">
             {/* Display user profile image */}
             <div className="flex flex-col items-center w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
@@ -239,7 +239,7 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <div className="w-full shadow-lg border-2 border-yellow-500 p-2 bg-white rounded-md ml-2">
+          <div className="w-full shadow-lg  p-2 bg-white rounded-md ml-2">
             <div className="w-full max-h-full bg-white rounded-lg ">
               <div className="px-6 py-4">
                 <div className="flex flex-wrap mb-4">

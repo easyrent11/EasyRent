@@ -188,7 +188,7 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
           },
         })
         .then((response) => {
-          console.log(response.data);
+          console.log("The response we got = ",response.data);
           if (response.data.fileUrl) {
             const { fileUrl } = response.data;
             const pathname = new URL(fileUrl).pathname;
@@ -211,8 +211,6 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
             first_name: firstName,
             last_name: lastName,
           };
-      
-          // Move the register API call inside this block
           register(registerInfo)
             .then((res) => {
               console.log(res.data);
@@ -227,10 +225,10 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
                 console.log(res.data);
               })
               .catch((error) => notify("error", error));
-              notify("success", res.data.message);
+              notify("success", "User Registered Successfully"); //res.data.message
               onClose();
             })
-            .catch((err) => notify("error", err.data.message));
+            .catch((err) => notify("error", "Error registering user")); //err.data.message
         })
         .catch((error) => {
           console.error(error);
@@ -244,7 +242,7 @@ export default function Register({ onClose, openLogin, setAllUsers }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
-      <form className="bg-[#E7E7E7] w-full h-full overflow-y-auto border-2 border-red-500 md:max-w-lg p-6 mx-auto rounded-lg">
+      <form className="bg-[#E7E7E7] w-full h-full overflow-y-auto  md:max-w-lg p-6 mx-auto rounded-lg">
         <div className="flex justify-end">
           <button
             type="button"

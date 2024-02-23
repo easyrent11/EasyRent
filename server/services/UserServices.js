@@ -786,7 +786,6 @@ async function updateOrderStatus(db, orderId, status) {
           if (selectError) {
             reject(selectError);
           } else {
-
             resolve(selectResults[0]);
           }
         });
@@ -809,21 +808,23 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
     const currentStartDate = currentOrder.Start_Date;
     const currentEndDate = currentOrder.End_Date;
     const currentStartTime = currentOrder.Start_Time;
+    const currentEndTime = currentOrder.End_Time;
     // query that will find the conflicting orders.
     const sql = `
-        SELECT * FROM orders 
-        WHERE status = 'pending' 
-        AND Order_Id <> ?
-        AND Car_Plates_Number = ?
-        AND (
-          (Start_Date > ? AND Start_Date < ?) OR 
-          (
-            (End_Date > ? OR (End_Date = ? AND End_Time >= ?)) AND 
-            (End_Date < ? OR (End_Date = ? AND End_Time >= ?))
-          ) OR
-          (Start_Date > ? AND End_Date < ?) OR 
-          (Start_Date = ? AND End_Time >= ?)
-        )
+    SELECT * FROM orders 
+    WHERE status = 'pending' 
+    AND Order_Id <> ?
+    AND Car_Plates_Number = ? 
+    AND NOT(
+      (Start_Date < ? AND End_Date < ?)
+        OR 
+        (Start_Date > ? AND End_Date > ?)
+        OR 
+        (Start_Date = ? AND End_Time < ?)
+        OR 
+        (Start_Date = ? AND Start_Time > ?)
+    )
+
       `;
     // creating the query parameter object.
     const queryParams = [
@@ -832,15 +833,11 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
       currentStartDate,
       currentEndDate,
       currentStartDate,
-      currentStartDate,
-      currentStartTime,
-      currentEndDate,
-      currentEndDate,
-      currentStartTime,
-      currentStartDate,
       currentEndDate,
       currentStartDate,
       currentStartTime,
+      currentStartDate,
+      currentEndTime
     ];
     const declinedOrderInformation = [];
 
@@ -852,11 +849,11 @@ async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
         } else {
           // Update the status of conflicting orders to 'declined'
           for (const order of results) {
-            if (order.Order_Id !== orderId) { 
-              await updateOrderStatus(db, order.Order_Id, 'declined');
+            if (order.Order_Id !== orderId) {
+              await updateOrderStatus(db, order.Order_Id, "declined");
               declinedOrderInformation.push({
                 Order_Id: order.Order_Id,
-                startchat: order.Rentee_id
+                startchat: order.Rentee_id,
               });
             }
           }
@@ -1008,7 +1005,6 @@ async function updateUserDetails(db, updatedUserDetails) {
 ##################################################################################
 */
 
-
 // Function to update user's status
 async function changeUserStatus(db, userId, newStatus) {
   return new Promise((resolve, reject) => {
@@ -1024,7 +1020,7 @@ async function changeUserStatus(db, userId, newStatus) {
     });
   });
 }
-// function that will report a user 
+// function that will report a user
 async function handleReportUser(db, reportDetails) {
   return new Promise((resolve, reject) => {
     const insertQuery =
@@ -1105,7 +1101,7 @@ async function markNotificationAsRead(db, notificationId) {
 }
 
 // a function that will mark all the messages that a user recieved from a specific person as read when he clicks on his chat page.
-async function markMessagesAsRead(db,user1Id, chatroom_id){
+async function markMessagesAsRead(db, user1Id, chatroom_id) {
   console.log(user1Id, chatroom_id);
   return new Promise((resolve, reject) => {
     const query = `
@@ -1113,34 +1109,32 @@ async function markMessagesAsRead(db,user1Id, chatroom_id){
     SET isRead = 1 
     WHERE chat_room_id = ? 
     AND user_id != ? `;
-    db.query(query, [chatroom_id, user1Id], (error,results) => {
-      if(error){
+    db.query(query, [chatroom_id, user1Id], (error, results) => {
+      if (error) {
         console.log("Error marking messages as read : ", error);
-      }
-      else{
+      } else {
         resolve("marked messages as read");
       }
-    })
+    });
   });
 }
 
-async function checkUnreadMessages(db,user1Id){
-  return new Promise((resolve,reject) => {
+async function checkUnreadMessages(db, user1Id) {
+  return new Promise((resolve, reject) => {
     const query = `
       SELECT user_id AS sender_user_id, COUNT(*) AS unread_count
       FROM messages
       WHERE user_id != ? AND chat_room_id IS NOT NULL AND isRead = 0
       GROUP BY user_id
     `;
-    db.query(query, [user1Id], (error,results) => {
-      if(error){
+    db.query(query, [user1Id], (error, results) => {
+      if (error) {
         reject(error);
-      }
-      else{
+      } else {
         resolve(results);
       }
-    })
-  })
+    });
+  });
 }
 
 // function to start chat room between 2 users so they can talk privately.
@@ -1176,22 +1170,22 @@ const startChat = (db, user1Id, user2Id) => {
   });
 };
 
-async function markAllNotificationsAsRead(db){
+async function markAllNotificationsAsRead(db) {
   return new Promise((resolve, reject) => {
     const query = "UPDATE notifications SET isRead = 1";
-    db.query(query, (error,results) => {
-      if(error){
+    db.query(query, (error, results) => {
+      if (error) {
         console.log("Error marking notifications as read : ", error);
-      }
-      else{
+      } else {
         resolve("notifications deleted");
       }
-    })
+    });
   });
 }
 // mark chat notifications as read query function
 async function markChatNotificationsAsRead(user1Id, user2Id, db) {
-  const query = "UPDATE notifications SET isRead = 1 WHERE userId = ? AND targetId = ? AND type = 'recieve-message-notification' ";
+  const query =
+    "UPDATE notifications SET isRead = 1 WHERE userId = ? AND targetId = ? AND type = 'recieve-message-notification' ";
   return new Promise((resolve, reject) => {
     db.query(query, [user1Id, user2Id], (error, results) => {
       if (error) {

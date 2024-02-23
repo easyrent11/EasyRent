@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getOrderById, getAllUserDetails } from "../api/UserApi";
 import { getCar } from "../api/CarApi";
 import { formatDate } from "../HelperFunctions/FormatDate";
+import {diff} from "../HelperFunctions/TimeDifference"
 
 export default function Report() {
   const [order, setOrder] = useState({});
@@ -56,7 +57,10 @@ export default function Report() {
 
       // Calculate the number of days between start and end dates
       const timeDifference = endDate.getTime() - startDate.getTime();
-      const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+      let numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+      if(numberOfDays=== 0){
+        numberOfDays = 1;
+      }
 
       // Calculate the total renting price
       const total = numberOfDays * car.Rental_Price_Per_Day;
@@ -94,11 +98,13 @@ export default function Report() {
             <tr>
               <td className="font-bold">Total Rental Time</td>
               <td>
-                {order.Start_Date && order.End_Date && (
+                  {order.Start_Date && order.End_Date && (
                   <>
                     {new Date(order.End_Date).getDate() -
-                      new Date(order.Start_Date).getDate()}
-                    {""} day/s
+                      new Date(order.Start_Date).getDate() !== 0 ? new Date(order.End_Date).getDate() -
+                      new Date(order.Start_Date).getDate() : diff(order.Start_Time, order.End_Time)}
+                    {new Date(order.End_Date).getDate() -
+                      new Date(order.Start_Date).getDate() !== 0 ? ' day/s' : ' hours'}
                   </>
                 )}
               </td>

@@ -49,6 +49,7 @@ export const Cities =
   { value: 55, label: 'Karmiel' },
   { value: 56, label: 'Nof HaGalil'} ,
   { value: 57, label: 'Shfaram'}, 
-  {value:58, label : 'Fassuta'}
+  {value:58, label : 'Fassuta'},
+  {value:59, label : 'Acre'}
 ];
   

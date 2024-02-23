@@ -5,14 +5,36 @@ import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { getAllUserDetails } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import ResetPasswordView from "./ResetPasswordView";
+import { AllCarsContext } from "../contexts/AllCarsContext";
+import { getAllCars } from "../api/CarApi";
+
 
 export default function Login({ onClose, handleLogin }) {
-  const { setUserDetails } = useContext(UserProfileDetails);
-
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [openForgotPasswordView, setOpenForgotPasswordView] = useState(false);
+  const { setUserDetails } = useContext(UserProfileDetails);
+  const {setAllCars } = useContext(AllCarsContext);
+
+
+   // function to reset the car list after search.
+   const handleResetSearch = () => {
+    getAllCars()
+      .then((response) => {
+        console.log("on login = ",response.data)
+        setAllCars(response.data);
+        localStorage.removeItem("startDate");
+        localStorage.removeItem("endDate");
+        localStorage.removeItem("startTime");
+        localStorage.removeItem("endTime");
+      })
+      .catch((error) => {
+        console.error("Error fetching cars:", error);
+      });
+  };
+
+
 
   const handleOpenForgotPassword = () => {
     setOpenForgotPasswordView(true);
@@ -41,6 +63,8 @@ export default function Login({ onClose, handleLogin }) {
         const { token, userFirstName, userId, isAdmin } = res.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
+        handleResetSearch();
+        
         if(isAdmin){
           localStorage.setItem('isAdmin', "true");
         }

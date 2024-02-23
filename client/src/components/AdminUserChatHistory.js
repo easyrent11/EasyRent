@@ -3,6 +3,7 @@ import {
   getMessagesForRoom,
   getRoomForUser,
   getAllUserDetails,
+  getAllUsers
 } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
@@ -10,13 +11,22 @@ import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
 export default function AdminUserChatHistory({
   userId,
   setShowChatHistory,
-  users,
 }) {
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showPopout, setShowPopout] = useState(false); // State to manage pop-out visibility
   const [searchValue, setSearchValue] = useState("");
+  const [users, setUsers] = useState([]);
+
+  
+  useEffect(() => {
+    getAllUsers()
+      .then((response) => setUsers(response.data))
+      .catch((error) => notify("error", error));
+  }, []);
+
+
 
   // function that takes a user id and returns his full name.
   function getFullNameById(id) {
@@ -38,7 +48,7 @@ export default function AdminUserChatHistory({
       getMessagesForRoom(selectedRoom)
         .then((res) => {
           console.log(res);
-          const messagesWithDetails = res.data.map((message) => {
+          const messagesWithDetails = res.data.map(async (message) => {
             const senderId = message.user_id;
             const chatRoom = chatRooms.find((room) => room.id === selectedRoom);
             const recipientId =
@@ -48,16 +58,13 @@ export default function AdminUserChatHistory({
             const senderPromise = getAllUserDetails(senderId);
             const recipientPromise = getAllUserDetails(recipientId);
 
-            return Promise.all([senderPromise, recipientPromise]).then(
-              ([senderDetails, recipientDetails]) => {
-                console.log(senderDetails, recipientDetails);
-                return {
-                  ...message,
-                  senderName: senderDetails.data[0].first_name,
-                  recipientName: recipientDetails.data[0].first_name,
-                };
-              }
-            );
+            const [senderDetails, recipientDetails] = await Promise.all([senderPromise, recipientPromise]);
+            console.log(senderDetails, recipientDetails);
+            return {
+              ...message,
+              senderName: senderDetails.data[0].first_name,
+              recipientName: recipientDetails.data[0].first_name,
+            };
           });
 
           Promise.all(messagesWithDetails)

@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect} from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Select from "react-select";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import axios from "axios";
 import { resetPassword } from "../api/UserApi";
 import { Cities } from "../res/Cities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faCloudUploadAlt} from "@fortawesome/free-solid-svg-icons";
+import { faCloudUploadAlt } from "@fortawesome/free-solid-svg-icons";
 import Car from "./Car";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { notify } from "../HelperFunctions/Notify";
@@ -46,6 +46,8 @@ export default function UserProfile() {
       return;
     }
 
+
+
     const info = {
       userId: userDetails.Id,
       currentPassword: currentPassword,
@@ -54,11 +56,12 @@ export default function UserProfile() {
     resetPassword(info)
       .then((res) => {
         setPasswordChanged(true);
-        notify("success","Password changed successfully.");
+        notify("success", "Password changed successfully.");
       })
       .catch((err) => {
-        setPasswordError(err.message || "Failed to reset password.");
-        notify("error",passwordError);
+        console.log(err);
+        setPasswordError(err.response.data.error || "Failed to reset password.");
+        notify("error", err.response.data);
       });
 
     setCurrentPassword("");
@@ -77,7 +80,6 @@ export default function UserProfile() {
     setEditing(false);
   };
 
-
   // gets all the cars in the website.
   const { allCars } = useContext(AllCarsContext);
   // filters the all cars to get only the cars of the logged in person.
@@ -87,7 +89,7 @@ export default function UserProfile() {
       JSON.stringify(updatedUserDetails) !== JSON.stringify(userDetails);
 
     if (!isUserDataChanged && !updatedImage) {
-      notify("info","No changes to save.");
+      notify("info", "No changes to save.");
       setEditing(false);
       return;
     }
@@ -113,10 +115,9 @@ export default function UserProfile() {
 
           // Update user details with new picture and other changes
           updateUserDetails(updatedDetailsWithPicture);
-          
         })
         .catch((error) => {
-          notify("error",`Failed to upload profile picture : ${error}`);
+          notify("error", `Failed to upload profile picture : ${error}`);
         });
     } else {
       // Update user details without changing the picture
@@ -124,7 +125,6 @@ export default function UserProfile() {
         ...updatedUserDetails,
         city_code: city || userDetails.city_code,
         City_Name: city_name || userDetails.City_Name,
-
       };
       // Update user details
       updateUserDetails(updatedDetailsWithoutPicture);
@@ -135,14 +135,14 @@ export default function UserProfile() {
     axios
       .put("http://localhost:3001/user/updateuserdetails", updatedDetails)
       .then((response) => {
-        notify("success",`${response.data}`);
+        notify("success", `${response.data}`);
         setEditing(false);
 
         // Update userDetails with the new updatedDetails
         setUserDetails(updatedDetails);
       })
       .catch((error) => {
-        notify("error",`Failed to save user details: ${error}`);
+        notify("error", `Failed to save user details: ${error}`);
       });
   };
 
@@ -213,8 +213,8 @@ export default function UserProfile() {
   return (
     <>
       <div className=" min-h-screen w-4/5 ">
-        <div className="w-full flex mx-auto px-4 py-8 ">
-          <div className="w-1/2 ">
+        <div className="w-full  flex mx-auto px-4 py-8 ">
+          <div className="w-1/2">
             {/* Display user profile image */}
             <div className="flex flex-col items-center w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
               <figure className="flex flex-col items-center justify-center">
@@ -238,7 +238,7 @@ export default function UserProfile() {
                 </div>
 
                 {editing && (
-                  <div className="flex flex-wrap mb-4">
+                  <div className="flex   flex-wrap mb-4">
                     <div className="w-full m-6">
                       <label
                         htmlFor="file-input"
@@ -264,10 +264,10 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <div className="w-full shadow-lg bg-white rounded-md ml-2">
-            <div className="w-full max-h-full bg-white rounded-lg ">
+          <div className="w-full  shadow-lg bg-white rounded-md ml-2">
+            <div className="w-full  max-h-full bg-white rounded-lg ">
               <div className="px-6 py-4">
-                <div className="flex flex-wrap mb-4">
+                <div className="flex  flex-wrap mb-4">
                   <div className="w-1/2">
                     <p className="text-lg font-bold text-black">ID:</p>
                     {renderInputOrText("Id", "ID")}
@@ -289,7 +289,9 @@ export default function UserProfile() {
                 </div>
                 <div className="flex flex-wrap mb-4">
                   <div className="w-1/2 ">
-                    <p className="text-lg font-bold text-black">Phone Number:</p>
+                    <p className="text-lg font-bold text-black">
+                      Phone Number:
+                    </p>
                     {renderInputOrText("phone_number", "Phone Number")}
                   </div>
                   <div className="w-1/2">
@@ -299,7 +301,7 @@ export default function UserProfile() {
                     {renderInputOrText("driving_license", "Driving License")}
                   </div>
 
-                  <div className="w-1/2">
+                  <div className=" w-1/2">
                     <p className="text-lg font-bold text-black">City :</p>
                     {editing ? (
                       <Select
@@ -318,7 +320,9 @@ export default function UserProfile() {
                   </div>
 
                   <div className="w-1/2">
-                    <p className="text-lg font-bold text-black">Street Name :</p>
+                    <p className="text-lg font-bold text-black">
+                      Street Name :
+                    </p>
                     {renderInputOrText("street_name", "StreetName")}
                   </div>
                 </div>
@@ -326,7 +330,7 @@ export default function UserProfile() {
 
               {/* Reset password section - show only in edit mode */}
               {editing && (
-                <div className="flex flex-col items-center justify-center w-full">
+                <div className="flex  flex-col items-center justify-center w-full">
                   <p className="text-lg p-2 ml-4 font-bold text-black w-full">
                     Change Password
                   </p>
@@ -365,6 +369,9 @@ export default function UserProfile() {
                       Change Password
                     </button>
                   </article>
+                  <p className="m-2 text-red-700 text-center font-bold">
+                    {passwordError}
+                  </p>
                 </div>
               )}
 
@@ -396,30 +403,26 @@ export default function UserProfile() {
               </div>
             </div>
           </div>
-
-          <p className="m-2 text-red-700 text-center font-bold">
-            {passwordError}
-          </p>
         </div>
         {/* Renter's Cars Section */}
         <div className="flex flex-col items-center min-h-screen w-full p-4 bg-white shadow-lg rounded-md">
           {allUserCars.length > 0 && (
             <h2 className="p-2 m-2 text-2xl">Your cars:</h2>
           )}
-           {allUserCars.length > 0 ? (
-          <article className="flex border-2 border-blue-900 min-h-screen flex-wrap w-full p-4">
-            {allUserCars.map((car, index) => (
-              <Car
-                key={index}
-                car={car}
-                btnText={"Edit Car"}
-                navigationLocation={navigationLocation}
-              />
-            ))}
-          </article>
-        ) : (
-          <p className="p-4 text-2xl">You don't have any cars yet.</p>
-        )}
+          {allUserCars.length > 0 ? (
+            <article className="flex border-2 border-blue-900 min-h-screen flex-wrap w-full p-4">
+              {allUserCars.map((car, index) => (
+                <Car
+                  key={index}
+                  car={car}
+                  btnText={"Edit Car"}
+                  navigationLocation={navigationLocation}
+                />
+              ))}
+            </article>
+          ) : (
+            <p className="p-4 text-2xl">You don't have any cars yet.</p>
+          )}
           <div className="flex self-center align-self-end mt-4">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button

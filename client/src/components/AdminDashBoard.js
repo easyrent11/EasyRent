@@ -124,7 +124,7 @@ export default function AdminDashBoard({ users, cars }) {
               </div>
             </div>
           </div>
-          <div className="w-full ">
+          <div className=" w-full">
             {/* Statistics graph for orders,users,cars amount each month. */}
             <StatisticsGraph />
             <div className="flex items-center justify-between">
