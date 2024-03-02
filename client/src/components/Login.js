@@ -63,7 +63,8 @@ export default function Login({ onClose, handleLogin }) {
         const { token, userFirstName, userId, isAdmin } = res.data;
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
-        handleResetSearch();
+        handleResetSearch(); // clear the search params on every login.
+        localStorage.removeItem('filterOptions'); // clear the car filter options on every login.
         
         if(isAdmin){
           localStorage.setItem('isAdmin', "true");

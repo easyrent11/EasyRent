@@ -4,11 +4,16 @@ import { AllCarsContext } from "../contexts/AllCarsContext";
 import { getAllCars } from "../api/CarApi";
 import { clearSearchParameters } from "../HelperFunctions/ClearSearchParams";
 import CarFilterPopout from "./CarFilterPopOut";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 export default function CarSortSection() {
   // getting all of the cars list from the context so we can preform a sort and update the list after.
   const { allCars, setAllCars } = useContext(AllCarsContext);
   const [showFilterSection, setShowFilterSection] = useState(false);
+
+  const token = localStorage.getItem("token");
 
   // function to toggle and untoggle car filter section.
   const toggleCarFilterSection = () => {
@@ -72,12 +77,19 @@ export default function CarSortSection() {
   return (
     <div className="w-full mb-4 flex justify-between lg:rounded-md items-center bg-[#f6f6f6] relative">
       <div className="w-4/5 h-full  flex items-center lg:justify-between justify-around  lg:w-1/2 p-2 2xl:w-1/3">
-        <button
-          onClick={handleResetSearch}
-          className="bg-red-500 hover:bg-black p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-white font-bold rounded-md"
-        >
-          Clear Search Results
-        </button>
+        {token ? (
+          <button
+            onClick={handleResetSearch}
+            className="bg-red-500 hover:bg-black p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-white font-bold rounded-md"
+          >
+            Clear Search Results
+          </button>
+        ) : (
+          <Link to="/" className="text-black">
+            <FontAwesomeIcon icon={faArrowLeft} size="2xl"/> Back
+          </Link>
+        )}
+
         <div className="lg:hidden bg-[#f6f6f6]  p-4 rounded-md">
           <button onClick={toggleCarFilterSection}>Car Filters</button>
         </div>

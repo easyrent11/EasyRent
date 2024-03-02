@@ -99,12 +99,14 @@ export default function SearchCar() {
 
     searchCars(requestData)
       .then((res) => {
-        const { pickupDate, returnDate, startTime, endTime } = requestData;
+        const { pickupDate, returnDate, startTime, endTime,city } = requestData;
         // Saving search params in localStorage
         localStorage.setItem("startDate", pickupDate);
         localStorage.setItem("endDate", returnDate);
         localStorage.setItem("startTime", startTime);
         localStorage.setItem("endTime", endTime);
+        localStorage.setItem("city", city);
+        
         const token = localStorage.getItem("token");
         if (token) {
           navigate("/homepage");

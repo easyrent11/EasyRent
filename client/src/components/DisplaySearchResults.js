@@ -22,7 +22,7 @@ export default function AllCarsSection() {
     pickupDate,
     returnDate,
     fromTime,
-    toTime
+    toTime,
   }
   
 
@@ -82,7 +82,7 @@ export default function AllCarsSection() {
   }
 
 
-  // You can update filteredCars whenever allCars changes
+  
   useEffect(() => {
     if (!localStorage.getItem('filterOptions'))
       setSearchFilteredCars([...allCars]); // Copy allCars when it changes
