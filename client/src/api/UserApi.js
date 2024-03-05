@@ -102,14 +102,20 @@ export const markChatMessagesAsRead = (chatRoomInfo) => {
 export const checkUnreadMessages = (user1Id) => {
   return axios.get(`${BASE_URL_USER}/unread-messages/${user1Id}`);
 } 
+// api to mark all notifications as read.
 export const markAllNotificationsAsRead = () => {
   return axios.put(`${BASE_URL_USER}/markallnotifications`);
 }
-
+// api for user forgot password
 export const forgotPassword = (email) => {
   return axios.post(`${BASE_URL_USER}/forgotpassword`, {email});
 }
-
+// api to mark chat notifications as read.
 export const markChatNotificationsAsRead = (idObject) => {
   return axios.put(`${BASE_URL_USER}/markchatnotificationsread`, idObject);
 }
+// api to check if a car is in use for a given order date and time.
+export const checkIfCarInUse = (orderObject) => {
+  return axios.post(`${BASE_URL_USER}/checkcarinuse`, orderObject);
+}
+

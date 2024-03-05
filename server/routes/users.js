@@ -458,6 +458,18 @@ router.put("/decline-conficting-orders", async (req, res) => {
   }
 });
 
+router.post("/checkcarinuse", async (req,res) => {
+  const {startDate,endDate,startTime,endTime, platesNumber} = req.body;
+  try{
+    const result = await UserServices.checkCarInUse(db,startDate,endDate,startTime,endTime,platesNumber);
+    return res.json({carInUse:result})
+  }
+  catch (error){
+    console.error("Error checking if car in use.", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+})
+
 router.put("/changeuserstatus", async (req, res) => {
   const { userId, newStatus } = req.body;
   console.log(userId, newStatus);

@@ -4,8 +4,7 @@ import { Carousel } from "@material-tailwind/react";
 import PersonIcon from "@mui/icons-material/Person";
 import { TbManualGearbox } from "react-icons/tb";
 import { FaCogs } from "react-icons/fa";
-import { getAllUserDetails } from "../api/UserApi";
-import { sendOrderRequest } from "../api/UserApi";
+import { getAllUserDetails,checkIfCarInUse,sendOrderRequest} from "../api/UserApi";
 import { useUserOrders } from "../contexts/UserOrdersContext";
 import { FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -31,6 +30,7 @@ export default function CarView({openLogin}) {
   const [ownerId, setOwnerId] = useState("");
   const [car, setCar] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const { setUserRenteeOrders } = useUserOrders();
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
@@ -151,8 +151,23 @@ export default function CarView({openLogin}) {
       return;
     }
 
+    // create order request object to send it to the check if car in use query.
+    const orderObject = {
+      startDate:startDate,
+      endDate:endDate,
+      startTime:startTime,
+      endTime:endTime,
+      platesNumber:platesNumber
+    }
 
-    // creating an order details object.
+    // check if the car is in use for those dates.
+    checkIfCarInUse(orderObject)
+    .then((res) => {
+      if(res.data.carInUse){
+        setErrorMsg("The car is unavailable for the dates you entered, enter different dates.");
+        return;
+      }
+       // creating an order details object.
     const orderRequest = {
       Start_Date: startDate,
       End_Date: endDate,
@@ -163,7 +178,7 @@ export default function CarView({openLogin}) {
       status: "pending",
       Renter_Id: ownerId,
     };
-    // sending the order to the renter.
+    //sending the order to the renter.
     sendOrderRequest(orderRequest)
       .then((res) => {
         notify("success", "Order request sent successfully!");
@@ -185,6 +200,10 @@ export default function CarView({openLogin}) {
         console.log(err);
         notify("error", "Failed to send order request!");
       });
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   };
   // handling the User View window close click.
   const handleCloseCarView = () => {
@@ -348,6 +367,7 @@ export default function CarView({openLogin}) {
               <button className="bg-[#CC6200] text-white py-2 px-4 rounded-lg m-1" onClick={saveOwnerId}>
                 <Link to="/ChatApp">Start Chat with Seller</Link>
               </button>
+              <p className="font-bold text-red-500 text-lg text-center">{errorMsg}</p>
             </div>
           </section>
         </section>

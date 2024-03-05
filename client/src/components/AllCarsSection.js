@@ -28,6 +28,8 @@ export default function AllCarsSection({filteredCars}) {
     setCurrentPage(pageNumber);
   };
 
+
+
   const navigationLocation = "/CarView";
   console.log("current cars, = ", currentCars);
   return (

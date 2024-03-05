@@ -793,6 +793,56 @@ async function updateOrderStatus(db, orderId, status) {
     });
   });
 }
+async function checkCarInUse(db, startDate, endDate, startTime, endTime, carPlatesNumber) {
+  try {
+    const sql = `
+      SELECT * FROM orders 
+      WHERE status = 'accepted' 
+      AND Car_Plates_Number = ? 
+      AND NOT(
+        (Start_Date < ? AND End_Date < ?)
+        OR 
+        (Start_Date > ? AND End_Date > ?)
+        OR 
+        (Start_Date = ? AND End_Time < ?)
+        OR 
+        (Start_Date = ? AND Start_Time > ?)
+      )
+    `;
+    
+    // creating the query parameter object.
+    const queryParams = [
+      carPlatesNumber,
+      startDate,
+      endDate,
+      startDate,
+      endDate,
+      startDate,
+      startTime,
+      startDate,
+      endTime
+    ];
+
+    // Use `await` directly on the query to get the results.
+    const results = await new Promise((resolve, reject) => {
+      db.query(sql, queryParams, (error, results) => {
+        if (error) {
+          console.error("Error finding if car in use", error);
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+
+    // Return the length of the results array.
+    return results.length > 0 ? true : false;
+  } catch (error) {
+    console.error("Error checking if car in use", error);
+    throw error;
+  }
+}
+
 // function that takes an order id and plates number and return all conflicting order details and decline them.
 async function findAndDeclineConflictingOrders(db, orderId, carPlatesNumber) {
   try {
@@ -1218,4 +1268,5 @@ module.exports = {
   checkUnreadMessages,
   markAllNotificationsAsRead,
   markChatNotificationsAsRead,
+  checkCarInUse,
 };

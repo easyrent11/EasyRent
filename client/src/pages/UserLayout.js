@@ -5,11 +5,12 @@ import CarFilterSection from "../components/CarFilterSection";
 import SearchCar from "../components/SearchCar";
 import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import { AllCarsContext } from "../contexts/AllCarsContext";
-import { clearSearchParameters } from "../HelperFunctions/ClearSearchParams";
+import { searchCars } from "../api/UserApi";
+
 
 // the user's home page.
 export default function UserLayout() {
-  const { allCars } = useContext(AllCarsContext);
+  const { allCars,setAllCars} = useContext(AllCarsContext);
   const userDetails = useContext(UserProfileDetails);
   const [filteredCars, setFilteredCars] = useState([...allCars]); // Copy allCars initially
   const [showSearchCars, setShowSearchCars] = useState(false);
@@ -85,23 +86,48 @@ export default function UserLayout() {
     }
   }, [allCars]);
 
-  // a use effect that clears the search parameters if a page refreshes.
+  // // a use effect that clears the search parameters if a page refreshes.
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event) => {
+  //     clearSearchParameters(); // calling the function that will remove the search parameters from the local storage.
+
+  //     // Cancel the default behavior to show a prompt before leaving the page
+  //     event.preventDefault();
+  //     // Chrome requires returnValue to be set
+  //     event.returnValue = "";
+  //   };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []); // Empty dependency array ensures this runs only on mount
+
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      clearSearchParameters(); // calling the function that will remove the search parameters from the local storage.
+    const city = parseInt(localStorage.getItem("city"));
+    const pickupDate = localStorage.getItem("startDate");
+    const returnDate = localStorage.getItem("endDate");
+    const startTime = localStorage.getItem("startTime");
+    const endTime = localStorage.getItem("endTime");
 
-      // Cancel the default behavior to show a prompt before leaving the page
-      event.preventDefault();
-      // Chrome requires returnValue to be set
-      event.returnValue = "";
+    if (!city || !pickupDate || !returnDate || !startTime || !endTime) {
+      return;
+    }
+    // Creating the search object
+    const requestData = {
+      city: city,
+      pickupDate: pickupDate,
+      returnDate: returnDate,
+      startTime: startTime,
+      endTime: endTime,
     };
+    searchCars(requestData).then((res) => {
+      // Updating the Cars List with the new search Array
+      setAllCars(res.data);
+    });
+  }, []);
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []); // Empty dependency array ensures this runs only on mount
 
   return (
     <>
