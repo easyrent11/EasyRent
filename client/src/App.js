@@ -34,6 +34,10 @@ import AdminProfile from "./components/AdminProfile";
 import AdminUserReports from "./components/AdminUserReports";
 import AdminUserChatHistory from "./components/AdminUserChatHistory";
 import AdminChatHistory from "./components/AdminChatHistory";
+import AdminUsersList from "./components/AdminUsersList";
+import AdminSideBar from "./components/AdminSideBar";
+import AdminUserReportsView from "./components/AdminUserReportsView";
+import ViewOrderedCarDetails from "./components/ViewOrderedCarDetails";
 // ########################################################################################
 // #                             Imports of contexts.                                     #
 // ########################################################################################
@@ -53,9 +57,7 @@ import HomeLayout from "./pages/HomeLayout";
 // ########################################################################################
 import { getAllCars } from "./api/CarApi";
 import { getAllUserDetails,getAllUsers } from "./api/UserApi";
-import AdminUsersList from "./components/AdminUsersList";
-import AdminSideBar from "./components/AdminSideBar";
-import AdminUserReportsView from "./components/AdminUserReportsView";
+
 
 function App() {
   // ########################################################################################
@@ -189,6 +191,14 @@ function App() {
                         <NoAccountPrivateRoute
                           openLogin={openLogin}
                           component={CarView}
+                        />
+                      }
+                    />
+                     <Route
+                      path="/ViewOrderedCarDetails/:encryptedPlatesNumber"
+                      element={
+                        <NoAccountPrivateRoute
+                          component={ViewOrderedCarDetails}
                         />
                       }
                     />

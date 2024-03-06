@@ -5,7 +5,7 @@ import { changeOrderStatus } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import { formatDate } from "../HelperFunctions/FormatDate";
 import {getOrderById} from "../api/UserApi";
-
+import {xorEncrypt} from "../HelperFunctions/Encrypt";
 
 import io from "socket.io-client";
 const socket = io.connect("http://localhost:3001");
@@ -14,6 +14,7 @@ const Orders = () => {
   const navigate = useNavigate();
   const { userOrders, userRenteeOrders, setUserRenteeOrders,fetchUserOrders } = useUserOrders();
   const [renterId, setRenterId] = useState(null);
+  const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
 
   useEffect(() => {
@@ -21,6 +22,13 @@ const Orders = () => {
     fetchUserOrders();
   }, [fetchUserOrders]);
 
+  // function to take the user to the orded car page view.
+  function handleGoToCarClick(platesNumber){
+    // the encrypted plates number.
+    const encNumber = xorEncrypt(platesNumber.toString(), secretKey);
+    console.log(encNumber);
+    navigate(`/ViewOrderedCarDetails/${encNumber}`)
+  }
 
   // function that cancels a user's order.
   function handleCancelOrder(orderId) {
@@ -141,6 +149,12 @@ const Orders = () => {
                   >
                     Report
                   </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Car
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -200,6 +214,9 @@ const Orders = () => {
                         </Link>
                       </td>
                     )}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
+                      <button onClick={() => handleGoToCarClick(order.Car_Plates_Number)}> View Car </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
