@@ -341,6 +341,7 @@ export default function UserProfile() {
                         className="w-4/5 border-2 border-black rounded-md"
                         name="oldpassword"
                         value={currentPassword}
+                        type="password"
                         onChange={(e) => setCurrentPassword(e.target.value)}
                       />
                     </div>
@@ -349,6 +350,7 @@ export default function UserProfile() {
                       <input
                         className="w-4/5 border-2 border-black rounded-md"
                         name="newpassword"
+                        type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                       />
@@ -358,6 +360,7 @@ export default function UserProfile() {
                       <input
                         className="w-4/5 border-2 border-black rounded-md"
                         name="confirmnewpassword"
+                        type="password"
                         value={confirmNewPassword}
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
                       />

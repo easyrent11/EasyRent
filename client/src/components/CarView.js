@@ -305,6 +305,7 @@ export default function CarView({openLogin}) {
             <input
               className="border-2 border-gray-300 rounded-md p-2 w-full"
               type="date"
+              min={new Date().toISOString().split('T')[0]}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
@@ -327,6 +328,7 @@ export default function CarView({openLogin}) {
             <input
               className="border-2 border-gray-300 rounded-md p-2 w-full"
               type="date"
+              min={new Date().toISOString().split('T')[0]}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />

@@ -149,6 +149,7 @@ export default function SearchCar() {
         <input
           type="date"
           id="pickupdate"
+          min={new Date().toISOString().split('T')[0]}
           value={pickupDate}
           onChange={handlePickUpDateChange}
           className="w-full p-1.5 rounded-md"
@@ -169,6 +170,7 @@ export default function SearchCar() {
         <input
           type="date"
           id="returnDate"
+          min={new Date().toISOString().split('T')[0]}
           value={returnDate}
           onChange={handleReturnDateChange}
           className="w-full p-1.5 rounded-md"
