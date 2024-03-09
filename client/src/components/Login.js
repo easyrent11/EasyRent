@@ -20,14 +20,15 @@ export default function Login({ onClose, handleLogin }) {
 
    // function to reset the car list after search.
    const handleResetSearch = () => {
+    localStorage.removeItem("startDate");
+    localStorage.removeItem("endDate");
+    localStorage.removeItem("startTime");
+    localStorage.removeItem("endTime");
+    localStorage.removeItem("city");
     getAllCars()
       .then((response) => {
         console.log("on login = ",response.data)
         setAllCars(response.data);
-        localStorage.removeItem("startDate");
-        localStorage.removeItem("endDate");
-        localStorage.removeItem("startTime");
-        localStorage.removeItem("endTime");
       })
       .catch((error) => {
         console.error("Error fetching cars:", error);

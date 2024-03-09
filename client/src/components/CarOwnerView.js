@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo,useContext } from "react";
 import { Carousel } from "@material-tailwind/react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faCloudUploadAlt} from "@fortawesome/free-solid-svg-icons";
+import { faCloudUploadAlt } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { updateCarDetails } from "../api/CarApi";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
@@ -11,8 +11,9 @@ import Select from "react-select";
 import { FaTimes } from "react-icons/fa";
 import { deleteOldImages, updateCarImages, getCarImages } from "../api/CarApi";
 import { xorDecrypt } from "../HelperFunctions/Encrypt";
-import {getCar} from "../api/CarApi";
-import {notify} from "../HelperFunctions/Notify";
+import { getCar } from "../api/CarApi";
+import { notify } from "../HelperFunctions/Notify";
+import { AllCarsContext } from '../contexts/AllCarsContext';
 
 export default function CarOwnerView() {
   const [editMode, setEditMode] = useState(false);
@@ -27,6 +28,10 @@ export default function CarOwnerView() {
   const [updatedRentalPrice, setUpdatedRentalPrice] = useState("");
   const [uploadedImages, setUploadedImages] = useState(null);
   const [car, setCar] = useState([]);
+  const {setAllCars} = useContext(AllCarsContext);
+  
+
+
 
   let flag = false;
 
@@ -35,18 +40,19 @@ export default function CarOwnerView() {
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
   //getting encrypted the plates number out of the paramaters that are passed in the car component.
   let { encryptedPlatesNumber } = useParams();
+  
   // decryping the encrypted plates number from the parameters.
   let platesNumber = xorDecrypt(encryptedPlatesNumber, secretKey);
-   // api call to fetch all car info based on plates number
-   useMemo(() => {
+  // api call to fetch all car info based on plates number
+  useMemo(() => {
     getCar(platesNumber)
-    .then((res) => {
-      setCar(res.data[0]);
-    })
-    .catch((error) => {
-      notify('error', error);
-    })
-  },[]);
+      .then((res) => {
+        setCar(res.data[0]);
+      })
+      .catch((error) => {
+        notify("error", error);
+      });
+  }, []);
 
   const carImageUrls = useMemo(() => {
     if (car && car.car_urls) {
@@ -68,7 +74,6 @@ export default function CarOwnerView() {
       setUpdatedRentalPrice(car.Rental_Price_Per_Day || "");
     }
   }, [car]);
-
 
   const updateCarDetailsInDB = (images) => {
     const updatedCarDetails = {
@@ -126,6 +131,7 @@ export default function CarOwnerView() {
         };
         updateCarImages(carDetails)
           .then((res) => {
+            console.log("Res in car update image = ", res);
             console.log("Images updated successfully");
           })
           .catch((error) => {
@@ -137,6 +143,7 @@ export default function CarOwnerView() {
       updateCarDetails(updatedCarDetails)
         .then(() => {
           setEditMode(false);
+          // update the car state with the new details.
           navigate("/UserProfile");
         })
         .catch((error) => {
@@ -191,6 +198,11 @@ export default function CarOwnerView() {
                       return pathname.substring(pathname.lastIndexOf("/") + 1);
                     });
                     updateCarDetailsInDB(filenames);
+                    // Update the state to reflect the changes
+                    setCar((prevCar) => ({
+                      ...prevCar,
+                      car_urls: filenames.join(","),
+                    }));
                   })
                   .catch((error) => {
                     console.error("Failed to upload new images:", error);
@@ -210,6 +222,11 @@ export default function CarOwnerView() {
                   return pathname.substring(pathname.lastIndexOf("/") + 1);
                 });
                 updateCarDetailsInDB(filenames);
+                // Update the state to reflect the changes
+                setCar((prevCar) => ({
+                  ...prevCar,
+                  car_urls: filenames.join(","),
+                }));
               })
               .catch((error) => {
                 console.error("Failed to upload new images:", error);
@@ -222,7 +239,21 @@ export default function CarOwnerView() {
     } else {
       // If no new images are selected, update only other details
       updateCarDetailsInDB(filenames);
+      // Update the state to reflect the changes
+      setCar((prevCar) => ({
+        ...prevCar,
+        Manufacturer_Code: updatedManufacturerCode.toLowerCase(),
+        model_code: updatedModelCode,
+        Year: updatedYear,
+        Color: updatedColor,
+        Seats_Amount: updatedSeatsAmount,
+        Engine_Type: updatedEngineType,
+        Transmission_type: updatedTransmissionType,
+        Description: updatedDescription,
+        Rental_Price_Per_Day: updatedRentalPrice,
+      }));
     }
+    window.location.reload(); // reload the page.
   };
 
   const handleImageUpload = (event) => {
@@ -253,7 +284,7 @@ export default function CarOwnerView() {
         <FaTimes className="mx-auto" />
       </button>
       <div className="w-full flex-col flex items-center m-2 border-2 border-blue-500 justify-centerm-2">
-     <Carousel className="rounded-md">
+        <Carousel className="rounded-md">
           {carImageUrls.length > 0 ? (
             carImageUrls.map((imageUrl, index) => (
               <figure key={index} className="rounded-xl">
