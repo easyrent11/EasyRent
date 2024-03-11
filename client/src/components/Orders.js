@@ -30,6 +30,7 @@ const Orders = () => {
     navigate(`/ViewOrderedCarDetails/${encNumber}`)
   }
 
+ 
   // function that cancels a user's order.
   function handleCancelOrder(orderId) {
     // get the renter id 

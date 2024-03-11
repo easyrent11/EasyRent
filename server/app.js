@@ -4,6 +4,7 @@ const cors = require("cors");
 const carRoutes = require("./routes/cars");
 const userRoutes = require("./routes/users");
 const adminRoutes = require("./routes/admin");
+const UserServices = require("./services/UserServices");
 const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./models/db");
@@ -122,6 +123,9 @@ function saveMessageToDB(data) {
     }
   });
 }
+
+//Run schedulePendingRemovals every hour
+setInterval(() => {UserServices.schedulePendingRemovals(db)},60 * 60 * 1000); 
 
 // Listen for incoming connections on the same port for both Express app and Socket.IO
 server.listen(port, () => {

@@ -14,6 +14,7 @@ import { getCar } from "../api/CarApi";
 import io from "socket.io-client";
 import {formatDate} from "../HelperFunctions/FormatDate";
 import { checkDate } from "../HelperFunctions/checkDate";
+import {sendOrderEmails} from "../api/UserApi";
 
 export default function CarView({openLogin}) {
   let flag = false;
@@ -28,6 +29,7 @@ export default function CarView({openLogin}) {
   const [carOwnerName, setCarOwnerName] = useState("");
   const [carOwnerPicture, setCarOwnerPicture] = useState("");
   const [ownerId, setOwnerId] = useState("");
+  const [carOwnerEmail,setCarOwnerEmail] = useState("");
   const [car, setCar] = useState([]);
   const [socket, setSocket] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -93,6 +95,7 @@ export default function CarView({openLogin}) {
         setCarOwnerName(result.data[0].first_name);
         setCarOwnerPicture(result.data[0].picture);
         setOwnerId(result.data[0].Id);
+        setCarOwnerEmail(result.data[0].email);
       })
       .catch((err) => {
         notify("error", err);
@@ -193,6 +196,19 @@ export default function CarView({openLogin}) {
           type: "order-request-notification",
           orderId: res.data.order.Order_Id,
         });
+        // order email details
+        const orderEmailDetails = {
+          recipientEmail : carOwnerEmail,
+          body :  `Hello there ${carOwnerName} you have a new order for one of your cars on EasyRent. Please login to your account to view the details and manage the order`,
+          subject : "EasyRent Car Order"
+        }
+        sendOrderEmails(orderEmailDetails)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
         resetFields();
         window.location.href = "/homepage"; // redirect user to the home page after sending a car request
       })

@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const fs = require("fs");
+const moment = require("moment")
+
 // ########################################################################################
 // #                                ADD CAR SERVICE FUNCTIONS                             #
 // ########################################################################################
@@ -16,7 +18,7 @@ function checkManufacturerExists(db, manufacturerCode) {
         if (error) {
           console.error("Error checking manufacturer:", error);
           reject("Failed to add car");
-        } else {
+        } else {UserServices
           resolve(results.length > 0);
         }
       }
@@ -1247,6 +1249,20 @@ async function markChatNotificationsAsRead(user1Id, user2Id, db) {
   });
 }
 
+// function that automatically runs every hour and auto cancels all pending orders that are older than 24 hours
+function schedulePendingRemovals(db) {
+  const twentyFourHoursAgo = moment().subtract(24, 'hours'); // 24 hours ago.
+  const formattedDate = twentyFourHoursAgo.format('YYYY-MM-DD HH:mm:ss');
+  const query = `UPDATE orders SET status = 'cancelled' WHERE status = 'pending' AND Order_Date < '${formattedDate}'`;
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error('Error removing pending orders:', err);
+      return;
+    }
+    console.log('Pending orders cancelled successfully');
+  });
+}
+
 module.exports = {
   registerUser,
   loginUser,
@@ -1269,4 +1285,5 @@ module.exports = {
   markAllNotificationsAsRead,
   markChatNotificationsAsRead,
   checkCarInUse,
+  schedulePendingRemovals,
 };

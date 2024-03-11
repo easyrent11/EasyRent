@@ -119,3 +119,7 @@ export const checkIfCarInUse = (orderObject) => {
   return axios.post(`${BASE_URL_USER}/checkcarinuse`, orderObject);
 }
 
+// api to send order email to the users
+export const sendOrderEmails = (orderDetails) => {
+  return axios.post(`${BASE_URL_USER}/send-order-email`, orderDetails);
+}

@@ -1,10 +1,9 @@
 // sendEmail.js
 const nodemailer = require("nodemailer");
-const tempPasswordGenerator = require('../email/RandomPasswordGenerator');
+const tempPasswordGenerator = require("../email/RandomPasswordGenerator");
 
 // generating a random secure password from the helper function.
 const temporaryPassword = tempPasswordGenerator();
-
 
 const sendEmail = async (recipientEmail) => {
   // defining the mail body.
@@ -32,7 +31,7 @@ const sendEmail = async (recipientEmail) => {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD,
       },
-    });    
+    });
     // mail details object
     const mailOptions = {
       from: process.env.EMAIL,

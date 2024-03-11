@@ -8,6 +8,7 @@ const path = require("path");
 const UserServices = require("../services/UserServices");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../email/sendEmail");
+const sendOrderEmail = require("../email/sendOrderEmails");
 // register route.
 router.post("/register", async (req, res) => {
   const userData = req.body;
@@ -35,7 +36,6 @@ router.post("/forgotpassword", async (req, res) => {
     }
     try {
       const temporaryPassword = await sendEmail(email);
-      console.log(temporaryPassword);
       // Hash the temporary password
       bcrypt.hash(temporaryPassword, 10, (error, newHashedPassword) => {
         if (error) {
@@ -367,11 +367,29 @@ router.post("/ordercar", async (req, res) => {
   try {
     // calling the function that will do the logic and getting back the id of the order.
     const order = await UserServices.orderCar(db, orderDetails);
+    // send email to the renter
     res
       .status(201)
       .json({ message: "Your request was sent to the renter", order: order });
   } catch (error) {
     res.status(500).json({ error: "Failed to send request to the renter" });
+  }
+});
+
+// route for sending order email
+router.post('/send-order-email', async (req, res) => {
+  try {
+    const { recipientEmail, body, subject } = req.body;
+    if (!recipientEmail || !body || !subject) {
+      return res.status(400).json({ message: 'Missing required parameters' });
+    }
+
+    const info = await sendOrderEmail(recipientEmail, body, subject);
+    console.log(info);
+    return res.status(200).json({ message: 'Email sent successfully', info });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
