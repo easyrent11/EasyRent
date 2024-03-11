@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { PieChart, Pie, ResponsiveContainer, Cell } from 'recharts';
 
-const COLORS = ['#000000', '#c6200', '#F5BA02'];
+const COLORS = ['#000000', '#cc6200', '#F5BA02'];
 
 export default function AdminOrdersStatisticsCircle() {
   const [orderData, setOrderData] = useState({

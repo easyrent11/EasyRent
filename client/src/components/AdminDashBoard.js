@@ -14,6 +14,7 @@ export default function AdminDashBoard({ users, cars }) {
   const [orderStats, setOrderStats] = useState({});
   const [selectedStatistic, setSelectedStatistic] = useState("today");
   const [bestSeller, setBestSeller] = useState(null);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -39,6 +40,7 @@ export default function AdminDashBoard({ users, cars }) {
   // the encrypted id.
   let encryptedId = null;
   if(bestSeller){
+    console.log("best seller = ",bestSeller);
     // Wait for bestSeller to be populated before accessing its properties
     const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
     const encryptedIdToString = bestSeller.Id ? bestSeller.Id.toString() : "";
