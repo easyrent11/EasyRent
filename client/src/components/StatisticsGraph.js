@@ -3,11 +3,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 import { getGraphData } from "../api/AdminApi";
 import { Typography, CircularProgress, Paper, FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 
-
 export default function StatisticsGraph() {
-
   const [graphData, setGraphData] = useState(null);
   const [timeInterval, setTimeInterval] = useState('month'); // Default selection is month
+  const [dataType, setDataType] = useState('orders'); // Default selection is orders
 
   useEffect(() => {
     async function fetchData() {
@@ -31,140 +30,72 @@ export default function StatisticsGraph() {
     );
   }
 
+  const getDataForTimeInterval = (interval, dataKey) => {
+    const data = {};
+
+    graphData[dataKey].forEach(date => {
+      const key = interval === 'day' ? new Date(date).toLocaleDateString() :
+        interval === 'year' ? new Date(date).getFullYear() :
+          months[new Date(date).getMonth()];
+
+      if (key in data) {
+        data[key]++;
+      } else {
+        data[key] = 1;
+      }
+    });
+
+    return data;
+  };
+
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const monthData = {};
+  const chartData = getDataForTimeInterval(timeInterval, `orderCreationDates`);
 
-  graphData.orderCreationDates.forEach(date => {
-    const monthIndex = new Date(date).getMonth();
-    const month = months[monthIndex];
-    monthData[month] = monthData[month] || { orders: 0, users: 0, cars: 0 };
-    monthData[month].orders++;
-  });
+  let fill;
 
-  graphData.userRegistrationDates.forEach(date => {
-    const monthIndex = new Date(date).getMonth();
-    const month = months[monthIndex];
-    monthData[month] = monthData[month] || { orders: 0, users: 0, cars: 0 };
-    monthData[month].users++;
-  });
+  switch (dataType) {
+    case 'users':
+      fill = '#cc6200';
+      break;
+    case 'cars':
+      fill = '#F5BA02';
+      break;
+    default:
+      fill = '#000000';
+      break;
+  }
 
-  graphData.carRegistrationDates.forEach(date => {
-    const monthIndex = new Date(date).getMonth();
-    const month = months[monthIndex];
-    monthData[month] = monthData[month] || { orders: 0, users: 0, cars: 0 };
-    monthData[month].cars++;
-  });
-
-  const chartData = months.map(month => ({
-    month,
-    ...monthData[month],
+  const selectedData = Object.keys(chartData).map(label => ({
+    label,
+    [dataType]: chartData[label],
   }));
 
-  let chartComponent = null;
-
-  if (timeInterval === 'year') {
-    const yearlyData = {};
-
-    graphData.orderCreationDates.forEach(date => {
-      const year = new Date(date).getFullYear();
-      yearlyData[year] = yearlyData[year] || { orders: 0, users: 0, cars: 0 };
-      yearlyData[year].orders++;
-    });
-
-    graphData.userRegistrationDates.forEach(date => {
-      const year = new Date(date).getFullYear();
-      yearlyData[year] = yearlyData[year] || { orders: 0, users: 0, cars: 0 };
-      yearlyData[year].users++;
-    });
-
-    graphData.carRegistrationDates.forEach(date => {
-      const year = new Date(date).getFullYear();
-      yearlyData[year] = yearlyData[year] || { orders: 0, users: 0, cars: 0 };
-      yearlyData[year].cars++;
-    });
-
-    const years = Object.keys(yearlyData).sort();
-    const yearlyChartData = years.map(year => ({
-      year,
-      ...yearlyData[year],
-    }));
-
-    chartComponent = (
-      <BarChart width={1250} height={400} data={yearlyChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="year" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="orders" fill="#000000" />   
-        <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#F5BA02" />
-      </BarChart>
-    );
-  } else if (timeInterval === 'day') {
-    const dayData = {};
-
-    graphData.orderCreationDates.forEach(date => {
-      const day = new Date(date).toLocaleDateString();
-      dayData[day] = dayData[day] || { orders: 0, users: 0, cars: 0 };
-      dayData[day].orders++;
-    });
-
-    graphData.userRegistrationDates.forEach(date => {
-      const day = new Date(date).toLocaleDateString();
-      dayData[day] = dayData[day] || { orders: 0, users: 0, cars: 0 };
-      dayData[day].users++;
-    });
-
-    graphData.carRegistrationDates.forEach(date => {
-      const day = new Date(date).toLocaleDateString();
-      dayData[day] = dayData[day] || { orders: 0, users: 0, cars: 0 };
-      dayData[day].cars++;
-    });
-
-    const days = Object.keys(dayData).sort();
-    const dailyChartData = days.map(day => ({
-      day,
-      ...dayData[day],
-    }));
-
-    chartComponent = (
-      <BarChart width={1250} height={400} data={dailyChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="day" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="orders" fill="#000000" />   
-        <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#F5BA02" />
-      </BarChart>
-    );
-  } else {
-    chartComponent = (
-      <BarChart width={1250}  height={400} data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="month" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="orders" fill="#000000" />   
-        <Bar dataKey="users" fill="#cc6200" />    
-        <Bar dataKey="cars" fill="#F5BA02" />
-      </BarChart>
-    );
-  }
   return (
     <Paper className=" flex flex-col items-center justify-center w-full mt-8 ">
       <div className="flex items-center justify-center w-full p-2 m-2">
         <Typography className='w-full  p-2 m-2' variant="h6">Statistics Graph</Typography>
+
         <FormControl className='p-2 m-2 w-2/12'>
-          <InputLabel>Time Frame</InputLabel>
+          <InputLabel className='m-2 p-2'>Data Type</InputLabel>
           <Select
+            value={dataType}
+            className='m-2 p-2'
+            onChange={(event) => setDataType(event.target.value)}
+          >
+            <MenuItem value="orders">Orders</MenuItem>
+            <MenuItem value="users">Users</MenuItem>
+            <MenuItem value="cars">Cars</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl className='p-2 m-2 w-2/12'>
+          <InputLabel className='m-2 p-2'>Time Frame</InputLabel>
+          <Select
+            className='m-2 p-2'
             value={timeInterval}
             onChange={(event) => setTimeInterval(event.target.value)}
           >
@@ -173,9 +104,17 @@ export default function StatisticsGraph() {
             <MenuItem value="day">Day</MenuItem>
           </Select>
         </FormControl>
+
       </div>
       <div className="w-full  p-2 relative">
-        {chartComponent}
+        <BarChart width={1250} height={400} data={selectedData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey={dataType} fill={fill} />
+        </BarChart>
       </div>
     </Paper>
   );

@@ -4,6 +4,13 @@ import { getUserReports } from "../api/UserApi";
 import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { Link } from "react-router-dom";
 import AdminUserChatHistory from "../components/AdminUserChatHistory";
+import {
+  getMessagesForRoom,
+  getRoomForUser,
+  getAllUserDetails,
+} from "../api/UserApi";
+import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
+import { notify } from "../HelperFunctions/Notify";
 
 export default function AdminUserReportsView() {
   const [showChatHistory, setShowChatHistory] = useState(false);
@@ -14,6 +21,10 @@ export default function AdminUserReportsView() {
 
   const [userReports, setUserReports] = useState([]);
   const [showMessagePopOut, setShowMessagePopOut] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [messages, setMessages] = useState("");
+  const [showPopout, setShowPopout] = useState(false); // State to manage pop-out visibility
+  const [chatRooms, setChatRooms] = useState("");
   const [message, setMessage] = useState("");
   useEffect(() => {
     fetchUserReports();
@@ -31,6 +42,80 @@ export default function AdminUserReportsView() {
   const handleOpenMessagePopOut = (messageContext) => {
     setShowMessagePopOut(true);
     setMessage(messageContext);
+  };
+
+  const togglePopOut = () => {
+    setShowPopout(!showPopout);
+  };
+
+  const clearRoom = () => setSelectedRoom("");
+
+  useEffect(() => {
+     // get the room of the user and the target.
+     getRoomForUser(userId)
+     .then((res) => {
+      setChatRooms(res.data);
+     })
+     .catch((err) => {
+      console.log(err);
+     })
+      
+  },[]);
+
+  useEffect(() => {
+    getMessagesForRoom(selectedRoom)
+    .then((res) => {
+      console.log(res);
+      const messagesWithDetails = res.data.map(async (message) => {
+        const senderId = message.user_id;
+        const chatRoom = chatRooms.find((room) => room.id === selectedRoom);
+        const recipientId =
+          senderId === chatRoom.user1_id
+            ? chatRoom.user2_id
+            : chatRoom.user1_id;
+        const senderPromise = getAllUserDetails(senderId);
+        const recipientPromise = getAllUserDetails(recipientId);
+
+        const [senderDetails, recipientDetails] = await Promise.all([
+          senderPromise,
+          recipientPromise,
+        ]);
+        return {
+          ...message,
+          senderName: senderDetails.data[0].first_name,
+          recipientName: recipientDetails.data[0].first_name,
+        };
+      });
+
+      Promise.all(messagesWithDetails)
+        .then((messagesWithNames) => {
+          setMessages(messagesWithNames);
+          setShowPopout(true);
+        })
+        .catch((error) => {
+          notify("error", error);
+        });
+    })
+    .catch((error) => {
+      notify("error", error);
+    })
+  },[selectedRoom])
+
+  const handleViewChatHistory = (targetUserId) => {
+    const alreadySelected = selectedRoom === targetUserId;
+    
+    if (alreadySelected) {
+      setSelectedRoom(null);
+    } else {
+      chatRooms.forEach((result) => {
+        if (
+          (result.user1_id === userId && result.user2_id === targetUserId) ||
+          (result.user1_id === targetUserId && result.user2_id === userId)
+        ) {
+          setSelectedRoom(result.id);
+        }
+      });
+    }
   };
 
   return (
@@ -64,6 +149,7 @@ export default function AdminUserReportsView() {
                   <th className="p-2 font-bold">Reporter Full Name</th>
                   <th className="p-2 font-bold">Report Cause</th>
                   <th className="p-2 font-bold">Report Message</th>
+                  <th className="p-2 font-bold">View Chat Room</th>
                 </tr>
               </thead>
               <tbody>
@@ -79,6 +165,15 @@ export default function AdminUserReportsView() {
                         onClick={() => handleOpenMessagePopOut(report.Message)}
                       >
                         View Message
+                      </button>
+                    </td>
+                    <td className="border p-2">
+                      <button
+                        onClick={() =>
+                          handleViewChatHistory(report.Reporting_User_Id)
+                        }
+                      >
+                        View Chat History
                       </button>
                     </td>
                   </tr>
@@ -98,8 +193,24 @@ export default function AdminUserReportsView() {
               X
             </button>
             <p className="font-bold text-2xl mb-8">Report Message : </p>
-            <p className="text-xl border-2 border-black p-2 max-h-60 max-1/2 text-center overflow-y-auto">{message}</p>
+            <p className="text-xl border-2 border-black p-2 max-h-60 max-1/2 text-center overflow-y-auto">
+              {message}
+            </p>
           </div>
+        </div>
+      )}
+
+      {showPopout && (
+        <div className="fixed top-0 left-0 w-screen h-screen z-20 flex justify-center items-center">
+          <div
+            className="bg-black bg-opacity-50 absolute top-0 left-0 w-full h-full"
+            onClick={togglePopOut}
+          />
+          {messages ? (
+            <AdminUserChatPopOut messages={messages} onClose={togglePopOut} clearRoom={clearRoom}/>
+          ) : (
+            <p>Loading messages...</p>
+          )}
         </div>
       )}
     </div>
