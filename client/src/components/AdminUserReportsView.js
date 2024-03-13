@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getUserReports } from "../api/UserApi";
-import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { Link } from "react-router-dom";
 import AdminUserChatHistory from "../components/AdminUserChatHistory";
 import {
@@ -11,14 +10,12 @@ import {
 } from "../api/UserApi";
 import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
 import { notify } from "../HelperFunctions/Notify";
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
+
 
 export default function AdminUserReportsView() {
   const [showChatHistory, setShowChatHistory] = useState(false);
-
-  const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
-  let { encryptedId } = useParams();
-  let userId = Number(xorDecrypt(encryptedId, secretKey));
-
   const [userReports, setUserReports] = useState([]);
   const [showMessagePopOut, setShowMessagePopOut] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState("");
@@ -26,6 +23,13 @@ export default function AdminUserReportsView() {
   const [showPopout, setShowPopout] = useState(false); // State to manage pop-out visibility
   const [chatRooms, setChatRooms] = useState("");
   const [message, setMessage] = useState("");
+
+
+  const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+  const pathSegments = window.location.pathname.split('/');
+  const encryptedId = pathSegments[pathSegments.length - 1];
+  console.log(encryptedId);
+  let userId = Number(AES.decrypt(decodeURIComponent(encryptedId), secretKey).toString(CryptoJS.enc.Utf8));
   useEffect(() => {
     fetchUserReports();
   }, []);
@@ -118,6 +122,7 @@ export default function AdminUserReportsView() {
     }
   };
 
+
   return (
     <div className="flex flex-col bg-[#f3f3f3] shadow-lg rounded-md w-4/5 justify-center items-center">
       {showChatHistory ? (
@@ -127,19 +132,12 @@ export default function AdminUserReportsView() {
         />
       ) : (
         <>
-          <Link to="/users">
+          <Link to={`/ViewUserProfile/${encryptedId}`}>
             <h2 className="m-4 font-bold text-2xl">
-              User Reports for User ID:{" "}
-              <span className="hover:text-[#cc6200]">{userId}</span>
+              User Reports for User ID : 
+               <span className="hover:text-[#cc6200]"> {userId} </span>
             </h2>
-          </Link>
-
-          <p
-            onClick={() => setShowChatHistory(!showChatHistory)}
-            className="cursor-pointer hover:text-[#cc6200]"
-          >
-            View Chat History
-          </p>
+          </Link> 
 
           <div className="max-h-60 overflow-y-auto">
             <table className="w-full text-center rounded-md shadow-lg">

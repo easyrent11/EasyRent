@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllUserDetails } from "../api/UserApi";
 import { useParams} from "react-router-dom";
-import { AES } from 'crypto-js';
+import { AES} from 'crypto-js';
 import CryptoJS from 'crypto-js';
 
 export default function AdminViewUserProfile() {
@@ -9,8 +9,10 @@ export default function AdminViewUserProfile() {
     const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
     let { encryptedId } = useParams();
-    console.log(encryptedId,"encrypted id in admin view profile");
-    let userId = AES.decrypt(decodeURIComponent(encryptedId), secretKey).toString(CryptoJS.enc.Utf8);
+    console.log("Encrypted Id = ", encryptedId);
+
+    let userId = Number(AES.decrypt(decodeURIComponent(encryptedId), secretKey).toString(CryptoJS.enc.Utf8));
+    
     console.log("User id = ",userId);
     useEffect(() => {
       getAllUserDetails(userId)

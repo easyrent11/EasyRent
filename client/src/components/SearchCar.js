@@ -9,6 +9,7 @@ import { clearSearchParameters } from "../HelperFunctions/ClearSearchParams";
 import { formatDate } from "../HelperFunctions/FormatDate";
 import { checkDate } from "../HelperFunctions/checkDate";
 import { notify } from "../HelperFunctions/Notify";
+import { selectStyle } from "../res/SelectStyle";
 
 export default function SearchCar() {
   const navigate = useNavigate();
@@ -142,6 +143,7 @@ export default function SearchCar() {
           noOptionsMessage={() => "Not Found"}
           options={sortedCities}
           className="text-base  md:text-sm lg:text-base xl:text-sm"
+          styles={selectStyle}
         />
       </div>
 
@@ -162,7 +164,8 @@ export default function SearchCar() {
           id="fromtime"
           value={fromTime}
           onChange={handleFromTimeChange}
-          className="w-full p-1.5 rounded-md"
+          className="w-full p-1.5 rounded-md border border-gray-300 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+
         />
       </div>
 

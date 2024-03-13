@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { getAllReports } from "../api/UserApi";
-import { xorEncrypt } from "../HelperFunctions/Encrypt";
+import { AES} from 'crypto-js';
+
 
 export default function AdminUserReports() {
   const [reports, setReports] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
   const handleSelectUser = (userId) => {
     const encryptedIdToString = userId ? userId.toString() : "";
-    const encryptedId = xorEncrypt(encryptedIdToString, secretKey);
-
+    const encryptedId = encodeURIComponent(AES.encrypt(encryptedIdToString, secretKey).toString());
+    console.log("In User reports = ",encryptedId)
     if (encryptedId) {
       const url = `/UserReportsView/${encryptedId}`;
       window.location.href = url;
     }
   };
 
+
+
+
+ 
   useEffect(() => {
     fetchReports();
   }, []);

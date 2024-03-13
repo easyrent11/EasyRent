@@ -1,16 +1,16 @@
-// functions that select a style for an element.
 export const selectStyle = {
   control: (base, state) => ({
     ...base,
-    borderColor: state.isFocused ? "#1a202c" : "gray", // Set border color on focus
+    borderColor: state.isFocused ? "#CC6200" : "gray", // Set border color on focus
     "&:hover": {
-      borderColor: "#1a202c", // Set border color on hover
+      borderColor: "#CC6200", // Set border color on hover
     },
+    boxShadow: state.isFocused ? "0 0 0 1px #CC6200" : base.boxShadow, // Add a box shadow on focus
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isSelected ? "#f2f2f2" : "white",
-    color:"black",
+    backgroundColor: state.isSelected ? "#C6200" : "white",
+    color: "black",
     "&:hover": {
       backgroundColor: "#CC6200",
     },
