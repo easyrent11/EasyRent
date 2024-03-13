@@ -27,7 +27,7 @@ import Notifications from "./components/Notifications";
 import Reports from "./components/Reports";
 import CarOwnerView from "./components/CarOwnerView";
 import ChatApp from "./components/ChatApp";
-import AdminViewUserPorfile from "./components/AdminViewUserPorfile";
+import AdminViewUserProfile from "./components/AdminViewUserProfile";
 // admin components.
 import PrivateAdminRoute from "./components/PrivateAdminRoute";
 import AdminDashboard from "./components/AdminDashBoard";
@@ -322,7 +322,7 @@ function App() {
                       element={
                         <PrivateAdminRoute
                          openLogin={openLogin}
-                         component={AdminViewUserPorfile}
+                         component={AdminViewUserProfile}
                         />
                       }
                     />

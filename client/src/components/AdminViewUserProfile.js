@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { getAllUserDetails } from "../api/UserApi";
-import { xorDecrypt } from "../HelperFunctions/Encrypt";
 import { useParams} from "react-router-dom";
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 export default function AdminViewUserProfile() {
     const [userDetails, setUserDetails] = useState({});
     const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
     let { encryptedId } = useParams();
-    let userId = xorDecrypt(encryptedId, secretKey);
-  
+    console.log(encryptedId,"encrypted id in admin view profile");
+    let userId = AES.decrypt(decodeURIComponent(encryptedId), secretKey).toString(CryptoJS.enc.Utf8);
+    console.log("User id = ",userId);
     useEffect(() => {
       getAllUserDetails(userId)
         .then((res) => {

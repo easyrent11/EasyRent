@@ -5,15 +5,18 @@ import {
 } from "../api/AdminApi";
 import { FaUsers, FaCar } from "react-icons/fa";
 import StatisticsGraph from "../components/StatisticsGraph";
-import { xorEncrypt } from "../HelperFunctions/Encrypt";
 import { Link } from "react-router-dom";
 import AdminOrdersStatisticsCircle from "../components/AdminOrdersStatisticsCircle";
 import AdminUserActivities from "./AdminUserActivities";
+import { AES} from 'crypto-js';
+
 export default function AdminDashBoard({ users, cars }) {
   // use states.
   const [orderStats, setOrderStats] = useState({});
   const [selectedStatistic, setSelectedStatistic] = useState("today");
   const [bestSeller, setBestSeller] = useState(null);
+  const [encryptedId, setEncryptedId] = useState(null); 
+
 
   useEffect(() => {
     async function fetchData() {
@@ -26,6 +29,14 @@ export default function AdminDashBoard({ users, cars }) {
         const bestSellerData = bestSellerThisMonth.data.user || {};
 
         setBestSeller(bestSellerData);
+
+        // encrypting the target Id and storing it in the state.
+        const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
+        const encryptedIdToString = bestSellerData.Id ? bestSellerData.Id.toString() : "";
+        const newEncryptedId = encodeURIComponent(AES.encrypt(encryptedIdToString, secretKey).toString());
+        setEncryptedId(newEncryptedId);
+        console.log(encryptedId);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -37,16 +48,8 @@ export default function AdminDashBoard({ users, cars }) {
   const handleStatisticChange = (statistic) => {
     setSelectedStatistic(statistic);
   };
-  // the encrypted id.
-  let encryptedId = null;
-  if(bestSeller){
-    console.log("best seller = ",bestSeller);
-    // Wait for bestSeller to be populated before accessing its properties
-    const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
-    const encryptedIdToString = bestSeller.Id ? bestSeller.Id.toString() : "";
-    encryptedId = xorEncrypt(encryptedIdToString, secretKey);
-  }
-  
+
+
 
   return (
     <>
@@ -115,7 +118,7 @@ export default function AdminDashBoard({ users, cars }) {
                 </h2>
                 <Link to={`/ViewUserProfile/${encryptedId}`}>
                   <p className="text-4xl hover:text-[#cc6200]">
-                    {bestSeller && bestSeller.first_name
+                    {bestSeller && bestSeller.first_name && encryptedId
                       ? bestSeller.first_name
                       : "No sellers found this month"}
                   </p>
