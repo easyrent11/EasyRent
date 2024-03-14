@@ -18,7 +18,7 @@ function checkManufacturerExists(db, manufacturerCode) {
         if (error) {
           console.error("Error checking manufacturer:", error);
           reject("Failed to add car");
-        } else {UserServices
+        } else {
           resolve(results.length > 0);
         }
       }

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import Car from "../components/Car";
 
-const carsPerPage = 4; // Number of cars to show per page
+const carsPerPage = 6; // Number of cars to show per page
 
 export default function AllCarsSection({filteredCars}) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,8 +33,8 @@ export default function AllCarsSection({filteredCars}) {
   const navigationLocation = "/CarView";
   console.log("current cars, = ", currentCars);
   return (
-    <div className="flex flex-col p-4 border-2 border-red-500  lg:p-0 items-center min-h-screen w-full  bg-[#f5f5f5] rounded-md">
-      <article className="flex border-2 border-blue-500 flex-col lg:flex-row justify-center  lg:justify-start   min-h-screen  lg:flex-wrap w-full p-4">
+    <div className="flex flex-col p-4 lg:p-0 items-center min-h-screen w-full  bg-[#f5f5f5] rounded-md">
+      <article className="min-h-screen lg:grid lg:grid-cols-3 lg:grid-rows-7 justify-center items-center w-full p-4">
         {currentCars.map((car, index) => (
           <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation}/>
         ))}

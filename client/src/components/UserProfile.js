@@ -413,7 +413,7 @@ export default function UserProfile() {
             <h2 className="p-2 m-2 text-2xl">Your cars:</h2>
           )}
           {allUserCars.length > 0 ? (
-            <article className="flex border-2 border-blue-900 min-h-screen flex-wrap w-full p-4">
+            <article className="flex lg:grid lg:grid-cols-3 lg:grid-rows-7 min-h-screen flex-wrap w-full p-4">
               {allUserCars.map((car, index) => (
                 <Car
                   key={index}

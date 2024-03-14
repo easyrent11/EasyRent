@@ -59,12 +59,12 @@ export default function Car({ car, btnText, navigationLocation }) {
   );
 
   return (
-    <article className="flex w-full border-green-500 lg:w-1/2 lg:h-1/2">
-      <div className="w-full  flex border-2 border-deep-orange-400 flex-col  items-center justify-center rounded-md m-7 bg-white">
+    <article className="flex items-start justify-center w-full h-full p-4 ">
+      <div className="w-full flex  mx-auto flex-col  items-center justify-center rounded-md m-7 bg-white">
         <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
-          <figure className="flex flex-col border-2 border-red-500 items-center   justify-center ">
+          <figure className="grid items-center justify-center relative max-w-full overflow-hidden">
             <img
-              className="max-w-full rounded-md object-cover"
+              className="w-[500px]  h-[300px] cursor-pointer"
               src={`http://localhost:3001/images/${car.car_urls[0]}`}
               alt="Car Image"
             />
