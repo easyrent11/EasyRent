@@ -8,6 +8,7 @@ import { markChatMessagesAsRead } from "../api/UserApi";
 import { checkUnreadMessages } from "../api/UserApi";
 import { useNotificationContext } from "../contexts/NotificationContext";
 import { markChatNotificationsAsRead } from "../api/UserApi";
+import { FaCrown } from "react-icons/fa"
 import { notify } from "../HelperFunctions/Notify";
 const socket = io.connect("http://localhost:3001");
 
@@ -78,7 +79,6 @@ export default function ChatApp() {
     };
   }, [room, user1Id]);
 
-  // function that will fetch all users from the backend
   function displayAllUsers() {
     axios
       .get("http://localhost:3001/user/getAllUsers")
@@ -87,7 +87,21 @@ export default function ChatApp() {
         const filteredUsers = response.data.filter(
           (user) => user.Id !== user1Id
         );
-        setUsers(filteredUsers);
+
+        // Find the admin user with the ID 444444444
+        const adminUser = filteredUsers.find((user) => user.Id === 444444444);
+
+        // Remove the admin user from the filteredUsers array
+        const usersWithoutAdmin = filteredUsers.filter(
+          (user) => user.Id !== 444444444
+        );
+
+        // Combine the admin user and the rest of the users
+        const finalUsers = adminUser
+          ? [adminUser, ...usersWithoutAdmin]
+          : filteredUsers;
+
+        setUsers(finalUsers);
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
@@ -126,8 +140,8 @@ export default function ChatApp() {
 
     // defining the ids object.
     const idObject = {
-      "user1Id":user1Id,
-      "user2Id":user2Id
+      user1Id: user1Id,
+      user2Id: user2Id,
     };
     markChatNotificationsAsRead(idObject)
       .then((res) => {
@@ -298,8 +312,20 @@ export default function ChatApp() {
                       )}
                     </div>
 
-                    <span className="text-black font-bold text-lg">
+                    <span
+                      className={`font-bold text-lg text-black ${
+                        user.Id === 444444444
+                          ? "mt-4  w-full text-start p-1 mb-4"
+                          : "text-black"
+                      }`}
+                    >
+                      {user.Id === 444444444 && <FaCrown className="mr-2 text-[#CC6200]" />}
                       {userFullName}
+                      {user.Id === 444444444 && (
+                        <span className="text-sm text-[#CC6200] ml-2">
+                          (ADMIN)
+                        </span>
+                      )}
                     </span>
                   </li>
                 );
@@ -331,7 +357,7 @@ export default function ChatApp() {
                     </p>
                   </div>
                 ) : null}
-                {selectedUser !== null && (
+                {selectedUser !== null && selectedUser !== 444444444 && (
                   <div
                     className="ml-auto cursor-pointer"
                     onClick={() => setShowReportMenuForUser(selectedUser)}

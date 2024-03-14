@@ -4,6 +4,7 @@ import "rc-slider/assets/index.css";
 import Select from "react-select";
 import { AllCarsContext } from "../contexts/AllCarsContext";
 import { CarMakesAndModels } from "../res/CarMakesAndModels";
+import { selectStyle } from "../res/SelectStyle";
 
 export default function CarFilterSection({filterCars,setFilteredCars}) {
   const {allCars} = useContext(AllCarsContext);
@@ -145,6 +146,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
             onChange={handleManufacturerChange}
             options={manufacturers}
             placeholder="Select Manufacturer"
+            styles={selectStyle}
           />
         </div>
         <div className="my-4 rounded-md">
@@ -162,6 +164,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
             }
             onChange={handleModelChange}
             isDisabled={!selectedManufacturer}
+            styles={selectStyle}
           />
         </div>
 
@@ -177,6 +180,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
                   label: (1990 + index).toString(),
                 }))}
                 placeholder="From Year"
+                styles={selectStyle}
               />
             </div>
             <div>
@@ -188,6 +192,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
                   label: (1990 + index).toString(),
                 }))}
                 placeholder="To Year"
+                styles={selectStyle}
               />
             </div>
           </div>
@@ -203,6 +208,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
               label: transmissionOption,
             }))}
             placeholder="Select Transmission Type"
+            styles={selectStyle}
           />
         </div>
 
@@ -218,6 +224,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
               })
             )}
             placeholder="Select Engine Type"
+            styles={selectStyle}
           />
         </div>
 
@@ -242,6 +249,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
               { value: 15, label: "15" },
             ]}
             placeholder="Select Seats Amount"
+            styles={selectStyle}
           />
         </div>
 
@@ -253,7 +261,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
           >
             Filter
           </button>
-          <button onClick={resetFilters} className="bg-red-500 p-2 text-white rounded-md w-4/5 mt-4  font-bold text-lg">
+          <button onClick={resetFilters} className="border-2 border-red-500 hover:bg-red-500 hover:text-white p-2 text-red-500 rounded-md w-4/5 mt-4  font-bold text-lg">
             reset
           </button>
         </div>

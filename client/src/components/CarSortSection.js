@@ -7,6 +7,7 @@ import CarFilterPopout from "./CarFilterPopOut";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { selectStyle } from "../res/SelectStyle";
 
 export default function CarSortSection() {
   // getting all of the cars list from the context so we can preform a sort and update the list after.
@@ -55,18 +56,7 @@ export default function CarSortSection() {
     { value: "priceHighToLow", label: "Price: High to Low" },
   ];
 
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      backgroundColor: "#f6f6f6",
-      borderRadius: "20px",
-    }),
-
-    placeholder: (provided) => ({
-      ...provided,
-      color: "black",
-    }),
-  };
+  
 
   // event handler for select change value.
   const handleOptionSelect = (selectedOption) => {
@@ -80,7 +70,7 @@ export default function CarSortSection() {
         {token ? (
           <button
             onClick={handleResetSearch}
-            className="bg-red-500 hover:bg-black p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-white font-bold rounded-md"
+            className="border-2 bg-white border-black hover:text-black hover:bg-[#CC6200] hover:border-none p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-grey-500 font-bold "
           >
             Clear Search Results
           </button>
@@ -97,12 +87,12 @@ export default function CarSortSection() {
 
       <div className="flex flex-col  p-2 h-full lg:justify-end justify-center items-center lg:items-end lg:w-1/2 2xl:w-1/4">
         <Select
-          className="lg:w-1/2 text-center p-2 w-full"
-          styles={customStyles}
+          className="lg:w-1/2 rounded-md text-center p-2 w-full"
           options={options}
           onChange={handleOptionSelect}
           placeholder="Car Sort Options"
           isSearchable={false}
+          styles={selectStyle}
         />
       </div>
 

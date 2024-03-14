@@ -236,7 +236,7 @@ export default function CarView({openLogin}) {
   }
 
   return (
-    <div className="shadow-lg min-h-full border-2 border-red-500 mb-4 bg-[#f6f6f6] rounded-lg flex flex-col items-center">
+    <div className="shadow-lg min-h-full  mb-4 bg-[#f6f6f6] rounded-lg flex flex-col items-center">
       <div className="text-right m-2  w-full ">
         <button
           className="p-2 m-2 rounded-md text-2xl text-gray-500 transform hover:scale-110"

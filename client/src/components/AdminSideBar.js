@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { BellIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
-import { UserProfileDetails } from "../contexts/UserProfileDetails";
 import NotificationDropdown from "./NotificationDropdown";
 import { notify } from "../HelperFunctions/Notify";
 import { getUserNotifications } from "../api/UserApi";
 import io from "socket.io-client";
+import { useNotificationContext } from "../contexts/NotificationContext"
 
 const adminNavigation = [
   { name: "Dashboard", href: "/adminpage" },
@@ -23,7 +23,7 @@ function classNames(...classes) {
 
 export default function AdminSideBar({ handleLogout, userDetails }) {
   const [socket, setSocket] = useState(null); // socket object.
-  const [notifications, setNotifications] = useState([]); // notifications array.
+  const { notifications, setNotifications} = useNotificationContext();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const userId = parseInt(localStorage.getItem("userId")); // getting admin id
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
 
   return (
     <>
-      <nav className="flex flex-col w-2/12 items-center m-4 bg-white shadow-md rounded-md justify-start  p-4">
+      <nav className="flex flex-col w-2/12 items-center m-4 border-2 border-red-500 bg-white shadow-md rounded-md justify-start  p-4">
         <div className="flex flex-col items-start justify-center  ">
           <div className="m-2 p-2 w-full flex items-center justify-start">
             <img
@@ -138,13 +138,13 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
           >
-            <span className="sr-only">View notifications</span>
+            <span className="sr-only border-2 border-red-500">View notifications</span>
             <BellIcon
               className="h-6 w-6 bg-black color-white rounded-full"
               aria-hidden="true"
             />
             {notifications.length > 0 && (
-              <span className="absolute top-0 right-9 p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+              <span className="absolute top-44  p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {notifications.length}
               </span>
             )}
@@ -153,7 +153,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
           {isDropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute left-0 top-12 w-48 origin-top-left bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              className="absolute border-2 border-red-500 left-0 top-12 w-48 origin-top-left bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
             >
               <NotificationDropdown
                 notifications={notifications}

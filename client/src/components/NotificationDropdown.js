@@ -82,7 +82,7 @@ const NotificationDropdown = ({notifications, setNotifications}) => {
         )}
       </div>
       <p
-        className="flex text-sm font-bold cursor-pointer justify-end p-2"
+        className="flex border-2 border-red-500 text-sm font-bold cursor-pointer justify-end p-2"
         onClick={handleClearAllNotifications}
       >
         Clear All
