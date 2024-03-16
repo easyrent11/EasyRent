@@ -22,7 +22,6 @@ export default function ChatApp() {
   const user1Id = parseInt(localStorage.getItem("userId"));
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const [newMessagesAmount, setNewMessagesAmount] = useState([]);
  
   // getting the notifications array from the dropdown.
   const { notifications, setNotifications } = useNotificationContext();
@@ -49,16 +48,6 @@ export default function ChatApp() {
     displayAllUsers();
   }, [room]);
 
-  // use effect to fetch the amount of unread messages for a user.
-  useEffect(() => {
-    checkUnreadMessages(user1Id)
-      .then((res) => {
-        setNewMessagesAmount(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   // use effect to handle cleanup logic when leaving the component
   useEffect(() => {
@@ -179,17 +168,7 @@ export default function ChatApp() {
       user1Id: user1Id,
       user2Id: user2Id,
     };
-    const updatedNewMessagesAmount = [...newMessagesAmount]; // Copy the state
-    const unreadMessagesForTargetIndex = updatedNewMessagesAmount.findIndex(
-      (unread) => unread.sender_user_id === user2Id
-    );
-    if (unreadMessagesForTargetIndex !== -1) {
-      updatedNewMessagesAmount[unreadMessagesForTargetIndex] = {
-        ...updatedNewMessagesAmount[unreadMessagesForTargetIndex],
-        unread_count: 0, // Set unread count to 0 for the selected user
-      };
-      setNewMessagesAmount(updatedNewMessagesAmount);
-    }
+  
     // remove the user2Id message count from the array (make it 0)
     axios
       .post("http://localhost:3001/user/startChat", roomInfo)
@@ -257,11 +236,11 @@ export default function ChatApp() {
 
   return (
     <main
-      className="min-h-screen flex justify-center w-4/5 border-2 border-red-500 bg-[#f6f6f6] show-lg rounded-md m-4"
+      className="min-h-screen flex justify-center w-4/5  bg-[#f6f6f6] show-lg rounded-md m-4"
       style={{ minHeight: "90vh" }}
     >
       <div className="flex flex-col lg:flex-row  w-full rounded-md shadow-lg">
-        <div className="w-full border-2 border-green-500 lg:w-1/4 p-4 text-center border-r rounded-md h-4/5">
+        <div className="w-full lg:w-1/4 p-4 text-center border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <input
             className="p-2 text-black w-4/5 text-center mb-4 font-bold border-2 rounded-md hover:border-black"
@@ -277,15 +256,6 @@ export default function ChatApp() {
               const userMatchesSearch =
                 !searchValue ||
                 userFullName.toLowerCase().includes(searchValue.toLowerCase());
-
-              // Find the user's unread message count from newMessagesAmount
-              const unreadMessages = newMessagesAmount.find(
-                (unread) => unread.sender_user_id === user.Id
-              );
-              // get the amount of unread messages for the current person while iterating the users list.
-              const unreadCount = unreadMessages
-                ? unreadMessages.unread_count
-                : 0;
 
               if (userMatchesSearch) {
                 return (
@@ -306,11 +276,6 @@ export default function ChatApp() {
                         alt={user.first_name}
                         className="w-8 h-8 rounded-full mr-2"
                       />
-                      {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2">
-                          {unreadCount}
-                        </span>
-                      )}
                     </div>
 
                     <span
@@ -338,7 +303,7 @@ export default function ChatApp() {
             })}
           </ul>
         </div>
-        <div className="lg:flex w-full border-2 border-blue-500 lg:flex-col lg:flex-1  lg:rounded-md">
+        <div className="lg:flex w-full lg:flex-col lg:flex-1  lg:rounded-md">
           {room ? (
             <>
               <div className="flex items-center rounded-md shadow-sm bg-[#f1f1f1] border p-2">

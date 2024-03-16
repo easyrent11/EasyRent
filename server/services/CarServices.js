@@ -7,6 +7,7 @@ const db = require("../models/db");
 const path = require("path");
 const fs = require("fs");
 const e = require("express");
+const moment = require("moment");
 
 // ########################################################################################
 // #                  Check if car exists  SERVICE FUNCTION                               #
@@ -66,9 +67,11 @@ function getAllCarsWithImages() {
 // function that checks if a given car exists in one of the orders in the website (if the car is used).
 async function carExistsInOrders(db, platesNumber) {
   platesNumber = Number(platesNumber);
+  const twentyFourHoursAgo = moment().subtract(24, "hours");
+  const formattedDate = twentyFourHoursAgo.format('YYYY-MM-DD HH:mm:ss');
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT * FROM orders WHERE Car_Plates_Number = ?",
+      `SELECT * FROM orders WHERE Car_Plates_Number = ? AND status='pending' AND Order_Date >= '${formattedDate}'`,
       [platesNumber],
       (error, results) => {
         if (error) {
@@ -79,23 +82,7 @@ async function carExistsInOrders(db, platesNumber) {
           if (results.length === 0) {
             resolve(false);
           } else {
-            // Get the current date and time
-            const currentDate = new Date();
-            console.log(currentDate);
-            // Check if there are any active orders for the car
-            const hasActiveOrders = results.some((order) => {
-              const orderStatus = order.status;
-              const orderEndDate = new Date(
-                order.End_Date + "T" + order.End_Time
-              );
-              console.log(orderEndDate);
-              return (
-                (orderStatus === "accepted" && orderEndDate > currentDate) ||
-                orderStatus === "pending"
-              );
-            });
-
-            resolve(hasActiveOrders);
+            resolve(true);
           }
         }
       }
@@ -377,7 +364,7 @@ async function getCarWithPlatesNumber(db, PlatesNumber) {
     });
   });
 }
-// function that retrieves a given user's cars 
+// function that retrieves a given user's cars
 async function getCarsWithUserId(db, userId) {
   const query = `select * from cars WHERE Renter_Id = ${userId}`;
   return new Promise((resolve, reject) => {

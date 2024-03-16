@@ -178,86 +178,57 @@ export default function CarOwnerView() {
     setEditMode(false);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     let filenames = null;
+  
     if (uploadedImages !== null) {
-      // Delete old images first
-      const platesNumber = car.Plates_Number;
-      getCarImages(platesNumber)
-        .then((res) => {
-          // if we found previous car images delete them then insert the new ones.
-          if (res.data.length > 0) {
-            deleteOldImages({ platesNumber: car.Plates_Number })
-              .then((res) => {
-                // Upload new images after old images are deleted
-                handleUploadImages(uploadedImages)
-                  .then((response) => {
-                    const { files } = response.data;
-                    const filenames = files.map((url) => {
-                      const pathname = new URL(url).pathname;
-                      return pathname.substring(pathname.lastIndexOf("/") + 1);
-                    });
-                    updateCarDetailsInDB(filenames);
-                    // Update the state to reflect the changes
-                    setCar((prevCar) => ({
-                      ...prevCar,
-                      car_urls: filenames.join(","),
-                    }));
-                  })
-                  .catch((error) => {
-                    console.error("Failed to upload new images:", error);
-                  });
-              })
-              .catch((error) => {
-                console.error("Failed to delete old images:", error);
-              });
-          }
-          // if no pictures found upload the images to db and local folder.
-          else {
-            console.log("No images found");
-            handleUploadImages(uploadedImages)
-              .then((response) => {
-                const { files } = response.data;
-                console.log("files = ", files);
-                filenames = files.map((url) => {
-                  const pathname = new URL(url).pathname;
-                  return pathname.substring(pathname.lastIndexOf("/") + 1);
-                });
-                console.log(filenames);
-                updateCarDetailsInDB(filenames);
-                // Update the state to reflect the changes
-                setCar((prevCar) => ({
-                  ...prevCar,
-                  car_urls: filenames.join(","),
-                }));
-              })
-              .catch((error) => {
-                console.error("Failed to upload new images:", error);
-              });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
+      try {
+        const platesNumber = car.Plates_Number;
+  
+        // Delete old images
+        const oldImagesResponse = await getCarImages(platesNumber);
+        if (oldImagesResponse.data.length > 0) {
+          await deleteOldImages({ platesNumber: car.Plates_Number });
+        }
+  
+        // Upload new images
+        const uploadResponse = await handleUploadImages(uploadedImages);
+        const { files } = uploadResponse.data;
+        filenames = files.map((url) => {
+          const pathname = new URL(url).pathname;
+          return pathname.substring(pathname.lastIndexOf("/") + 1);
         });
+      } catch (error) {
+        console.error("Failed to delete old images or upload new images:", error);
+        return;
+      }
     } else {
-      // If no new images are selected, update only other details
-      updateCarDetailsInDB(filenames);
-      // Update the state to reflect the changes
-      setCar((prevCar) => ({
-        ...prevCar,
-        Manufacturer_Code: updatedManufacturerCode.toLowerCase(),
-        model_code: updatedModelCode,
-        Year: updatedYear,
-        Color: updatedColor,
-        Seats_Amount: updatedSeatsAmount,
-        Engine_Type: updatedEngineType,
-        Transmission_type: updatedTransmissionType,
-        Description: updatedDescription,
-        Rental_Price_Per_Day: updatedRentalPrice,
-      }));
+      // If no new images are selected, set filenames to an empty array
+      filenames = [];
     }
-    //window.location.reload(); // reload the page.
+  
+    // Update car details in the database
+    updateCarDetailsInDB(filenames);
+  
+    // Update the state to reflect the changes
+    setCar((prevCar) => ({
+      ...prevCar,
+      Manufacturer_Code: updatedManufacturerCode.toLowerCase(),
+      model_code: updatedModelCode,
+      Year: updatedYear,
+      Color: updatedColor,
+      Seats_Amount: updatedSeatsAmount,
+      Engine_Type: updatedEngineType,
+      Transmission_type: updatedTransmissionType,
+      Description: updatedDescription,
+      Rental_Price_Per_Day: updatedRentalPrice,
+      car_urls: filenames.join(","),
+    }));
+  
+    // Reload the page after all operations have completed
+    window.location.reload();
   };
+  
 
   const handleImageUpload = (event) => {
     const fileList = event.target.files;

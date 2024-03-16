@@ -73,10 +73,11 @@ router.put("/deletecar/:platesNumber", async (req, res) => {
   try {
     // check if the car we are trying to delete exists in the orders (in use)
     const carExistsInOrders = await carServices.carExistsInOrders(db, platesNumber);
-    // car exist in orders, we return that its in use.
-    if (carExistsInOrders.length > 0) {
-      res.status(200).json({exists:true});
-    } else {                                                               
+    // the car exists in the orders and cant be removed.
+    if(carExistsInOrders){
+      res.status(200).json({exists:true, message:"You have new pending orders on this car, deal with them before trying to delete it."});
+    }
+    else{
       const result = await carServices.deleteCar(db,platesNumber);
       if (result) {
         res.json({ message: "Car deleted successfully" });
@@ -84,6 +85,7 @@ router.put("/deletecar/:platesNumber", async (req, res) => {
         res.status(500).json({ message: "Failed to delete car" });
       }
     }
+    // the car doesnt exist in the orders proceed to delete it
   } catch (error) {
     res.status(500).json({ message: "Failed to delete car and images" });
   }

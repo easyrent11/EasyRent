@@ -10,6 +10,8 @@ import { notify } from "../HelperFunctions/Notify";
 import io from "socket.io-client";
 import { useNotificationContext } from "../contexts/NotificationContext";
 import { formatDate } from "../HelperFunctions/FormatDate";
+import { sendOrderEmails } from "../api/UserApi";
+import { getAllUserDetails } from "../api/UserApi";
 
 export default function Notifications() {
   const { orderId, typeOfNotification } = useParams();
@@ -42,6 +44,33 @@ export default function Notifications() {
   // function that will handle the accept order logic for the renter to accept the order made on his cars.
   // we need to also decline all other orders made on the car that conflicts with the order dates.
   const handleAcceptOrder = () => {
+    // Fetching the car owner's email
+    getAllUserDetails(orderDetails.Rentee_id)
+      .then((res) => {
+        if (res.data) {
+          console.log("Rentee  =", res.data);
+          // get the rentee's email.
+          const renteeEmail = res.data[0].email;
+          // Send an email to the car owner
+          const orderEmailDetails = {
+            recipientEmail: renteeEmail,
+            body: `Hello ${res.data[0].first_name} ${res.data[0].last_name}, The renter has accepted your order,
+                  On the car with plates number : ${JSON.stringify(orderDetails.Car_Plates_Number)}. 
+                  Please login to your account to view the report and chat with the owner and plan a meetup to get the keys.`,
+            subject: "EasyRent Car Order Accepted",
+          };
+          sendOrderEmails(orderEmailDetails)
+            .then((res) => {
+              console.log("Email sent to car owner:", res);
+            })
+            .catch((err) => {
+              console.error("Error sending email to car owner:", err);
+            });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user details:", err);
+      });
     const newOrderStatus = {
       orderId: orderId,
       status: "accepted",
@@ -106,6 +135,33 @@ export default function Notifications() {
 
   // function that will handle the accept order logic for the renter to accept the order made on his cars.
   const handleDeclineOrder = () => {
+
+    getAllUserDetails(orderDetails.Rentee_id)
+    .then((res) => {
+      if (res.data) {
+        console.log("Rentee  =", res.data);
+        // get the rentee's email.
+        const renteeEmail = res.data[0].email;
+        // Send an email to the car owner
+        const orderEmailDetails = {
+          recipientEmail: renteeEmail,
+          body: `Hello ${res.data[0].first_name} ${res.data[0].last_name}, We are sorry to tell you that the renter has declined your order,
+                On the car with plates number : ${JSON.stringify(orderDetails.Car_Plates_Number)}. 
+                If you have any issues you can contact the owner via chat or you reply to us on this mail.`,
+          subject: "EasyRent Car Order Declined",
+        };
+        sendOrderEmails(orderEmailDetails)
+          .then((res) => {
+            console.log("Email sent to car owner:", res);
+          })
+          .catch((err) => {
+            console.error("Error sending email to car owner:", err);
+          });
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching user details:", err);
+    });
     const newOrderStatus = {
       orderId: orderId,
       status: "declined",

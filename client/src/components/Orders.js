@@ -93,13 +93,13 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Start Date
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     End Date
                   </th>
@@ -111,13 +111,13 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Renter Id
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Rentee Id
                   </th>
@@ -135,25 +135,25 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Order Date
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Report
+                    Actions
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Car
                   </th>
@@ -163,7 +163,7 @@ const Orders = () => {
                 {userOrders.map((order) => (
                   <tr key={order.Order_Id}>
                     <td
-                      className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900"
+                      className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-blue-900"
                       onClick={() =>
                         navigate(
                           `/Notifications/${order.Order_Id}/renterAccepted`
@@ -178,7 +178,7 @@ const Orders = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {formatDate(order.End_Date)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.Car_Plates_Number}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -193,9 +193,22 @@ const Orders = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.End_Time}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap font-bold text-sm ${
+                        order.status === "accepted"
+                          ? "text-green-500"
+                          : order.status === "declined"
+                          ? "text-red-500"
+                          : order.status === "cancelled"
+                          ? "text-gray-500"
+                          : order.status === "pending"
+                          ? "text-blue-500"
+                          : ""
+                      }`}
+                    >
                       {order.status}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {formatDate(order.Order_Date)}
                     </td>
@@ -210,7 +223,8 @@ const Orders = () => {
                     )}
 
                     {order.status === "declined" && (
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-blue-900"></td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">N/A</td>
+
                     )}
                     {order.status === "accepted" && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
@@ -255,13 +269,13 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Start Date
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     End Date
                   </th>
@@ -273,13 +287,13 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Renter Id
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Rentee Id
                   </th>
@@ -297,36 +311,36 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Order Date
                   </th>
 
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Report
+                    Actions
                   </th>
 
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Cancel Order
+                    Car
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {userRenteeOrders.map((order) => (
                   <tr key={order.Order_Id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-blue-900">
                       {order.Order_Id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -335,7 +349,7 @@ const Orders = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {formatDate(order.End_Date)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
                       {order.Car_Plates_Number}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -350,7 +364,19 @@ const Orders = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.End_Time}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap font-bold text-sm ${
+                        order.status === "accepted"
+                          ? "text-green-500"
+                          : order.status === "declined"
+                          ? "text-red-500"
+                          : order.status === "cancelled"
+                          ? "text-gray-500"
+                          : order.status === "pending"
+                          ? "text-blue-500"
+                          : ""
+                      }`}
+                    >
                       {order.status}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -384,10 +410,20 @@ const Orders = () => {
                         </td>
                       </>
                     )}
+                    {order.status === "declined" && (
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">N/A</td>
 
-                    {order.status !== "pending" && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-900 cursor-pointer p-2"></td>
                     )}
+                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
+                      <button
+                        onClick={() =>
+                          handleGoToCarClick(order.Car_Plates_Number)
+                        }
+                      >
+                        {" "}
+                        View Car{" "}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

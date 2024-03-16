@@ -109,10 +109,8 @@ router.get("/homepage", verifyToken, (req, res) => {
 
 // Route for adding a car.
 router.post("/addcar", async (req, res) => {
-  console.log("HELLOOOOOO")
   // grabbing the car details  from the body.
   const carData = req.body;
-  console.log("Hereee");
   try {
     // calling the function that will do the logic.
     const result = await UserServices.addCar(db, carData);

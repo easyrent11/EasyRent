@@ -31,9 +31,10 @@ export default function AllCarsSection({filteredCars}) {
 
 
   const navigationLocation = "/CarView";
-  console.log("current cars, = ", currentCars);
   return (
-    <div className="flex flex-col p-4 lg:p-0 items-center min-h-screen w-full  bg-[#f5f5f5] rounded-md">
+    <>
+    <h2 className="p-4 font-bold text-2xl text-gray-600 items-center w-full  bg-[#f5f5f5] text-start">{filteredCars.length} Cars Available</h2>
+    <div className="flex flex-col p-4 lg:p-0 items-center  min-h-screen w-full  bg-[#f5f5f5] rounded-md">
       <article className="min-h-screen lg:grid lg:grid-cols-3 lg:grid-rows-7 justify-center items-center w-full p-4">
         {currentCars.map((car, index) => (
           <Car key={index} car={car} btnText="Rent Now" navigationLocation={navigationLocation}/>
@@ -53,5 +54,6 @@ export default function AllCarsSection({filteredCars}) {
         ))}
       </div>
     </div>
+    </>
   );
 } 

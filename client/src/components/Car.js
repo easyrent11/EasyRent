@@ -27,18 +27,16 @@ export default function Car({ car, btnText, navigationLocation }) {
     if (window.confirm("Are you sure you want to delete this car?")) {
       deleteCar(platesNumber)
         .then((res) => {
-          if (res.data.exists) {
-            notify(
-              "error",
-              "The car exists in the orders, please check your orders"
-            );
-          } else {
-            // Remove the deleted car from the AllCarsContext
-            setAllCars((prevCars) =>
-              prevCars.filter((c) => c.Plates_Number !== platesNumber)
-            );
-            notify("success", res.message);
+          if(res.data.exists){
+            // car exists in the orders and cant be deleted.
+            alert(`${res.data.message}`)
+            return;
           }
+          // Remove the deleted car from the AllCarsContext
+          setAllCars((prevCars) =>
+            prevCars.filter((c) => c.Plates_Number !== platesNumber)
+          );
+          notify("success", res.message);
         })
         .catch((error) => {
           notify("error", `Failed To Delete Car ${error}`);
