@@ -81,7 +81,7 @@ async function carExistsInOrders(db, platesNumber) {
           } else {
             // Get the current date and time
             const currentDate = new Date();
-
+            console.log(currentDate);
             // Check if there are any active orders for the car
             const hasActiveOrders = results.some((order) => {
               const orderStatus = order.status;

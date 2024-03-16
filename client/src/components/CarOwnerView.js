@@ -28,7 +28,7 @@ export default function CarOwnerView() {
   const [updatedRentalPrice, setUpdatedRentalPrice] = useState("");
   const [uploadedImages, setUploadedImages] = useState(null);
   const [car, setCar] = useState([]);
-  const {setAllCars} = useContext(AllCarsContext);
+  const {allCars,setAllCars} = useContext(AllCarsContext);
   
 
 
@@ -214,13 +214,16 @@ export default function CarOwnerView() {
           }
           // if no pictures found upload the images to db and local folder.
           else {
+            console.log("No images found");
             handleUploadImages(uploadedImages)
               .then((response) => {
                 const { files } = response.data;
+                console.log("files = ", files);
                 filenames = files.map((url) => {
                   const pathname = new URL(url).pathname;
                   return pathname.substring(pathname.lastIndexOf("/") + 1);
                 });
+                console.log(filenames);
                 updateCarDetailsInDB(filenames);
                 // Update the state to reflect the changes
                 setCar((prevCar) => ({
@@ -253,7 +256,7 @@ export default function CarOwnerView() {
         Rental_Price_Per_Day: updatedRentalPrice,
       }));
     }
-    window.location.reload(); // reload the page.
+    //window.location.reload(); // reload the page.
   };
 
   const handleImageUpload = (event) => {
@@ -316,6 +319,7 @@ export default function CarOwnerView() {
               name="picture"
               onChange={handleImageUpload}
               className="hidden"
+              multiple 
             />
           </div>
         )}

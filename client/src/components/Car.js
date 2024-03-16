@@ -64,7 +64,7 @@ export default function Car({ car, btnText, navigationLocation }) {
         <Link to={`${navigationLocation}/${encryptedPlatesNumber}`}>
           <figure className="grid items-center justify-center relative max-w-full overflow-hidden">
             <img
-              className="w-[500px]  h-[300px] cursor-pointer"
+              className="w-[700px]  h-[300px] cursor-pointer"
               src={`http://localhost:3001/images/${car.car_urls[0]}`}
               alt="Car Image"
             />

@@ -4,18 +4,18 @@ import { useNavigate, Link } from "react-router-dom";
 import { changeOrderStatus } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import { formatDate } from "../HelperFunctions/FormatDate";
-import {getOrderById} from "../api/UserApi";
-import {xorEncrypt} from "../HelperFunctions/Encrypt";
+import { getOrderById } from "../api/UserApi";
+import { xorEncrypt } from "../HelperFunctions/Encrypt";
 
 import io from "socket.io-client";
 const socket = io.connect("http://localhost:3001");
 
 const Orders = () => {
   const navigate = useNavigate();
-  const { userOrders, userRenteeOrders, setUserRenteeOrders,fetchUserOrders } = useUserOrders();
+  const { userOrders, userRenteeOrders, setUserRenteeOrders, fetchUserOrders } =
+    useUserOrders();
   const [renterId, setRenterId] = useState(null);
   const secretKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
 
   useEffect(() => {
     // Call the fetch function when the component mounts
@@ -23,26 +23,24 @@ const Orders = () => {
   }, [fetchUserOrders]);
 
   // function to take the user to the orded car page view.
-  function handleGoToCarClick(platesNumber){
+  function handleGoToCarClick(platesNumber) {
     // the encrypted plates number.
     const encNumber = xorEncrypt(platesNumber.toString(), secretKey);
     console.log(encNumber);
-    navigate(`/ViewOrderedCarDetails/${encNumber}`)
+    navigate(`/ViewOrderedCarDetails/${encNumber}`);
   }
 
- 
   // function that cancels a user's order.
   function handleCancelOrder(orderId) {
-    // get the renter id 
+    // get the renter id
     getOrderById(orderId)
-    .then((res) => {
-      console.log("res data from get order by id",res.data);
-      setRenterId(res.data.Renter_Id); //save the renter id.
-
-    })  
-    .catch((error) => {
-      console.log(error);
-    })
+      .then((res) => {
+        console.log("res data from get order by id", res.data);
+        setRenterId(res.data.Renter_Id); //save the renter id.
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     // declare the new status.
     const status = "cancelled";
     // change the status to cancelled.
@@ -57,7 +55,10 @@ const Orders = () => {
           (order) => order.Order_Id !== canceledOrderId
         );
         setUserRenteeOrders(updatedOrders);
-        socket.emit("order-cancelled", {userId:renterId,orderId:canceledOrderId });
+        socket.emit("order-cancelled", {
+          userId: renterId,
+          orderId: canceledOrderId,
+        });
         notify("success", "Your order has been successfully cancelled");
       })
       .catch((err) => {
@@ -66,10 +67,10 @@ const Orders = () => {
   }
 
   useEffect(() => {
-    socket.on('order-cancelled', (data) => {
+    socket.on("order-cancelled", (data) => {
       console.log("I got data from cancel order ", data);
-    })
-  },[renterId])
+    });
+  }, [renterId]);
 
   return (
     <div className="flex-1 p-4">
@@ -80,13 +81,13 @@ const Orders = () => {
         {userOrders.length === 0 ? (
           <p>No orders made by you.</p>
         ) : (
-          <div className="shadow w-full overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 overflow-y-auto">
-                <tr>
+          <div className="shadow w-full  border-b  overflow-hidden border-gray-200 sm:rounded-lg">
+            <table className=" min-w-full divide-y divide-gray-200">
+              <thead className="border-green-500  bg-gray-50 overflow-y-auto">
+                <tr className="">
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium  text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3  text-left text-xs font-medium  text-gray-500 uppercase tracking-wider"
                   >
                     Order ID
                   </th>
@@ -158,9 +159,8 @@ const Orders = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y  divide-gray-200">
                 {userOrders.map((order) => (
-                  
                   <tr key={order.Order_Id}>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900"
@@ -208,6 +208,10 @@ const Orders = () => {
                         </Link>
                       </td>
                     )}
+
+                    {order.status === "declined" && (
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-blue-900"></td>
+                    )}
                     {order.status === "accepted" && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
                         <Link to={`/Reports/${order.Order_Id}`}>
@@ -215,8 +219,16 @@ const Orders = () => {
                         </Link>
                       </td>
                     )}
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
-                      <button onClick={() => handleGoToCarClick(order.Car_Plates_Number)}> View Car </button>
+                      <button
+                        onClick={() =>
+                          handleGoToCarClick(order.Car_Plates_Number)
+                        }
+                      >
+                        {" "}
+                        View Car{" "}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -371,6 +383,10 @@ const Orders = () => {
                           </button>
                         </td>
                       </>
+                    )}
+
+                    {order.status !== "pending" && (
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-900 cursor-pointer p-2"></td>
                     )}
                   </tr>
                 ))}

@@ -86,23 +86,6 @@ export default function UserLayout() {
     }
   }, [allCars]);
 
-  // // a use effect that clears the search parameters if a page refreshes.
-  // useEffect(() => {
-  //   const handleBeforeUnload = (event) => {
-  //     clearSearchParameters(); // calling the function that will remove the search parameters from the local storage.
-
-  //     // Cancel the default behavior to show a prompt before leaving the page
-  //     event.preventDefault();
-  //     // Chrome requires returnValue to be set
-  //     event.returnValue = "";
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, []); // Empty dependency array ensures this runs only on mount
 
   useEffect(() => {
     const city = parseInt(localStorage.getItem("city"));
@@ -152,9 +135,7 @@ export default function UserLayout() {
         </div>
 
         <div className="w-full items-center  justify-end flex flex-col">
-          <h1 className="text-xl  md:text-3xl mb-4">
-            All Available Cars On The Website{" "}
-          </h1>
+     
 
           <div className="flex  items-start justify-around xl:mr-20  w-full ">
             <div className="bg-[#f6f6f6] lg:block hidden rounded-md mr-4 p-4 h-full">

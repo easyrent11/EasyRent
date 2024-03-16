@@ -8,7 +8,7 @@ import { markChatMessagesAsRead } from "../api/UserApi";
 import { checkUnreadMessages } from "../api/UserApi";
 import { useNotificationContext } from "../contexts/NotificationContext";
 import { markChatNotificationsAsRead } from "../api/UserApi";
-import { FaCrown } from "react-icons/fa"
+import { FaCrown } from "react-icons/fa";
 import { notify } from "../HelperFunctions/Notify";
 const socket = io.connect("http://localhost:3001");
 
@@ -23,10 +23,11 @@ export default function ChatApp() {
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [newMessagesAmount, setNewMessagesAmount] = useState([]);
-
+ 
   // getting the notifications array from the dropdown.
   const { notifications, setNotifications } = useNotificationContext();
-
+  
+ 
   // Check if there's a targetedUser in localStorage
   useEffect(() => {
     const targetedUser = localStorage.getItem("targetedUser");
@@ -78,6 +79,7 @@ export default function ChatApp() {
       }
     };
   }, [room, user1Id]);
+
 
   function displayAllUsers() {
     axios
@@ -137,7 +139,6 @@ export default function ChatApp() {
   // function that will start a chat between 2 users.
   function startChat(user2Id) {
     // send request to backend to mark all notifications between the 2 users as read.
-
     // defining the ids object.
     const idObject = {
       user1Id: user1Id,
@@ -256,11 +257,11 @@ export default function ChatApp() {
 
   return (
     <main
-      className="min-h-screen flex justify-center w-4/5 border-2 bg-[#f6f6f6] show-lg rounded-md m-4"
+      className="min-h-screen flex justify-center w-4/5 border-2 border-red-500 bg-[#f6f6f6] show-lg rounded-md m-4"
       style={{ minHeight: "90vh" }}
     >
-      <div className="flex w-full rounded-md shadow-lg">
-        <div className="w-full lg:w-1/4 p-4 text-center border-r rounded-md h-4/5">
+      <div className="flex flex-col lg:flex-row  w-full rounded-md shadow-lg">
+        <div className="w-full border-2 border-green-500 lg:w-1/4 p-4 text-center border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <input
             className="p-2 text-black w-4/5 text-center mb-4 font-bold border-2 rounded-md hover:border-black"
@@ -319,7 +320,9 @@ export default function ChatApp() {
                           : "text-black"
                       }`}
                     >
-                      {user.Id === 444444444 && <FaCrown className="mr-2 text-[#CC6200]" />}
+                      {user.Id === 444444444 && (
+                        <FaCrown className="mr-2 text-[#CC6200]" />
+                      )}
                       {userFullName}
                       {user.Id === 444444444 && (
                         <span className="text-sm text-[#CC6200] ml-2">
@@ -335,8 +338,7 @@ export default function ChatApp() {
             })}
           </ul>
         </div>
-
-        <div className="lg:flex hidden lg:flex-col lg:flex-1  lg:rounded-md">
+        <div className="lg:flex w-full border-2 border-blue-500 lg:flex-col lg:flex-1  lg:rounded-md">
           {room ? (
             <>
               <div className="flex items-center rounded-md shadow-sm bg-[#f1f1f1] border p-2">
@@ -396,8 +398,10 @@ export default function ChatApp() {
                       {msg.message}
                     </p>
                   </div>
+                  
                 ))}
               </div>
+          
               <div className="mt-4 p-2 bg-white flex">
                 <input
                   placeholder="Message"
@@ -412,6 +416,7 @@ export default function ChatApp() {
                   <FiSend />
                 </button>
               </div>
+            
             </>
           ) : (
             <div className="h-full flex items-center justify-center">
