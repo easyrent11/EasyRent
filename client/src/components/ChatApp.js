@@ -41,7 +41,7 @@ export default function ChatApp() {
         localStorage.removeItem("targetedUser");
       }
     }
-  }, [localStorage.getItem("targetedUser"), users]); // Add targetedUser and users to the dependency array
+  }, [localStorage.getItem("targetedUser"), users]); 
 
   // use effect to display all users.
   useEffect(() => {

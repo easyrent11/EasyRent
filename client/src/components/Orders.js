@@ -111,18 +111,6 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Renter Id
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Rentee Id
-                  </th>
-                  <th
-                    scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Start Time
@@ -147,15 +135,21 @@ const Orders = () => {
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Actions
+                    Order Actions
                   </th>
                   <th
                     scope="col"
                     className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Car
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Contact Rentee 
                   </th>
                 </tr>
               </thead>
@@ -180,12 +174,6 @@ const Orders = () => {
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.Car_Plates_Number}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.Renter_Id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.Rentee_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.Start_Time}
@@ -213,7 +201,7 @@ const Orders = () => {
                       {formatDate(order.Order_Date)}
                     </td>
                     {order.status === "pending" && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-blue-900">
                         <Link
                           to={`/Notifications/${order.Order_Id}/order-request-notification`}
                         >
@@ -223,11 +211,12 @@ const Orders = () => {
                     )}
 
                     {order.status === "declined" && (
-                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">N/A</td>
-
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">
+                        N/A
+                      </td>
                     )}
                     {order.status === "accepted" && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-blue-900">
                         <Link to={`/Reports/${order.Order_Id}`}>
                           View Report
                         </Link>
@@ -244,6 +233,12 @@ const Orders = () => {
                         View Car{" "}
                       </button>
                     </td>
+                    <button
+                      className="text-center w-full py-2 px-4 rounded-lg m-1"
+                      onClick={() => localStorage.setItem('targetedUser', order.Rentee_id)}
+                    >
+                      <Link className=" w-full text-sm text-center" to="/ChatApp">Chat</Link>
+                    </button>
                   </tr>
                 ))}
               </tbody>
@@ -283,24 +278,6 @@ const Orders = () => {
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Car Plates Number
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Renter Id
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Rentee Id
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
                     Start Time
                   </th>
                   <th
@@ -326,7 +303,7 @@ const Orders = () => {
                     scope="col"
                     className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Actions
+                    Order Actions
                   </th>
 
                   <th
@@ -334,6 +311,12 @@ const Orders = () => {
                     className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Car
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Contact Owner
                   </th>
                 </tr>
               </thead>
@@ -348,15 +331,6 @@ const Orders = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {formatDate(order.End_Date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
-                      {order.Car_Plates_Number}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.Renter_Id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.Rentee_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.Start_Time}
@@ -411,10 +385,11 @@ const Orders = () => {
                       </>
                     )}
                     {order.status === "declined" && (
-                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">N/A</td>
-
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-bold text-red-900 p-2">
+                        N/A
+                      </td>
                     )}
-                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">
                       <button
                         onClick={() =>
                           handleGoToCarClick(order.Car_Plates_Number)
@@ -422,6 +397,14 @@ const Orders = () => {
                       >
                         {" "}
                         View Car{" "}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="w-full py-2 px-4 rounded-lg m-1"
+                        onClick={() => localStorage.setItem('targetedUser', order.Renter_Id)}
+                      >
+                        <Link className="w-full text-sm text-center" to="/ChatApp">Chat</Link>
                       </button>
                     </td>
                   </tr>
