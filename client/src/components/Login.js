@@ -25,6 +25,13 @@ export default function Login({ onClose, handleLogin }) {
     localStorage.removeItem("startTime");
     localStorage.removeItem("endTime");
     localStorage.removeItem("city");
+
+    // clearing out orders sort and filter options.
+    localStorage.removeItem("userOrdersSort");
+    localStorage.removeItem("renteeOrdersSort");
+    localStorage.removeItem("userOrdersFilter");
+    localStorage.removeItem("renteeOrdersFilter");
+    
     getAllCars()
       .then((response) => {
         console.log("on login = ",response.data)

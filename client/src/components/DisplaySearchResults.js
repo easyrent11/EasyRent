@@ -8,7 +8,7 @@ import { searchCars } from "../api/UserApi";
 
 const carsPerPage = 4; // Number of cars to show per page
 
-export default function AllCarsSection() {
+export default function DisplaySearchResults() {
   const location = useLocation();
   const { allCars, setAllCars } = useContext(AllCarsContext);
   const [currentPage, setCurrentPage] = useState(1);
@@ -141,16 +141,16 @@ export default function AllCarsSection() {
 
   return (
     <>
-      <div className="flex m-20 w-4/5 items-start justify-around">
-        <div className="bg-[#f6f6f6] flex rounded-md p-4 h-full">
+      <div className="flex  m-20 w-4/5 xl:w-full items-start justify-around">
+        <div className="bg-[#f6f6f6] xl:flex hidden  rounded-md p-4 h-full">
           <CarFilterSection
             filterCars={filterCars}
             setFilteredCars={setSearchFilteredCars}
           />
         </div>
-        <div className="flex flex-col rounded-md shadow-md items-center min-h-screen w-4/5 p-4 bg-[#f5f5f5] ">
+        <div className="flex flex-col  rounded-md shadow-md items-center min-h-screen xl:ml-4 lg:w-4/5 w-full p-4 bg-[#f5f5f5] ">
           <CarSortSection />
-          <article className="flex  min-h-screen  flex-wrap w-full p-4">
+          <article className=" min-h-screen xl:grid xl:grid-cols-3  xl:grid-rows-7  justify-center items-center w-full  flex-wrap p-4">
             {currentCars.map((car, index) => (
               <Car
                 key={index}
@@ -161,7 +161,7 @@ export default function AllCarsSection() {
               />
             ))}
           </article>
-          <div className="flex self-center align-self-end mt-4">
+          <div className="flex  self-center align-self-end mt-4">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
