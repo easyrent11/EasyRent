@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getAllUsers, changeUserStatus } from "../api/UserApi";
+import {sendOrderEmails} from "../api/UserApi";
 
 export default function AdminUsersList() {
   const [users, setUsers] = useState([]);
@@ -19,8 +20,32 @@ export default function AdminUsersList() {
       });
   }, []);
 
-  const toggleUserStatus = (userId, newStatus) => {
-    console.log(userId, newStatus);
+  // function to disable/enable any user from the users list.
+  const toggleUserStatus = (userId, newStatus, emailAddress, userFirstName) => {
+    // send email to the user.
+    if(newStatus === 'disabled'){
+      const orderEmailDetails = {
+        recipientEmail : emailAddress,
+        body : `
+            Hello ${userFirstName},
+            We regret to inform you that your EasyRent account has been suspended due to your behavior towards other users in the chat app. This decision was made by our admin team based on reports of misconduct.
+            If you believe this action was taken in error or if you have any questions or concerns, please reply to this email, and we will investigate further.
+            Thank you for your understanding.
+  
+            Best regards,
+            The EasyRent Team
+            `,
+        subject : "EasyRent account suspended"
+      }
+      sendOrderEmails(orderEmailDetails)
+      .then((res) => {
+        console.log("email = ",res);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    }
+    
     const userDetails = {
       userId,
       newStatus,
@@ -41,9 +66,7 @@ export default function AdminUsersList() {
 
   return (
     <div className="flex-1 flex text-center items-center flex-col mt-8 justify-start">
-      <h1 className="text-3xl  w-4/5 mt-8 font-bold ">
-        Users List
-      </h1>
+      <h1 className="text-3xl  w-4/5 mt-8 font-bold ">Users List</h1>
       <input
         className="p-2 text-black w-1/4  mt-4 text-center font-bold border-2 rounded-md hover:border-black"
         type="text"
@@ -52,7 +75,10 @@ export default function AdminUsersList() {
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />
-      <div className="w-4/5  rounded-lg mt-10">
+      <div
+        className="w-4/5  rounded-lg mt-10"
+        style={{ maxHeight: "50vh", overflow: "auto" }}
+      >
         <table className="w-full rounded-md  shadow-lg ">
           <thead className="rounded-md">
             <tr className="bg-black text-white">
@@ -73,9 +99,7 @@ export default function AdminUsersList() {
               const fullName = `${user.first_name} ${user.last_name}`;
               if (
                 !searchValue ||
-                fullName
-                  .toLowerCase()
-                  .includes(searchValue.toLowerCase()) 
+                fullName.toLowerCase().includes(searchValue.toLowerCase())
               ) {
                 return (
                   <tr key={user.Id} className="border">
@@ -95,7 +119,9 @@ export default function AdminUsersList() {
                         onClick={() =>
                           toggleUserStatus(
                             user.Id,
-                            user.status === "disabled" ? "active" : "disabled"
+                            user.status === "disabled" ? "active" : "disabled",
+                            user.email,
+                            user.first_name
                           )
                         }
                         className={

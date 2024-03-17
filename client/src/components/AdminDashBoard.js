@@ -53,12 +53,12 @@ export default function AdminDashBoard({ users, cars }) {
 
   return (
     <>
-      <div className="w-full m-2">
-        <h1 className="text-3xl self-start p-2 font-bold mb-4">Dashboard</h1>
-        <main className="min-h-screen w-4/5 mx-auto flex flex-col items-center">
-          <div className="flex items-center  w-full justify-between">
+      <div className="lg:w-2/3 w-full lg:text-center 2xl:text-start 2xl:w-full  m-2">
+        <h1 className="text-3xl  p-2  font-bold mb-4">Dashboard</h1>
+        <main className="min-h-screen w-full mx-auto flex flex-col  items-center">
+          <div className="flex items-center flex-col md:flex-row   w-full justify-between">
             {/* Display Total Users */}
-            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
+            <div className="md:bg-white mb-2  bg-[#f6f6f6] h-40  w-full md:h-40 md:w-80  rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">Total Users</h2>
                 <p className="text-4xl">{users.length}</p>
@@ -70,9 +70,9 @@ export default function AdminDashBoard({ users, cars }) {
             {/*End of display Total Users */}
 
             {/* Display Order Statistics */}
-            <div className="bg-white  h-40 w-80 rounded-lg p-4 flex flex-col items-center justify-center">
+            <div className="md:bg-white mb-2 bg-[#f6f6f6]  h-40 w-full md:h-40 md:w-80 rounded-lg p-4 flex flex-col items-center justify-center">
               <h2 className="text-lg font-semibold mb-2">Orders Made</h2>
-              <div className="flex items-center justify-between w-full">
+              <div className="flex  md:flex-col xl:flex-row items-center justify-between w-full">
                 <div
                   className={`cursor-pointer ${
                     selectedStatistic === "today" && "font-bold"
@@ -101,7 +101,7 @@ export default function AdminDashBoard({ users, cars }) {
               <p className="text-4xl">{orderStats[`${selectedStatistic}`]}</p>
             </div>
 
-            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
+            <div className="md:bg-white  mb-2 bg-[#f6f6f6] h-40 w-full md:h-40 md:w-80 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">Total Cars</h2>
                 <p className="text-4xl">{cars.length}</p>
@@ -111,7 +111,7 @@ export default function AdminDashBoard({ users, cars }) {
               </div>
             </div>
 
-            <div className="bg-white h-40 w-80 rounded-lg p-4 flex items-center justify-between">
+            <div className="md:bg-white bg-[#f6f6f6] h-40 w-full md:h-40 md:w-80 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold mb-1">
                   Best seller of the month
@@ -129,11 +129,13 @@ export default function AdminDashBoard({ users, cars }) {
               </div>
             </div>
           </div>
-          <div className=" w-full">
+          <div className=" mt-4 lg:mt-0  p-2 w-full">
             {/* Statistics graph for orders,users,cars amount each month. */}
-            <StatisticsGraph />
+            <div className="hidden  lg:block">
+              <StatisticsGraph />
+            </div>
             <div className="flex items-center justify-between">
-              <div className="flex w-full ">
+              <div className="flex w-full flex-col 2xl:flex-row">
                 <AdminUserActivities />
                 <AdminOrdersStatisticsCircle />
               </div>

@@ -182,10 +182,10 @@ export default function UserProfile() {
         name={fieldName}
         value={updatedUserDetails[fieldName]}
         onChange={handleChange}
-        className="text-black w-10/12 border-2 p-2 mr-4 rounded-md"
+        className="text-black  w-10/12 border-2 p-2 mr-4 rounded-md"
       />
     ) : (
-      <p className="text-black w-10/12 border-2 p-2 m-2 rounded-md">
+      <p className="text-black w-full  md:w-10/12 border-2 mt-2 md:p-2 md:m-2 rounded-md">
         {userDetails[fieldName]}
       </p>
     );
@@ -213,10 +213,10 @@ export default function UserProfile() {
   return (
     <>
       <div className=" min-h-screen w-4/5 ">
-        <div className="w-full  flex mx-auto px-4 py-8 ">
-          <div className="w-1/2">
+        <div className="w-full flex-col lg:flex-row  flex mx-auto ">
+          <div className="w-full lg:w-1/2">
             {/* Display user profile image */}
-            <div className="flex flex-col items-center w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
+            <div className="flex flex-col  items-center w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
               <figure className="flex flex-col items-center justify-center">
                 <img
                   src={`http://localhost:3001/images/${
@@ -264,48 +264,48 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <div className="w-full  shadow-lg bg-white rounded-md ml-2">
+          <div className="w-full  shadow-lg bg-white rounded-md ">
             <div className="w-full  max-h-full bg-white rounded-lg ">
               <div className="px-6 py-4">
                 <div className="flex  flex-wrap mb-4">
-                  <div className="w-1/2">
-                    <p className="text-lg font-bold text-black">ID:</p>
+                  <div className=" w-full  md:w-1/2 p-2">
+                    <p className="text-lg  font-bold text-black">ID:</p>
                     {renderInputOrText("Id", "ID")}
                   </div>
-                  <div className="w-1/2">
+                  <div className="w-full md:w-1/2 p-2">
                     <p className="text-lg font-bold text-black">First Name:</p>
                     {renderInputOrText("first_name", "First Name")}
                   </div>
                 </div>
-                <div className="flex flex-wrap mb-4">
-                  <div className="w-1/2">
+                <div className="flex  flex-wrap mb-4">
+                  <div className="w-full p-2 md:w-1/2">
                     <p className="text-lg font-bold text-black">Last Name:</p>
                     {renderInputOrText("last_name", "Last Name")}
                   </div>
-                  <div className="w-1/2">
+                  <div className="w-full p-2 md:w-1/2">
                     <p className="text-lg font-bold text-black">Email:</p>
                     {renderInputOrText("email", "Email")}
                   </div>
                 </div>
-                <div className="flex flex-wrap mb-4">
-                  <div className="w-1/2 ">
+                <div className="flex items-center  justify-center  flex-wrap p-1">
+                  <div className="w-full md:w-1/2">
                     <p className="text-lg font-bold text-black">
                       Phone Number:
                     </p>
                     {renderInputOrText("phone_number", "Phone Number")}
                   </div>
-                  <div className="w-1/2">
+                  <div className="w-full mt-2 md:w-1/2">
                     <p className="text-lg font-bold text-black">
                       Driving License:
                     </p>
                     {renderInputOrText("driving_license", "Driving License")}
                   </div>
 
-                  <div className=" w-1/2">
+                  <div className="w-full mt-2  self-start  md:w-1/2">
                     <p className="text-lg font-bold text-black">City :</p>
                     {editing ? (
                       <Select
-                        className="border border-gray-300  rounded-md max-w-full mr-4"
+                        className="border border-gray-300 w-5/6  rounded-md md:mr-4"
                         id="city"
                         value={{ value: city, label: selectedCityLabel }}
                         onChange={handleCityChange}
@@ -313,13 +313,13 @@ export default function UserProfile() {
                         options={Cities}
                       />
                     ) : (
-                      <p className="text-black border-2 p-2 m-2 rounded-md">
+                      <p className="text-black border-2 w-5/6 mt-2 md:p-2 md:m-2 rounded-md">
                         {userDetails.City_Name}
                       </p>
                     )}
                   </div>
 
-                  <div className="w-1/2">
+                  <div className="w-full mt-2 md:w-1/2">
                     <p className="text-lg font-bold text-black">
                       Street Name :
                     </p>
@@ -334,39 +334,42 @@ export default function UserProfile() {
                   <p className="text-lg p-2 ml-4 font-bold text-black w-full">
                     Change Password
                   </p>
-                  <article className="flex items-center justify-center flex-col p-2 w-full ">
-                    <div className="w-4/5 flex items-center m-2  p-2 justify-between">
+                  <article className="flex  items-start justify-center flex-col p-2 w-full ">
+                    <div className="w-full xl:w-4/5 flex flex-col xl:flex-row items-center m-2  p-2 justify-between">
                       <label>Current Password : </label>
                       <input
-                        className="w-4/5 border-2 border-black rounded-md"
+                        className="w-4/5 border-2 p-1 text-center border-black rounded-md"
                         name="oldpassword"
                         value={currentPassword}
                         type="password"
+                        placeholder="Enter your current password"
                         onChange={(e) => setCurrentPassword(e.target.value)}
                       />
                     </div>
-                    <div className="w-4/5 flex items-center m-2 p-2 justify-between">
+                    <div className=" w-full flex  xl:w-4/5 flex-col xl:flex-row items-center m-2 p-2 justify-between">
                       <label>New Password : </label>
                       <input
-                        className="w-4/5 border-2 border-black rounded-md"
+                        className="w-4/5 border-2 p-1 text-center border-black rounded-md"
                         name="newpassword"
                         type="password"
                         value={newPassword}
+                        placeholder="Enter your new password"
                         onChange={(e) => setNewPassword(e.target.value)}
                       />
                     </div>
-                    <div className="w-4/5 flex items-center m-2  p-2 justify-between">
-                      <label>Confirm New Password : </label>
+                    <div className="w-full flex  xl:w-4/5 flex-col xl:flex-row items-center m-2  p-2 justify-between">
+                      <label>Confirm Password : </label>
                       <input
-                        className="w-4/5 border-2 border-black rounded-md"
+                        className="w-4/5 border-2 p-1 text-center border-black rounded-md"
                         name="confirmnewpassword"
                         type="password"
                         value={confirmNewPassword}
+                        placeholder="Confirm new password"
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
                       />
                     </div>
                     <button
-                      className="bg-black p-2 mt-4 text-white rounded-md"
+                      className="bg-black mx-auto p-2 mt-4 text-white rounded-md"
                       onClick={handleChangePassword}
                     >
                       Change Password

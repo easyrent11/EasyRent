@@ -37,7 +37,7 @@ export default function AddCar() {
   const [engineType, setEngineType] = useState("");
   const [transmissionType, setTransmissionType] = useState("");
   const [description, setDescription] = useState("");
-  const [rentalPricePerDay, setRentalPricePerDay] = useState(0);
+  const [rentalPricePerDay, setRentalPricePerDay] = useState(30);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -427,6 +427,7 @@ export default function AddCar() {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="rentalPricePerDay"
             type="number"
+            min={30}
             value={rentalPricePerDay}
             onChange={handleRentalPricePerDayChange}
           />

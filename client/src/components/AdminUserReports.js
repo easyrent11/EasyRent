@@ -56,7 +56,7 @@ export default function AdminUserReports() {
       <div className="w-1/2 flex flex-col  mb-4 p-4 items-center justify-center">
         <h3 className="text-xl text-[#cc6200] p-2 rounded-md font-bold mb-2">Search User Reports</h3>
         <input
-          className="p-2 text-black w-1/4  font-bold border-2 rounded-md hover:border-black"
+          className="p-2 text-black w-full xl:w-1/4  font-bold border-2 rounded-md hover:border-black"
           type="text"
           name="searchreports"
           placeholder="Enter the user's name"

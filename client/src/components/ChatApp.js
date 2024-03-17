@@ -239,8 +239,8 @@ export default function ChatApp() {
       className="min-h-screen flex justify-center w-4/5  bg-[#f6f6f6] show-lg rounded-md m-4"
       style={{ minHeight: "90vh" }}
     >
-      <div className="flex flex-col lg:flex-row  w-full rounded-md shadow-lg">
-        <div className="w-full lg:w-1/4 p-4 text-center border-r rounded-md h-4/5">
+      <div className="flex flex-col lg:flex-row  w-full  rounded-md shadow-lg">
+        <div className="w-full lg:w-1/4  p-4 text-center overflow-y-auto border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <input
             className="p-2 text-black w-4/5 text-center mb-4 font-bold border-2 rounded-md hover:border-black"
@@ -303,7 +303,7 @@ export default function ChatApp() {
             })}
           </ul>
         </div>
-        <div className="lg:flex w-full lg:flex-col lg:flex-1  lg:rounded-md">
+        <div className="lg:flex mt-8 md:mt-0 w-full overflow-y-auto lg:flex-col lg:flex-1  lg:rounded-md">
           {room ? (
             <>
               <div className="flex items-center rounded-md shadow-sm bg-[#f1f1f1] border p-2">

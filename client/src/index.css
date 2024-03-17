@@ -34,6 +34,18 @@ code {
   scroll-behavior: smooth;
   min-height: 100vh;
 }
+@media (max-width: 1023px) {
+  .admin-layout{
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    align-items: center;
+    width: 100%;
+    background-color: #FFFFFF;
+    scroll-behavior: smooth;
+    min-height: 100vh;
+  }
+}
 
 /* Default Layout */
 .default-layout {

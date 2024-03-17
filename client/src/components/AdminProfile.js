@@ -185,13 +185,13 @@ export default function UserProfile() {
   
   return (
     <>
-      <div className="flex flex-col items-center justify-around flex-1 w-4/5 ">
-      <h1 className="text-3xl mt-8 font-bold ">{userDetails.first_name} Profile Details</h1>
+      <div className="flex flex-col items-center mt-10  flex-1 w-full ">
+      <h1 className="text-3xl mt-8 mb-20 font-bold ">{userDetails.first_name} Profile Details</h1>
 
-        <div className="w-4/5  h-3/4 m-2 flex">
-          <div className="w-1/2 ">
+        <div className="md:w-4/5  lg:w-4/5 max-w-full lg:h-1/2 max-h-3/4 m-2 items-center flex lg:flex-row flex-col">
+          <div className="w-full lg:h-full lg:w-4/5">
             {/* Display user profile image */}
-            <div className="flex flex-col items-center w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
+            <div className="flex flex-col items-center lg:flex-1  w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
               <figure className="flex flex-col items-center justify-center">
                 <img
                   src={`http://localhost:3001/images/${
@@ -239,8 +239,8 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <div className="w-full shadow-lg  p-2 bg-white rounded-md ml-2">
-            <div className="w-full max-h-full bg-white rounded-lg ">
+          <div className="xl:w-4/5 lg:h-full w-full  shadow-lg  p-2 bg-white rounded-md">
+            <div className="w-full  bg-white rounded-lg ">
               <div className="px-6 py-4">
                 <div className="flex flex-wrap mb-4">
                   <div className="w-1/2">

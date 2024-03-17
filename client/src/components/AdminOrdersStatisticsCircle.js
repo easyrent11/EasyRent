@@ -45,7 +45,7 @@ export default function AdminOrdersStatisticsCircle() {
   ];
 
   return (
-    <div className="text-center w-1/4 mt-1 p-4 bg-white rounded-md flex-col  flex items-center justify-center">
+    <div className="text-center w-full 2xl:w-1/4 mt-1 p-4 bg-white rounded-md flex-col  flex items-center justify-center">
       <Typography variant="h5" component="h3" gutterBottom>
         Total Orders: {totalOrders}
       </Typography>

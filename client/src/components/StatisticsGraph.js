@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { getGraphData } from "../api/AdminApi";
 import { Typography, CircularProgress, Paper, FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 
 export default function StatisticsGraph() {
   const [graphData, setGraphData] = useState(null);
-  const [timeInterval, setTimeInterval] = useState('month'); // Default selection is month
-  const [dataType, setDataType] = useState('orders'); // Default selection is orders
+  const [dataType, setDataType] = useState('order');
+  const [timeInterval, setTimeInterval] = useState('month');
 
   useEffect(() => {
     async function fetchData() {
       try {
         const data = await getGraphData();
         setGraphData(data.data.graphData);
+        console.log("data", data);
       } catch (error) {
         console.error("Error fetching graph data:", error);
       }
@@ -21,9 +22,10 @@ export default function StatisticsGraph() {
     fetchData();
   }, []);
 
+
   if (!graphData) {
     return (
-      <Paper className='className="p-4 flex flex-col items-center justify-center w-full mt-8 rounded '>
+      <Paper className="p-4 flex flex-col items-center justify-center w-full mt-8 rounded">
         <CircularProgress />
         <Typography>Loading...</Typography>
       </Paper>
@@ -32,7 +34,7 @@ export default function StatisticsGraph() {
 
   const getDataForTimeInterval = (interval, dataKey) => {
     const data = {};
-
+    console.log("data key = ", dataKey);
     graphData[dataKey].forEach(date => {
       const key = interval === 'day' ? new Date(date).toLocaleDateString() :
         interval === 'year' ? new Date(date).getFullYear() :
@@ -53,7 +55,7 @@ export default function StatisticsGraph() {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const chartData = getDataForTimeInterval(timeInterval, `orderCreationDates`);
+  const chartData = getDataForTimeInterval(timeInterval, `${dataType === 'user' ? 'userRegistrationDates' : dataType === 'car' ? 'carRegistrationDates' : 'orderCreationDates' }`);
 
   let fill;
 
@@ -75,8 +77,8 @@ export default function StatisticsGraph() {
   }));
 
   return (
-    <Paper className=" flex flex-col items-center justify-center w-full mt-8 ">
-      <div className="flex items-center justify-center w-full p-2 m-2">
+    <Paper>
+      <div className="flex items-center justify-center w-full">
         <Typography className='w-full  p-2 m-2' variant="h6">Statistics Graph</Typography>
 
         <FormControl className='p-2 m-2 w-2/12'>
@@ -86,9 +88,9 @@ export default function StatisticsGraph() {
             className='m-2 p-2'
             onChange={(event) => setDataType(event.target.value)}
           >
-            <MenuItem value="orders">Orders</MenuItem>
-            <MenuItem value="users">Users</MenuItem>
-            <MenuItem value="cars">Cars</MenuItem>
+            <MenuItem value="order">Orders</MenuItem>
+            <MenuItem value="user">Users</MenuItem>
+            <MenuItem value="car">Cars</MenuItem>
           </Select>
         </FormControl>
 
@@ -106,8 +108,8 @@ export default function StatisticsGraph() {
         </FormControl>
 
       </div>
-      <div className="w-full  p-2 relative">
-        <BarChart width={1250} height={400} data={selectedData}>
+      <div className="w-full  hidden 2xl:block p-2 relative">
+        <BarChart width={1260} height={500} data={selectedData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" />
           <YAxis />

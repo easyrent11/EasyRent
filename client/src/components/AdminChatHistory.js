@@ -23,10 +23,11 @@ export default function AdminChatHistory() {
       {selectedUser ? (
         <AdminUserChatHistory userId={selectedUser} users={users}/>
       ) : (
-        <div className="w-1/2 max-h-120 overflow-y-auto text-center">
-          <h2 className="text-3xl font-bold mt-8 mb-8">Admin Chat History</h2>
+        <div className="w-1/2 max-h-120 overflow-y-auto text-center" style={{ maxHeight: "50vh", overflow: "auto" }}>
+        
+          <h2 className="text-3xl  font-bold mt-8 mb-8">Admin Chat History</h2>
           <input
-            className="p-2 text-black w-1/4 mb-4 font-bold border-2 rounded-md hover:border-black"
+            className="p-2 text-black w-full xl:w-1/4 mb-4 font-bold border-2 rounded-md hover:border-black"
             type="text"
             name="searchreports"
             placeholder="Enter the user's name"

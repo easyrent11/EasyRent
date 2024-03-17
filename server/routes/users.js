@@ -381,6 +381,7 @@ router.post("/ordercar", async (req, res) => {
 router.post('/send-order-email', async (req, res) => {
   try {
     const { recipientEmail, body, subject } = req.body;
+    console.log(recipientEmail,body,subject)
     if (!recipientEmail || !body || !subject) {
       return res.status(400).json({ message: 'Missing required parameters' });
     }
