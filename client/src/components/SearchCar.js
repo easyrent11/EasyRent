@@ -21,7 +21,7 @@ export default function SearchCar() {
 
   // use states for all form fields
   const [city, setCity] = useState("");
-  const [selectedCityLabel, setSelectedCityLabel] = useState("Choose a city");
+  const [selectedCityLabel, setSelectedCityLabel] = useState("City");
   const [pickupDate, setPickUpDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [fromTime, setFromTime] = useState("10:00");
@@ -124,7 +124,7 @@ export default function SearchCar() {
   // function to reset all form fields to their initial values
   const handleFormReset = () => {
     setCity("");
-    setSelectedCityLabel("Choose a city");
+    setSelectedCityLabel("City");
     setPickUpDate("");
     setReturnDate("");
     setFromTime("10:00");
@@ -136,19 +136,21 @@ export default function SearchCar() {
       className=" flex flex-col lg:flex-row  xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
       onSubmit={handleFormSubmit}
     >
-      <div className="w-full 4 m-2 p-2">
+      <div className="w-full text-center 4 m-2 p-2">
+        <label htmlFor="city">Choose a location</label>
         <Select
           id="city"
           value={{ value: city, label: selectedCityLabel }}
           onChange={handleCityChange}
           noOptionsMessage={() => "Not Found"}
           options={sortedCities}
-          className="text-base  md:text-sm lg:text-base xl:text-sm"
+          className="text-base  md:text-sm  lg:text-base xl:text-sm"
           styles={selectStyle}
         />
       </div>
 
-      <div className="w-full  m-2 p-2">
+      <div className="w-full text-center m-2 p-2">
+      <label htmlFor="pickupdate">Start date</label>
         <input
           type="date"
           id="pickupdate"
@@ -159,7 +161,8 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full m-2 p-2">
+      <div className="w-full text-center m-2 p-2">
+        <label htmlFor="fromtime">Start time</label>
         <input
           type="time"
           id="fromtime"
@@ -169,7 +172,8 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full m-2 p-2">
+      <div className="w-full text-center m-2 p-2">
+      <label htmlFor="returndate">End date </label>
         <input
           type="date"
           id="returnDate"
@@ -180,7 +184,8 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="w-full  m-2 p-2">
+      <div className="w-full text-center m-2 p-2">
+      <label htmlFor="totime">End time </label>
         <input
           type="time"
           id="totime"
@@ -190,7 +195,7 @@ export default function SearchCar() {
         />
       </div>
 
-      <div className="flex w-full justify-center  items-center">
+      <div className="flex w-full mt-6 justify-center  items-center">
         <button
           type="submit"
           className="bg-black text-1xl  text-white p-2 w-full rounded-md"

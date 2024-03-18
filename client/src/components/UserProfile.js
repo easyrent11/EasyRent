@@ -252,7 +252,7 @@ export default function UserProfile() {
   if (loading) {
     return <p>No Cars yet...</p>;
   }
-  const carsPerPage = 4;
+  const carsPerPage = 6;
   const allUserCars = Array.from(userCars);
   const totalPages = Math.ceil(allUserCars.length / carsPerPage);
 

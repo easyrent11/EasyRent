@@ -6,7 +6,7 @@ export default function FirstSection() {
   return (
     <>
       <div className="flex flex-col  justify-center items-center p-4 w-full bg-no-repeat bg-cover bg-center">
-        <article className="flex flex-col  2xl:flex-row justify-between items-center m-4 w-full">
+        <article className="flex flex-col 2xl:flex-row justify-between items-center m-4 w-full">
           <MainTitle/>
           <SearchCar />
         </article>

@@ -6,7 +6,7 @@ import CarFilterSection from "../components/CarFilterSection";
 import { useLocation } from "react-router-dom";
 import { searchCars } from "../api/UserApi";
 
-const carsPerPage = 4; // Number of cars to show per page
+const carsPerPage = 6; // Number of cars to show per page
 
 export default function DisplaySearchResults() {
   const location = useLocation();
@@ -151,7 +151,7 @@ export default function DisplaySearchResults() {
         <div className="flex flex-col  rounded-md shadow-md items-center min-h-screen xl:ml-4 lg:w-4/5 w-full p-4 bg-[#f5f5f5] ">
           <CarSortSection />
           <h2 className="p-4 font-bold text-2xl text-gray-600 items-center w-full  bg-[#f5f5f5] text-start">
-        {currentCars.length} Cars Available
+        {searchFilteredCars.length} Cars Available
       </h2>
           <article className=" min-h-screen xl:grid xl:grid-cols-3  xl:grid-rows-7  justify-center items-center w-full  flex-wrap p-4">
             {currentCars.map((car, index) => (

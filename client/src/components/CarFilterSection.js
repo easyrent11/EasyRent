@@ -22,7 +22,7 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
   const [seatsAmount, setSeatsAmount] = useState("");
   const [engineType, setEngineType] = useState("");
   const [transmissionType, setTransmissionType] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [priceRange, setPriceRange] = useState([30, 2000]);
 
   const handleSeatsAmountChange = (selectedOption) => {
     setSeatsAmount(selectedOption);
@@ -128,8 +128,8 @@ export default function CarFilterSection({filterCars,setFilteredCars}) {
           <h3>Price Range</h3>
           <Slider
             range
-            min={0}
-            max={5000}
+            min={30}
+            max={2000}
             defaultValue={priceRange}
             onChange={handleRentalPricePerDayChange}
             tipFormatter={(value) => `₪${value}`}
