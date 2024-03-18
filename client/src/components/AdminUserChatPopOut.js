@@ -9,7 +9,9 @@ export default function ({ messages, onClose, clearRoom }) {
         <FaTimes
           onClick={() => {
             onClose();
-            clearRoom();
+            if(clearRoom){
+              clearRoom();
+            }
           }}
           size={30}
           className="mx-auto hover:text-[#cc6200] cursor-pointer text-black"

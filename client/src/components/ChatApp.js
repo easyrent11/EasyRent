@@ -5,11 +5,13 @@ import io from "socket.io-client";
 import axios from "axios";
 import ReportUserView from "./ReportUserView";
 import { markChatMessagesAsRead } from "../api/UserApi";
-import { checkUnreadMessages } from "../api/UserApi";
 import { useNotificationContext } from "../contexts/NotificationContext";
 import { markChatNotificationsAsRead } from "../api/UserApi";
 import { FaCrown } from "react-icons/fa";
 import { notify } from "../HelperFunctions/Notify";
+
+import moment from "moment";
+
 const socket = io.connect("http://localhost:3001");
 
 export default function ChatApp() {
@@ -22,11 +24,10 @@ export default function ChatApp() {
   const user1Id = parseInt(localStorage.getItem("userId"));
   const [showReportMenuForUser, setShowReportMenuForUser] = useState(null);
   const [searchValue, setSearchValue] = useState("");
- 
+
   // getting the notifications array from the dropdown.
   const { notifications, setNotifications } = useNotificationContext();
-  
- 
+
   // Check if there's a targetedUser in localStorage
   useEffect(() => {
     const targetedUser = localStorage.getItem("targetedUser");
@@ -41,13 +42,12 @@ export default function ChatApp() {
         localStorage.removeItem("targetedUser");
       }
     }
-  }, [localStorage.getItem("targetedUser"), users]); 
+  }, [localStorage.getItem("targetedUser"), users]);
 
   // use effect to display all users.
   useEffect(() => {
     displayAllUsers();
   }, [room]);
-
 
   // use effect to handle cleanup logic when leaving the component
   useEffect(() => {
@@ -68,7 +68,6 @@ export default function ChatApp() {
       }
     };
   }, [room, user1Id]);
-
 
   function displayAllUsers() {
     axios
@@ -168,7 +167,7 @@ export default function ChatApp() {
       user1Id: user1Id,
       user2Id: user2Id,
     };
-  
+
     // remove the user2Id message count from the array (make it 0)
     axios
       .post("http://localhost:3001/user/startChat", roomInfo)
@@ -239,8 +238,9 @@ export default function ChatApp() {
       className="min-h-screen flex justify-center w-4/5  bg-[#f6f6f6] show-lg rounded-md m-4"
       style={{ minHeight: "90vh" }}
     >
-      <div className="flex flex-col lg:flex-row  w-full  rounded-md shadow-lg">
-        <div className="w-full lg:w-1/4  p-4 text-center overflow-y-auto border-r rounded-md h-4/5">
+      <div className="flex flex-col lg:flex-row  w-full h-auto rounded-md shadow-lg">
+        <div
+          className="w-full lg:w-1/4  text-center  border-r rounded-md h-4/5">
           <h2 className="text-xl text-black font-bold mb-4">All Users:</h2>
           <input
             className="p-2 text-black w-4/5 text-center mb-4 font-bold border-2 rounded-md hover:border-black"
@@ -250,7 +250,8 @@ export default function ChatApp() {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <ul>
+          <div className="flex flex-wrap flex-col" style={{ maxHeight: '600px' }}>
+          <ul className="block overflow-y-auto ">
             {users.map((user) => {
               const userFullName = `${user.first_name} ${user.last_name}`;
               const userMatchesSearch =
@@ -302,6 +303,7 @@ export default function ChatApp() {
               return null; // Exclude users that don't match the filter
             })}
           </ul>
+          </div>
         </div>
         <div className="lg:flex mt-8 md:mt-0 w-full overflow-y-auto lg:flex-col lg:flex-1  lg:rounded-md">
           {room ? (
@@ -361,12 +363,12 @@ export default function ChatApp() {
                       }`}
                     >
                       {msg.message}
+                   
                     </p>
                   </div>
-                  
                 ))}
               </div>
-          
+
               <div className="mt-4 p-2 bg-white flex">
                 <input
                   placeholder="Message"
@@ -381,7 +383,6 @@ export default function ChatApp() {
                   <FiSend />
                 </button>
               </div>
-            
             </>
           ) : (
             <div className="h-full flex items-center justify-center">

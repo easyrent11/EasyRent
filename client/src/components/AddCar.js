@@ -30,7 +30,7 @@ export default function AddCar() {
   const [models, setModels] = useState([]);
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [selectedModel, setSelectedModel] = useState("");
-  const [platesNumber, setPlatesNumber] = useState("");
+  const [platesNumber, setPlatesNumber] = useState(1000000);
   const [year, setYear] = useState("");
   const [color, setColor] = useState("");
   const [seatsAmount, setSeatsAmount] = useState("");
@@ -125,6 +125,14 @@ export default function AddCar() {
       return;
     }
 
+    if(rentalPricePerDay < 30){
+      setErrorMessage("Rental Price per day cant be negative number or below 30")
+      return;
+    }
+    if(platesNumber < 1000000 || platesNumber > 99999999){
+      setErrorMessage("Car plates number must be a 7 or 8 digits numbers only")
+      return;
+    }
     getCar(platesNumber)
       .then((res) => {
         if (res.data.length > 0) {
@@ -170,7 +178,6 @@ export default function AddCar() {
                   insertActivity(activityDetails)
                   .then((res) => {
                     console.log(res.data);
-                    notify("success", res.data.message);
                   })
                   .catch((error) => notify("error", error));
                   // navigate to the homepage after adding a car.
@@ -249,6 +256,8 @@ export default function AddCar() {
             type="number"
             value={platesNumber}
             onChange={handlePlatesNumberChange}
+            min={1000000}
+            max={99999999}
             required
           />
         </div>

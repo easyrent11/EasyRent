@@ -126,7 +126,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
                   aria-hidden="true"
                 />
                 {notifications.length > 0 && (
-                  <span className="absolute top-44  p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  <span className="absolute top-24  p-2 m-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                     {notifications.length}
                   </span>
                 )}
@@ -138,7 +138,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
                 alt="User Image"
                 className="border-2 flex w-12 h-12 lg:w-32 lg:h-32 rounded-full"
               />
-              {/* End of admin name and logout button section */}    
+              {/* End of admin name and logout button section */}
             </div>
             <p className="text-lg text-center  font-bold">
               {userDetails.first_name}
@@ -150,8 +150,6 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
               Logout
             </button>
           </section>
-
-         
 
           <div className="hidden  lg:flex flex-1 flex-col  w-full m-2 ">
             {adminNavigation.map((item) => (
@@ -169,23 +167,23 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
                 {item.name}
               </Link>
             ))}
-              {isDropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="absolute top-20 left-20 w-48 origin-top-right bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-            >
-              <NotificationDropdown
-                notifications={notifications}
-                setNotifications={setNotifications}
-              />
-            </div>
-          )}
+            {isDropdownOpen && (
+              <div
+                ref={dropdownRef}
+                className="absolute  mt-10 top-3 w-48 origin-top-right bg-[#f4f4f4]  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              >
+                <NotificationDropdown
+                  notifications={notifications}
+                  setNotifications={setNotifications}
+                />
+              </div>
+            )}
           </div>
           {/* End of normal navbar */}
           <Disclosure>
             {({ open }) => (
               <>
-                <Disclosure.Button className="lg:hidden border-2 border-red-500">
+                <Disclosure.Button className="lg:hidden">
                   <span className="sr-only">Toggle sidebar</span>
                   {open ? (
                     <XMarkIcon className="block h-8 w-8" aria-hidden="true" />
@@ -221,7 +219,7 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
           <Logo />
         </figure>
 
-        <div className="m-2 p-2  lg:hidden border-2 justify-between border-yellow-700 flex items-center">
+        <div className="m-2 p-2  lg:hidden  justify-between flex items-center">
           <button
             className="rounded-md lg:hidden border-none p-2  cursor-pointer hover:text-[#cc6200] "
             onClick={logout}
@@ -265,7 +263,6 @@ export default function AdminSideBar({ handleLogout, userDetails }) {
             </div>
           )}
         </div>
-      
       </nav>
     </>
   );

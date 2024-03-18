@@ -30,6 +30,7 @@ export default function CarOwnerView() {
   const [uploadedImages, setUploadedImages] = useState(null);
   const [car, setCar] = useState([]);
   const { allCars, setAllCars } = useContext(AllCarsContext);
+  const [errorMsg, setErrorMsg] = useState("");
 
   let flag = false;
 
@@ -162,6 +163,7 @@ export default function CarOwnerView() {
     );
   };
   const handleCancelClick = () => {
+    setErrorMsg("");
     // Revert changes by setting the state back to the original car data
     setUpdatedManufacturerCode(car.Manufacturer_Code);
     setUpdatedModelCode(car.model_code);
@@ -177,6 +179,10 @@ export default function CarOwnerView() {
   };
 
   const handleSaveClick = async () => {
+    if(updatedRentalPrice < 30){
+      setErrorMsg("Rental Price per day cant be negative or below 30")
+      return;
+    }
     let filenames = null;
 
     if (uploadedImages !== null) {
@@ -251,11 +257,11 @@ export default function CarOwnerView() {
 
   return (
     <article className="w-full flex-col flex justify-center items-center flex-1">
-      <div className="flex w-full lg:w-4/5 order-red-500 border-2 border-red-500 bg-[#f5f5f5]  rounded-md p-4 flex-col items-center justify-center">
-        <Link to="/UserProfile" className="text-black border-2 border-red-500 w-full text-end self-end mr-2 p-2">
+      <div className="flex w-full lg:w-4/5 order-red-500  bg-[#f5f5f5]  rounded-md p-4 flex-col items-center justify-center">
+        <Link to="/UserProfile" className="text-black  w-full text-end self-end mr-2 p-2">
           <FontAwesomeIcon icon={faArrowLeft} size="2xl" /> Back
         </Link>
-        <div className="w-full flex-col lg:flex-row border-2 border-blue-500 flex">
+        <div className="w-full flex-col lg:flex-row  flex">
           <div className="w-full flex-col flex items-center justify-center m-2">
             <Carousel className="rounded-md flex ">
               {carImageUrls.length > 0 ? (
@@ -298,7 +304,7 @@ export default function CarOwnerView() {
             )}
           </div>
 
-          <div className="w-full p-4 m-2 flex flex-col justify-between border-2 border-black">
+          <div className="w-full p-4 m-2 flex flex-col justify-between ">
             <div className="flex flex-col md:flex-row justify-between">
               <div className="md:w-1/2  p-2">
                 <h2 className="text-2xl font-bold mb-2">
@@ -397,6 +403,7 @@ export default function CarOwnerView() {
                           onChange={(e) =>
                             setUpdatedRentalPrice(e.target.value)
                           }
+                          min={30}
                           className="w-full p-2  rounded-md m-2"
                         />
                         </div>
@@ -571,6 +578,7 @@ export default function CarOwnerView() {
                 </ul>
               </div>
             </div>
+            <p className="text-red-500 text-lg text-center">{errorMsg}</p>
             <div className=" flex items-center justify-center m-6  max-w-full">
               {!editMode && (
                 <button

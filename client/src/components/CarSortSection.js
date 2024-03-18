@@ -65,12 +65,12 @@ export default function CarSortSection() {
   };
 
   return (
-    <div className="w-full mb-4 flex justify-between lg:rounded-md items-center bg-[#f6f6f6] relative">
-      <div className="w-4/5 h-full  flex items-center lg:justify-between justify-around  lg:w-1/2 p-2 2xl:w-1/3">
+    <div className="w-full mb-4 flex  justify-between lg:rounded-md items-center bg-[#f6f6f6] relative">
+      <div className="w-4/5 h-full flex items-center lg:justify-between justify-around  lg:w-1/2 p-2 2xl:w-1/3">
         {token ? (
           <button
             onClick={handleResetSearch}
-            className="border-2 bg-white border-black hover:text-black hover:bg-[#CC6200] hover:border-none p-1 lg:w-1/3 xl:w-1/4 size-md w-1/3 text-grey-500 font-bold "
+            className="border-2 bg-white border-black hover:text-black hover:bg-[#CC6200] hover:border-none p-1 lg:w-1/3 2xl:w-1/4 size-md w-1/2 text-grey-500 font-bold "
           >
             Clear Search Results
           </button>

@@ -188,7 +188,7 @@ export default function UserProfile() {
       <div className="flex flex-col items-center mt-10  flex-1 w-full ">
       <h1 className="text-3xl mt-8 mb-20 font-bold ">{userDetails.first_name} Profile Details</h1>
 
-        <div className="md:w-4/5  lg:w-4/5 max-w-full lg:h-1/2 max-h-3/4 m-2 items-center flex lg:flex-row flex-col">
+        <div className="md:w-4/5  lg:w-4/5 max-w-full  2xl:h-2/3 max-h-3/4 m-2 items-center flex lg:flex-row flex-col">
           <div className="w-full lg:h-full lg:w-4/5">
             {/* Display user profile image */}
             <div className="flex flex-col items-center lg:flex-1  w-full justify-center  bg-white rounded-lg shadow-lg overflow-hidden  h-full">
@@ -240,7 +240,7 @@ export default function UserProfile() {
           </div>
 
           <div className="xl:w-4/5 lg:h-full w-full  shadow-lg  p-2 bg-white rounded-md">
-            <div className="w-full  bg-white rounded-lg ">
+            <div className="max-w-full max-h-auto  bg-white rounded-lg ">
               <div className="px-6 py-4">
                 <div className="flex flex-wrap mb-4">
                   <div className="w-1/2">
@@ -301,7 +301,7 @@ export default function UserProfile() {
 
               {/* Reset password section - show only in edit mode */}
               {editing && (
-                <div className="flex flex-col items-center justify-center w-full">
+                <div className="flex max-h-full flex-col items-center justify-center max-w-full">
                   <p className="text-lg p-2 ml-4 font-bold text-black w-full">
                     Change Password
                   </p>

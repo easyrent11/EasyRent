@@ -100,14 +100,15 @@ export default function SearchCar() {
 
     searchCars(requestData)
       .then((res) => {
-        const { pickupDate, returnDate, startTime, endTime,city } = requestData;
+        const { pickupDate, returnDate, startTime, endTime, city } =
+          requestData;
         // Saving search params in localStorage
         localStorage.setItem("startDate", pickupDate);
         localStorage.setItem("endDate", returnDate);
         localStorage.setItem("startTime", startTime);
         localStorage.setItem("endTime", endTime);
         localStorage.setItem("city", city);
-        
+
         const token = localStorage.getItem("token");
         if (token) {
           navigate("/homepage");
@@ -132,10 +133,10 @@ export default function SearchCar() {
 
   return (
     <form
-      className="flex flex-col lg:flex-row  xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
+      className=" flex flex-col lg:flex-row  xl:w-full  xl:items-center 2xl:flex-row 2xl:w-2/3 2xl:items-center   items-center justify-center p-2 m-4 rounded-md w-full md:w-3/5 lg:w-full  bg-[#f6f6f6]"
       onSubmit={handleFormSubmit}
     >
-       <div className="w-full 4 m-2 p-2">
+      <div className="w-full 4 m-2 p-2">
         <Select
           id="city"
           value={{ value: city, label: selectedCityLabel }}
@@ -151,7 +152,7 @@ export default function SearchCar() {
         <input
           type="date"
           id="pickupdate"
-          min={new Date().toISOString().split('T')[0]}
+          min={new Date().toISOString().split("T")[0]}
           value={pickupDate}
           onChange={handlePickUpDateChange}
           className="w-full p-1.5 rounded-md"
@@ -165,7 +166,6 @@ export default function SearchCar() {
           value={fromTime}
           onChange={handleFromTimeChange}
           className="w-full p-1.5 rounded-md border border-gray-300 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-
         />
       </div>
 
@@ -173,7 +173,7 @@ export default function SearchCar() {
         <input
           type="date"
           id="returnDate"
-          min={new Date().toISOString().split('T')[0]}
+          min={new Date().toISOString().split("T")[0]}
           value={returnDate}
           onChange={handleReturnDateChange}
           className="w-full p-1.5 rounded-md"

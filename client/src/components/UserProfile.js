@@ -21,7 +21,6 @@ export default function UserProfile() {
   const [city, setCity] = useState("");
   const [city_name, setCityName] = useState("");
   const [selectedCityLabel, setSelectedCityLabel] = useState("Choose a city");
-  const carsPerPage = 4;
 
   // update password use states.
   const [currentPassword, setCurrentPassword] = useState("");
@@ -93,6 +92,57 @@ export default function UserProfile() {
       setEditing(false);
       return;
     }
+    // there are changes.
+    console.log(updatedUserDetails);
+      // Validation functions for register fields.
+      const validateName = (name) => /^[a-zA-Z]{2,}$/.test(name);
+      const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const validatePhoneNumber = (phoneNumber) =>
+        /^05\d{1}-?\d{7}$/.test(phoneNumber);
+      const validateGovernmentId = (governmentId) => /^\d{9}$/.test(governmentId);
+      const validateDrivingLicense = (drivingLicense) =>
+        /^\d{9}$/.test(drivingLicense);
+      const validateStreetName = (streetName) =>
+      /^[a-zA-Z\d\s-]*$/.test(streetName);
+      const validateForm = () => {
+        let errors = {};
+  
+        if (!validateName(updatedUserDetails.first_name)) {
+          errors.firstName = "Invalid first name,it must be only letters";
+        }
+  
+        if (!validateName(updatedUserDetails.last_name)) {
+          errors.lastName = "Invalid last name, it must be only letters";
+        }
+  
+        if (!validateEmail(updatedUserDetails.email)) {
+          errors.email = "Invalid email address";
+        }
+  
+        if (!validatePhoneNumber('0'+updatedUserDetails.phone_number)) {
+          errors.phoneNumber =
+            "Invalid phone number,it must be an israeli phone number format";
+        }
+        if (!validateGovernmentId(updatedUserDetails.Id)) {
+          errors.governmentId = "Invalid government ID, it must be 9 digits";
+        }
+  
+        if (!validateDrivingLicense(updatedUserDetails.driving_license)) {
+          errors.drivingLicense = "Invalid driving license, it must be 9 digits";
+        }
+        if (!validateStreetName(updatedUserDetails.street_name)) {
+          errors.streetName =
+            "Invalid Street Name, must be only letters and spaces and digits";
+        }
+        return errors;
+      };
+    
+      const errors = validateForm();
+      if (Object.keys(errors).length > 0) {
+        const errMsg = errors[Object.keys(errors)[0]];
+        console.log(errMsg);
+        return;
+      }
 
     if (updatedImage) {
       // Handle image update only when a new image is selected
@@ -159,6 +209,7 @@ export default function UserProfile() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+  
 
     if (name === "picture" && files.length > 0) {
       const file = files[0];
@@ -201,7 +252,7 @@ export default function UserProfile() {
   if (loading) {
     return <p>No Cars yet...</p>;
   }
-
+  const carsPerPage = 4;
   const allUserCars = Array.from(userCars);
   const totalPages = Math.ceil(allUserCars.length / carsPerPage);
 
@@ -417,7 +468,7 @@ export default function UserProfile() {
           )}
           {allUserCars.length > 0 ? (
             <article className="flex lg:grid lg:grid-cols-3 lg:grid-rows-7 min-h-screen flex-wrap w-full p-4">
-              {allUserCars.map((car, index) => (
+              {currentCars.map((car, index) => (
                 <Car
                   key={index}
                   car={car}

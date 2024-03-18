@@ -109,7 +109,7 @@ export default function StatisticsGraph() {
 
       </div>
       <div className="w-full  hidden 2xl:block p-2 relative">
-        <BarChart width={1260} height={500} data={selectedData}>
+        <BarChart width={1560} height={500} data={selectedData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" />
           <YAxis />

@@ -214,7 +214,7 @@ useEffect(() => {
         {userOrders.length === 0 ? (
           <p>No orders made by you.</p>
         ) : (
-          <div className="shadow w-full  border-b  overflow-hidden border-gray-200 sm:rounded-lg">
+          <div className="shadow w-full  border-b  overflow-hidden border-gray-200 sm:rounded-lg"  style={{ maxHeight: "50vh",overflowY: "auto" }}>
             <table className=" min-w-full divide-y divide-gray-200">
               <thead className="border-green-500  bg-gray-50 overflow-y-auto">
                 <tr className="">
@@ -404,7 +404,7 @@ useEffect(() => {
         {userRenteeOrders.length === 0 ? (
           <p>No orders made on your cars.</p>
         ) : (
-          <div className="shadow w-full overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div className="shadow w-full overflow-hidden border-b border-gray-200 sm:rounded-lg"  style={{ maxHeight: "50vh",overflowY: "auto" }}>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

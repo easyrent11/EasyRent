@@ -3,7 +3,7 @@ import {
   getMessagesForRoom,
   getRoomForUser,
   getAllUserDetails,
-  getAllUsers
+  getAllUsers,
 } from "../api/UserApi";
 import { notify } from "../HelperFunctions/Notify";
 import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
@@ -11,6 +11,7 @@ import AdminUserChatPopOut from "../components/AdminUserChatPopOut";
 export default function AdminUserChatHistory({
   userId,
   setShowChatHistory,
+  onClose,
 }) {
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -19,14 +20,11 @@ export default function AdminUserChatHistory({
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState([]);
 
-  
   useEffect(() => {
     getAllUsers()
       .then((response) => setUsers(response.data))
       .catch((error) => notify("error", error));
   }, []);
-
-
 
   // function that takes a user id and returns his full name.
   function getFullNameById(id) {
@@ -58,7 +56,10 @@ export default function AdminUserChatHistory({
             const senderPromise = getAllUserDetails(senderId);
             const recipientPromise = getAllUserDetails(recipientId);
 
-            const [senderDetails, recipientDetails] = await Promise.all([senderPromise, recipientPromise]);
+            const [senderDetails, recipientDetails] = await Promise.all([
+              senderPromise,
+              recipientPromise,
+            ]);
             console.log(senderDetails, recipientDetails);
             return {
               ...message,
@@ -91,14 +92,12 @@ export default function AdminUserChatHistory({
 
   return (
     <div className="p-4 w-4/5 flex flex-col items-center">
-      {setShowChatHistory && (
-        <button
-          className="p-2 bg-black text-white text-lg hover:bg-[#cc6200] rounded-md shadow-lg"
-          onClick={() => setShowChatHistory(false)}
-        >
-          Return To Reports
-        </button>
-      )}
+      <button
+        className="p-2 bg-black text-white text-lg hover:bg-[#cc6200] rounded-md shadow-lg"
+        onClick={() => onClose()}
+      >
+        Return
+      </button>
       <h2 className="mt-8 mb-8 text-2xl font-bold">
         Chat History for {getFullNameById(userId)}
       </h2>
@@ -115,41 +114,45 @@ export default function AdminUserChatHistory({
           onChange={(e) => setSearchValue(e.target.value)}
         />
         <ul className="w-full text-center p-4">
-          {chatRooms.map((room) => {
-            const otherUserId =
-              room.user1_id === userId ? room.user2_id : room.user1_id;
-            const otherUserFullName = getFullNameById(otherUserId);
+          {chatRooms.length !== 0 ? (
+            chatRooms.map((room) => {
+              const otherUserId =
+                room.user1_id === userId ? room.user2_id : room.user1_id;
+              const otherUserFullName = getFullNameById(otherUserId);
 
-            // Filter based on the search query
-            const isMatch =
-              otherUserFullName
-                .toLowerCase()
-                .includes(searchValue.toLowerCase()) ||
-              otherUserId.toString() === searchValue.toString() ||
-              !searchValue;
+              // Filter based on the search query
+              const isMatch =
+                otherUserFullName
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase()) ||
+                otherUserId.toString() === searchValue.toString() ||
+                !searchValue;
 
-            if (isMatch) {
-              return (
-                <li
-                  key={room.id}
-                  onClick={() => setSelectedRoom(room.id)}
-                  className={`text-lg ${
-                    selectedRoom === room.id ? "selected" : ""
-                  }`}
-                >
-                  View Chats With User
-                  <p
-                    onClick={openPopout}
-                    className="font-bold hover:text-[#cc6200] cursor-pointer"
+              if (isMatch) {
+                return (
+                  <li
+                    key={room.id}
+                    onClick={() => setSelectedRoom(room.id)}
+                    className={`text-lg ${
+                      selectedRoom === room.id ? "selected" : ""
+                    }`}
                   >
-                    {otherUserFullName}
-                  </p>
-                </li>
-              );
-            }
+                    View Chats With User
+                    <p
+                      onClick={openPopout}
+                      className="font-bold hover:text-[#cc6200] cursor-pointer"
+                    >
+                      {otherUserFullName}
+                    </p>
+                  </li>
+                );
+              }
 
-            return null; // Exclude users that don't match the search criteria
-          })}
+              return null; // Exclude users that don't match the search criteria
+            })
+          ) : (
+            <p>No chat rooms for this person.</p>
+          )}
         </ul>
       </div>
 

@@ -122,7 +122,7 @@ export default function UserLayout() {
         <div className="lg:hidden xl:hidden 2xl:hidden flex items-center flex-col justify-center w-full">
           {showSearchCars ? (
             <>
-            <button className="w-full text-lg font-bold text-red-500 p-2 text-start" onClick={() => setShowSearchCars(false)}>Close</button>
+            <button className="w-full text-lg font-bold p-2 text-start" onClick={() => setShowSearchCars(false)}>Close</button>
               <SearchCar />
             </>
           ) : (
@@ -137,8 +137,8 @@ export default function UserLayout() {
         <div className="w-full items-center  justify-end flex flex-col">
      
 
-          <div className="flex  items-start justify-around xl:mr-20  w-full ">
-            <div className="bg-[#f6f6f6] lg:block hidden rounded-md mr-4 p-4 h-full">
+          <div className="flex  items-start justify-around xl:mr-20  max-w-4/5 ">
+            <div className="bg-[#f6f6f6] max-w-full lg:block hidden rounded-md mr-4  h-full">
               <CarFilterSection
                 filterCars={filterCars}
                 filteredCars={filteredCars}

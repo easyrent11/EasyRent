@@ -154,7 +154,7 @@ export default function Report() {
           </tr>
           <tr className="flex p-2 items-center w-full">
             <td className="p-2 text-xl font-bold">Phone Number:</td>
-            <td className="text-lg">{rentee.phone_number}</td>
+            <td className="text-lg">0{rentee.phone_number}</td>
           </tr>
         </tbody>
       </table>
@@ -177,7 +177,7 @@ export default function Report() {
           </tr>
           <tr className="flex p-2 items-center w-full">
             <td className="p-2 text-xl font-bold">Phone Number:</td>
-            <td className="text-lg">{renter.phone_number}</td>
+            <td className="text-lg">0{renter.phone_number}</td>
           </tr>
         </tbody>
       </table>

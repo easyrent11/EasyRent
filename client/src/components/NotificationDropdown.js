@@ -41,7 +41,7 @@ const NotificationDropdown = ({notifications, setNotifications}) => {
   }, [notifications]);
 
   return (
-    <div className="flex flex-col py-1 w-full space-y-2 max-h-[25vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200">
+    <div className="flex flex-col border-2 z-1 border-blue-500 py-1 w-full space-y-2 max-h-[25vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200">
       <div className="px-4 py-3 text-sm text-gray-700  w-full  h-auto">
         {updatedNotifications.length > 0 ? (
           updatedNotifications.map((notification) => {
@@ -58,7 +58,7 @@ const NotificationDropdown = ({notifications, setNotifications}) => {
             return (
               <div
                 key={notification.id}
-                className={`mb-2 p-2 rounded-lg bg-black`}
+                className={`mb-2 p-2 border-2 border-red-500 rounded-lg  bg-black`}
                 onClick={() => handleNotificationClick(notification.id)}
               >
                 <Link

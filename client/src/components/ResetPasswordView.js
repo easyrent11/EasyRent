@@ -41,7 +41,7 @@ export default function ForgotPasswordView({ onClose }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-gray-900">
-      <div className="flex flex-col justify-between bg-[#E7E7E7] w-1/3 h-1/2 p-6 mx-auto rounded-lg relative">
+      <div className="flex flex-col justify-between bg-[#E7E7E7] w-full 2xl:w-1/3 h-full 2xl:h-4/5 p-6 mx-auto rounded-lg relative">
         <div className='flex items-center justify-end w-full'>
           <button onClick={onClose} className="bg-gray-300 text-black px-4 py-2 rounded-lg">
             X
